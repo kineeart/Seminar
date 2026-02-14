@@ -1,0 +1,98 @@
+.post-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  border: 1px solid #e0e0e0;
+}
+
+.post-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ff6b35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.post-info {
+  flex: 1;
+}
+
+.post-username {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.post-content {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.post-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.post-action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.post-action-button:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.post-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.post-action-button.liked {
+  color: #ff4444;
+}
+
+.post-action-button svg {
+  width: 20px;
+  height: 20px;
+}

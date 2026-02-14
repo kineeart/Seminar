@@ -1,0 +1,97 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-prompt {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.modal-textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.modal-textarea:focus {
+  border-color: #4285f4;
+  background-color: white;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modal-submit {
+  padding: 10px 24px;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-submit:hover:not(:disabled) {
+  background-color: #357ae8;
+}
+
+.modal-cancel {
+  padding: 10px 24px;
+  background-color: transparent;
+  color: #4285f4;
+  border: 1px solid #4285f4;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-cancel:hover:not(:disabled) {
+  background-color: #f0f7ff;
+}
+
+.modal-submit:disabled,
+.modal-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

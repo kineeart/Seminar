@@ -1,0 +1,52 @@
+.home-page {
+  display: flex;
+  min-height: 100vh;
+  background-color: #ff6b35;
+  padding-left: 60px;
+}
+
+.home-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.home-sidebar-right {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.create-post-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b35;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+.create-post-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.create-post-button svg {
+  width: 24px;
+  height: 24px;
+}

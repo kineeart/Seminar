@@ -1,0 +1,28 @@
+.backend-status-error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #ff4444;
+  color: white;
+  padding: 12px 16px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.backend-status-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.backend-status-icon {
+  font-size: 20px;
+}
+
+.backend-status-message {
+  font-size: 14px;
+  font-weight: 500;
+}
