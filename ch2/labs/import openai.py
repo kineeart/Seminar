@@ -12,10 +12,9 @@ if __name__ == "__main__":
         model="gpt-4o",
         temperature=0.2,
         max_tokens=100,
-        n=1,
         messages=[
-            {"role": "system", "content": "You are a hiring manager at a tech company."},
-            {"role": "user", "content": "What is the Two Sum problem?"},
+            {"role": "system", "content": "Ban la tro ly AI, luon tra loi bang tieng Viet."},
+            {"role": "user", "content": "Co bao nhieu ngoi sao trong dai ngan ha cua chung ta?"},
         ],
     )
 

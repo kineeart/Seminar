@@ -1,10 +1,15 @@
-import openai
+import os
+import re
+
 from openai import OpenAI
 
 USER_PROMPT = """
-user prompt here
+def print_fibonacci_sequence(n: int) -> None:
 """
-SYSTEM_PROMPT = "system prompt here"
+SYSTEM_PROMPT = (
+    "You will be provided with a Python function signature. "
+    "Your task is to implement the function. Return code only."
+)
 
 
 def get_code_with_instructions(code: str) -> str:
@@ -14,20 +19,31 @@ def get_code_with_instructions(code: str) -> str:
     :return: The code with additional instruction - "Complete this code"
     """
 
-    return code + "your wrapping instructions here"
+    return code + "\n# Complete this code"
 
 
 if __name__ == "__main__":
-    client: OpenAI = OpenAI()
+    api_key = ((os.getenv("DACDEV_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip())
+    if not api_key:
+        raise ValueError("Set DACDEV_API_KEY (or OPENAI_API_KEY) before running this script.")
 
-    completion: openai.ChatCompletion = (
-        client.chat.completions.create())
+    client = OpenAI(api_key=api_key, base_url="https://dacdev.com/api/v1")
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        temperature=1,
+        n=2,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": "Include docstring and typehints."},
+            {"role": "user", "content": get_code_with_instructions(USER_PROMPT)},
+        ],
+    )
 
-    for i in range(2):
-        output = completion.choices[i].message.content
-        print(f"Output {i + 1}:")
+    for i, choice in enumerate(completion.choices, start=1):
+        output = choice.message.content
+        code_suggestion = re.sub(r"(.*?)```python(.*?)```(.*)", r"\2", output, flags=re.DOTALL).strip()
+        print(f"Output {i}:")
         try:
-            suggested_code = output.split("```")[1]
-            print(suggested_code)
+            print(code_suggestion)
         except IndexError:
             print(output)
