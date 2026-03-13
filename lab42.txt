@@ -1,0 +1,47 @@
+CONTEXT: You will be provided with Python code in the Python editor with explanation enclosed with
+{{{ CODE_EXPLANATION }}} that may contain errors enclosed with {{{ ERRORS }}}.
+
+TASK: Fix the errors in the code. 
+
+CODE_EXPLANATION: {{{
+Run 10 random multiplication quizzes and provide feedback about each to the user
+}}}
+
+ERRORS: {{{
+1. Compilation
+2. Reproducibility of random number generation
+3. Logical scoping of variable assignments
+4. Error handling for input casting
+}}} 
+
+Question 1: 11 x 2 = 22
+Correct!
+
+Question 2: 1 x 12 = 10
+Incorrect. The correct answer is 12
+
+Question 3: 5 x 4 = 20
+Correct!
+
+Question 4: 4 x 3 = 12
+Correct!
+
+Question 5: 12 x 2 = 25
+Incorrect. The correct answer is 24
+
+Question 6: 11 x 12 = 132
+Correct!
+
+Question 7: 9 x 2 = 18
+Correct!
+
+Question 8: 10 x 7 = 70
+Correct!
+
+Question 9: 1 x 1 = 1
+Correct!
+
+Question 10: 2 x 4 = 8
+Correct!
+
+Final score: 8/10
