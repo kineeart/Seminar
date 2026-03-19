@@ -2,9 +2,8 @@
 
 A microservice that calculates the Manhattan distance between two DataFrames provided as JSON input.
 
-
 ## Running the app
-In your terminal, navigate to the `ch7` directory and run the following command:
+In your terminal, navigate to the `ch10` directory and run the following command:
 
 ```bash
 python app.py

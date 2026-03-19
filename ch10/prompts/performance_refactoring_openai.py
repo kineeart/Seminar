@@ -3,7 +3,7 @@ import inspect
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
 
-from ch10.app import get_euclidean_distance
+from ch10.app import get_euclidean_dist_loop
 
 SURROUND = """You are provided with:
 1. A Python function implementation enclosed with {{{ FUNCTION }}}
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     client: OpenAI = OpenAI()
 
     system_prompt = f"{SURROUND} {SINGLE_TASK}"
-    user_prompt = get_user_prompt(get_euclidean_distance, "NumPy", LINES)
+    user_prompt = get_user_prompt(get_euclidean_dist_loop, "NumPy", LINES)
 
     completion: ChatCompletion = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -43,6 +43,6 @@ if __name__ == "__main__":
             {"role": "user", "content": user_prompt},
         ],
     )
-    print("Explanation:", completion.choices[0].message.content)
+    print("Refactored code suggestion:\n", completion.choices[0].message.content)
 
 
