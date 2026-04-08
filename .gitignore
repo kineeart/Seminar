@@ -1,0 +1,20 @@
+# Build outputs
+**/target/
+**/build/
+
+# Frontend dependencies
+**/node_modules/
+
+# Local tools and editor folders
+.tools/
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
