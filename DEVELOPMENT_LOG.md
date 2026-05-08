@@ -1,0 +1,132 @@
+# DEVELOPMENT LOG — AI Tutor English Learning System
+
+Phiên bản: 0.1 (MVP)
+
+Tác giả: Nhóm VibeCoding
+
+---
+
+## Mục đích
+Ghi lại tiến trình phát triển theo phong cách Vibe Engineering: nhật ký hàng ngày, chia theo phase, kèm prompt đã dùng cho AI, đánh giá, sửa đổi, kết quả và bài học. Dùng làm tư liệu báo cáo đồ án và bằng chứng kỹ thuật.
+
+## Hướng dẫn sử dụng file
+- Mỗi entry ghi theo **ngày** và **phase** (phase có thể là: Research, Design, Implementation, Testing, Deployment).
+- Mỗi phase bao gồm các phần bắt buộc: Mục tiêu, Prompt đã dùng, AI trả kết quả gì, Tôi review gì, Tôi sửa gì, Kết quả cuối, Bài học rút ra.
+- Thêm hình ảnh/ảnh chụp màn hình vào section `Screenshot Evidence` bằng cách đặt file trong thư mục `docs/evidence/` và link tới đó.
+- Ghi lỗi và cách fix vào section `Errors & Fixes` theo dạng issue → root cause → fix → refs.
+
+---
+
+## Table of Contents
+- [Daily Entries](#daily-entries)
+- [Screenshot Evidence](#screenshot-evidence)
+- [Errors & Fixes](#errors--fixes)
+- [Appendix: Prompts Repository](#appendix-prompts-repository)
+
+---
+
+## Daily Entries
+
+### 2026-05-16 — Phase: Architecture Design
+
+- **Mục tiêu**: Đề xuất kiến trúc Microservices phù hợp cho AI Tutor (MVP), tách auth, AI chat, flashcards, quiz, gateway, DB per service, Docker-ready.
+- **Prompt đã dùng**:
+
+	> "Design a microservices architecture for an AI-powered English tutoring system suitable for MVP. Requirements: separate auth service, AI chat service, flashcard service, quiz service, API gateway, database per service, Docker deployment, scalable and easy to operate. Provide services list, responsibilities, communication flow, tech stack recommendations."
+
+- **AI trả kết quả gì**: Một bản đề xuất chi tiết gồm danh sách services, nhiệm vụ từng service, communication flow (sync/async), database-per-service recommendation, Docker + K8s deployment guidance, tech stack (Node/NestJS, Python for workers, Postgres, Redis, RabbitMQ, MinIO, Prometheus/Grafana).
+- **Tôi review gì**: Kiểm tra tính phù hợp với user stories trong `USERSTORIES.md` và phạm vi MVP trong `MVP_SCOPE.md`. Đảm bảo tách dịch vụ hợp lý, tránh over-engineering cho MVP, ưu tiên docker-compose cho dev.
+- **Tôi sửa gì**: Điều chỉnh đề xuất để gom các dịch vụ không cần thiết vào sau MVP (đưa `analytics` và `notification` xuống optional), thêm chi tiết về AI worker và streaming WebSocket cho chat, đề xuất RabbitMQ cho decoupling.
+- **Kết quả cuối**: Bản kiến trúc MVP-ready với services: `gateway`, `auth`, `ai-chat(+worker)`, `flashcard`, `quiz`, `content`, `profile`, optional `media`, `analytics`, `notification`. Tài liệu đã được lưu vào `ARCHITECTURE_PROPOSAL.md` (nếu cần) và tóm tắt đưa vào `PLAN.md`.
+- **Bài học rút ra**: Lập kế hoạch microservices cho MVP cần cân bằng: tách service rõ nhưng tránh nhiều infra ban đầu; ưu tiên developer experience (docker-compose) và dễ chuyển lên K8s khi scale.
+
+---
+
+### 2026-05-17 — Phase: Scaffold Repo (Ví dụ)
+
+- **Mục tiêu**: Tạo skeleton cho `auth-service`, `gateway`, `ai-chat-service` với Dockerfile và đơn giản endpoint healthcheck.
+- **Prompt đã dùng**:
+
+	> "Generate a lightweight Node.js (NestJS) microservice skeleton with healthcheck endpoint and Dockerfile, suitable for 'auth-service' in a microservices repo. Include sample JWT issue endpoint."
+
+- **AI trả kết quả gì**: Code skeleton, Dockerfile, sample package.json, minimal endpoint implementation.
+- **Tôi review gì**: Kiểm tra tính bảo mật của sample (đặc biệt JWT secret handling), cấu trúc file, scripts để chạy trong docker-compose.
+- **Tôi sửa gì**: Thay dotenv secret bằng reference tới env var, thêm healthcheck `/health`, thêm readiness probe route.
+- **Kết quả cuối**: `auth-service/` có `Dockerfile`, `src/main.ts`, `src/auth.controller.ts`, `docker-compose` entry. Tài liệu hướng dẫn dev ngắn trong `README.md`.
+- **Bài học rút ra**: Khi scaffold, luôn chuẩn hóa env var names, health/readiness routes, và CI lint bước build.
+
+---
+
+### [Template] New entry (copy for each day)
+
+#### YYYY-MM-DD — Phase: <Phase Name>
+
+- **Mục tiêu**: <Mục tiêu cụ thể>
+- **Prompt đã dùng**:
+
+	> "<Full prompt text>"
+
+- **AI trả kết quả gì**: <Tóm tắt output từ AI>
+- **Tôi review gì**: <Những điểm đã kiểm tra, tiêu chí chấp nhận>
+- **Tôi sửa gì**: <Những thay đổi đã thực hiện>
+- **Kết quả cuối**: <Kết quả cuối cùng sau chỉnh sửa>
+- **Bài học rút ra**: <Những gì học được>
+
+---
+
+## Screenshot Evidence
+
+Gợi ý: lưu bằng đường dẫn `docs/evidence/YYYY-MM-DD-<short-desc>.png` và tham chiếu ở đây.
+
+- 2026-05-16: [Architecture proposal diagram](docs/evidence/2026-05-16-architecture-proposal.png)
+- 2026-05-17: [Auth service scaffold screenshot](docs/evidence/2026-05-17-auth-scaffold.png)
+
+> Thêm mục mới dưới đây khi có ảnh chụp màn hình.
+
+---
+
+## Errors & Fixes
+
+Ghi nhận lỗi kỹ thuật, thời gian phát hiện, root cause và cách fix để phục vụ báo cáo.
+
+| Ngày | Issue | Root cause | Fix | Ref |
+|---|---|---|---|---|
+| 2026-05-17 | JWT secret leak in sample | Hard-coded secret in code | Use env var and secrets manager in prod; update README | `auth-service/README.md` |
+| 2026-05-18 | WebSocket stream dropped under load (dev) | No backpressure / single worker | Introduce RabbitMQ queue + scaled `ai-worker` + reconnect logic | `ai-chat-service/` |
+
+> Thêm rows khi phát hiện lỗi mới.
+
+---
+
+## Appendix: Prompts Repository
+
+Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts/`):
+- `design_microservices.md` — prompt dùng để thiết kế kiến trúc.
+- `scaffold_auth_service.md` — prompt scaffold code.
+
+---
+
+## Versioning & Sign-off
+- Log này cập nhật bởi: [tên thành viên] — ký: __________________
+- Ngày sign-off (MVP ready): __________________
+
+---
+
+*File này là nguồn chính thức để báo cáo tiến trình kỹ thuật cho đồ án. Giữ ngắn gọn, có bằng chứng, và cập nhật hàng ngày khi tiến triển.*
+
+---
+
+### 2026-05-16 — Phase: Architecture Documentation
+
+- **Mục tiêu**: Soạn `ARCHITECTURE.md` cho MVP (services: frontend, gateway, auth, ai-chat, flashcard, quiz, content) kèm Mermaid diagrams, DB, logging, monitoring, CI/CD.
+- **Prompt đã dùng**:
+
+	> "Dựa trên PRD.md, MVP_SCOPE.md, USERSTORIES.md, WORKFLOWS.md, DB_SCHEMA.md hãy tạo ARCHITECTURE.md cho hệ thống AI Tutor (MVP). Yêu cầu: microservices tối giản gồm frontend, api gateway, auth, ai-chat, flashcard, quiz, content; mô tả nhiệm vụ, database, communication flow, logging, monitoring, CI/CD; kèm Mermaid architecture diagram và sequence flow. Ghi lại toàn bộ quá trình vào DEVELOPMENT_LOG.md."
+
+- **AI trả kết quả gì**: Một tài liệu kiến trúc hoàn chỉnh (`ARCHITECTURE.md`) với mô tả service, DB-per-service, communication flow, logging/tracing, monitoring, CI/CD và hai Mermaid diagrams (architecture + chat sequence).
+- **Tôi review gì**: Kiểm tra đáp ứng yêu cầu MVP, tính nhất quán với `DB_SCHEMA.md` và `MVP_SCOPE.md`, đảm bảo không over-engineer và có hướng dev bằng Docker Compose.
+- **Tôi sửa gì**: Điều chỉnh wording, xác định rõ DB cho từng service (Postgres/Mongo/Redis), thêm hướng dẫn Docker Compose và CI/CD per-service, cập nhật link tới file: [ARCHITECTURE.md](ARCHITECTURE.md).
+- **Kết quả cuối**: `ARCHITECTURE.md` được thêm vào repository với nội dung phù hợp MVP và Mermaid diagrams. `DEVELOPMENT_LOG.md` được cập nhật với entry này.
+- **Bài học rút ra**: Khi document kiến trúc cho đồ án, luôn nhắm vào scope MVP và ghi lại quyết định (trade-offs) để phục vụ thuyết trình.
+
+
