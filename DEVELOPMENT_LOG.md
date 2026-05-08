@@ -167,4 +167,54 @@ Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts
 	- Mỗi phase cần DoD và success metrics rõ ràng để tránh scope creep.
 	- Risk management từ sớm giúp team chuẩn bị contingency (mock LLM khi API chậm, fallback UI, etc.).
 
+---
+
+### 2026-05-16 — Phase: Phase 0 Implementation (Setup & Infrastructure, Lightweight MVP)
+
+- **Mục tiêu**: Triển khai Phase 0 (Setup & Infrastructure) theo hướng lightweight MVP: CI/CD cloud-based (GitHub Actions), không dùng Docker, hướng dẫn local dev, sample test & linting.
+
+- **Prompt đã dùng**:
+
+	> "Dựa trên ARCHITECTURE.md, IMPLEMENTATION_ROADMAP.md, PROJECT_STRUCTURE.md: triển khai Phase 0 theo hướng lightweight MVP (không Docker). Tạo: 1) .github/workflows/ với frontend.yml (Node setup, npm install, eslint, build) + backend.yml (Node setup, npm install, test, lint); 2) workflow trigger on push/PR; 3) nếu chưa có test, tạo sample Jest test; 4) tạo README hướng dẫn chạy local + CI/CD explanation; 5) cập nhật DEVELOPMENT_LOG.md ghi prompt, reasoning, decisions, results."
+
+- **AI trả kết quả gì**: 
+	- `frontend.yml`: GitHub Actions workflow, Node 18.x + 20.x matrix, npm install + eslint + vite build, upload dist artifacts.
+	- `backend.yml`: GitHub Actions workflow, Node matrix, npm install + eslint + jest test, upload coverage.
+	- `jest.config.js`: Jest test configuration cho backend.
+	- `server.test.js`: Sample Jest tests (2 basic test suites, check health endpoint structure).
+	- `.eslintrc.js`: ESLint config cho backend (Airbnb style).
+	- Updated `package.json`: Thêm jest, eslint, test scripts.
+	- `PHASE_0_SETUP_GUIDE.md`: 200+ lines hướng dẫn setup local dev, running apps, viewing CI/CD results, troubleshooting.
+
+- **Tôi review gì**:
+	- Workflows có trigger đúng (on push/PR to main/develop, path filters).
+	- Node matrix testing (18.x, 20.x) để ensure compatibility.
+	- Sample test có thực tế (không quá trivial, demo structure + assertions).
+	- ESLint config phù hợp Node environment + Jest.
+	- README đủ chi tiết cho dev onboarding (local commands, CI explanation, troubleshooting).
+	- Quyết định bỏ Docker phù hợp MVP (lightweight, nhanh setup, CI/CD trên cloud).
+
+- **Tôi sửa gì**:
+	- Thêm `npm ci` thay vì `npm install` trong CI (reproducible builds).
+	- Thêm `if-no-files-found: ignore` cho coverage artifact (nếu test chưa hoàn chỉnh).
+	- Thêm Jest `collectCoverageFrom` để exclude test files khỏi coverage.
+	- Điều chỉnh sample test từ integration test thành unit test mẫu.
+	- Bổ sung README sections: "Running Full Local Stack", "Pull Request Integration", "Artifacts", "Troubleshooting".
+	- Thêm reasoning tại sao chọn GitHub Actions (free, built-in, easy setup).
+
+- **Kết quả cuối**:
+	- `.github/workflows/` folder có 2 workflow files (frontend.yml, backend.yml).
+	- Backend package.json có jest, eslint, test scripts.
+	- Sample test file + Jest config sẵn sàng.
+	- PHASE_0_SETUP_GUIDE.md đầy đủ hướng dẫn setup, running, CI/CD.
+	- Team có thể: `npm install` → `npm run dev` (local) hoặc push → see CI results (Actions).
+	- Definition of Done (Phase 0) hoàn thành: dev setup documented, CI/CD working, sample test/lint bao gồm.
+
+- **Bài học rút ra**:
+	- **Lightweight > Perfect**: MVP không cần Docker ngay; GitHub Actions đơn giản, free, không overhead. Docker thêm sau khi scale (Phase 6+).
+	- **Test & Lint từ sớm**: Setup Jest + ESLint early giúp maintain code quality; sample test là blueprint cho team.
+	- **CI/CD clarity**: README + artifacts cần rõ ràng (dev hiểu được "why CI fails" + "how to fix locally").
+	- **Matrix testing**: Test multi Node versions trong CI giúp catch environment issues sớm.
+	- **Path filters**: Workflows trigger only khi relevant code changed → save CI minutes, faster feedback.
+
 
