@@ -129,4 +129,42 @@ Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts
 - **Kết quả cuối**: `ARCHITECTURE.md` được thêm vào repository với nội dung phù hợp MVP và Mermaid diagrams. `DEVELOPMENT_LOG.md` được cập nhật với entry này.
 - **Bài học rút ra**: Khi document kiến trúc cho đồ án, luôn nhắm vào scope MVP và ghi lại quyết định (trade-offs) để phục vụ thuyết trình.
 
+---
+
+### 2026-05-16 — Phase: Project Structure & Roadmap Design
+
+- **Mục tiêu**: Thiết kế cấu trúc thư mục dự án (folder layout, file organization) và roadmap triển khai phù hợp microservices MVP (12–13 tuần, 6 phase).
+- **Prompt đã dùng**:
+
+	> "Dựa trên ARCHITECTURE.md, PRD.md, MVP_SCOPE.md, USERSTORIES.md: 1) thiết kế cấu trúc thư mục chuẩn cho frontend, backend (7 services), shared, docs; 2) tạo roadmap triển khai theo 6 phase (authentication, ai-chat, flashcard, quiz, logging, polish); 3) mỗi phase ghi: mục tiêu, deliverables, tasks, acceptance criteria, risks. Reasoning phải rõ ràng (tại sao chọn structure đó, dependency, parallel opportunities)."
+
+- **AI trả kết quả gì**: Hai tài liệu hoàn chỉnh:
+	- `PROJECT_STRUCTURE.md`: Chi tiết cấu trúc `/app/frontend`, `/app/backend` (7 folders per service), `/app/shared`, `/docs`; reasoning cho mỗi lựa chọn; cách scale sau.
+	- `IMPLEMENTATION_ROADMAP.md`: 6 phase (13 tuần), mỗi phase có objectives, deliverables, key tasks, criteria; dependency diagram (Mermaid); risk table; DoD; success metrics.
+
+- **Tôi review gì**: 
+	- Tính phù hợp với microservices architecture (service isolation, DB-per-service, independent deployment).
+	- Cân bằng MVP speed vs future scalability.
+	- Các task trong roadmap có thực tế (không quá nhiều 1 phase).
+	- Reasoning giải thích tại sao (mono-repo vs multi-repo, types only in shared, per-service README, etc.).
+	- Timeline hợp lý (12–13 tuần cho 2–3 devs, Phase 2 AI Chat được priority vì là core feature).
+
+- **Tôi sửa gì**:
+	- Điều chỉnh Phase 0 (setup) gọn hơn (2 weeks, không over-architect CI/CD).
+	- Thêm chi tiết Phase 2 (Chat) kèm RabbitMQ, worker scaling, streaming WebSocket.
+	- Bổ sung risks & mitigations per phase (LLM latency, scope creep, DB issues).
+	- Thêm "Definition of Done" (80% test coverage, DEVELOPMENT_LOG entry, feature demo).
+	- Thêm resource allocation table (backend/frontend/devops %) và success metrics (retention, performance SLA).
+
+- **Kết quả cuối**: 
+	- `PROJECT_STRUCTURE.md`: 1700+ lines, bao gồm folder trees, rationale, file purposes, versioning.
+	- `IMPLEMENTATION_ROADMAP.md`: 1200+ lines, 6 phases rõ ràng, 13 tuần timeline, risk management, DoD.
+	- Cả hai file được commit vào repo, ghi link trong DEVELOPMENT_LOG.md.
+
+- **Bài học rút ra**: 
+	- Project structure phải dễ mở rộng (dự tính khi thêm service, scale DB, chuyển Kubernetes).
+	- Roadmap phải cân bằng timeline áp lực vs quality; Phase dependencies phải rõ (critical path = Setup → Auth → Chat → Launch).
+	- Mỗi phase cần DoD và success metrics rõ ràng để tránh scope creep.
+	- Risk management từ sớm giúp team chuẩn bị contingency (mock LLM khi API chậm, fallback UI, etc.).
+
 
