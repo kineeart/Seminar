@@ -1,16 +1,14 @@
-module.exports = {
+﻿module.exports = {
   testEnvironment: 'node',
   coverageDirectory: 'coverage',
-  collectCoverageFrom: [
-    'src/**/*.js',
-    '!src/**/*.test.js',
-    '!src/index.js'
+  testMatch: [
+    '<rootDir>/auth-service/src/**/*.test.js',
+    '<rootDir>/gateway/src/**/*.test.js'
   ],
-  testMatch: ['**/__tests__/**/*.js', '**/*.test.js'],
-  collectCoverageFrom: {
-    exclude: [
-      'node_modules',
-      'dist'
-    ]
-  }
+  collectCoverageFrom: [
+    'auth-service/src/**/*.js',
+    'gateway/src/**/*.js',
+    '!**/*.test.js'
+  ],
+  coveragePathIgnorePatterns: ['/node_modules/']
 };

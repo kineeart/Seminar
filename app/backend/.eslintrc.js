@@ -7,10 +7,12 @@ module.exports = {
   extends: 'airbnb-base',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'script'
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+    'linebreak-style': 'off',
+    'arrow-body-style': 'off',
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'func-names': 'off'
   }

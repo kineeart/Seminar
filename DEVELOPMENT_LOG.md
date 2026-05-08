@@ -217,4 +217,60 @@ Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts
 	- **Matrix testing**: Test multi Node versions trong CI giúp catch environment issues sớm.
 	- **Path filters**: Workflows trigger only khi relevant code changed → save CI minutes, faster feedback.
 
+---
+
+### 2026-05-16 — Phase: Authentication (Runnable MVP)
+
+- **Mục tiêu**: Triển khai Phase 1 auth chạy local thật theo microservices tối giản: `gateway` + `auth-service`, không database, ưu tiên runnable flow.
+- **Prompt đã dùng**:
+
+	> "Triển khai PHASE 1 - Authentication theo hướng MVP chạy được thật; refactor backend thành gateway/auth-service; Express CommonJS; API POST /signup, POST /login, GET /health; users in-memory; JWT mock; tạo đầy đủ scripts/config/test; fix dependency/import/script issues; cập nhật DEVELOPMENT_LOG.md và PHASE_1_AUTH_NOTES.md."
+
+- **AI trả kết quả gì**:
+	- Refactor `app/backend` thành npm workspaces gồm `gateway/` và `auth-service/`.
+	- `auth-service` có cấu trúc: `src/server.js`, `routes/auth.routes.js`, `controllers/auth.controller.js`, `services/auth.service.js`.
+	- Implement APIs: `GET /health`, `POST /signup`, `POST /login` (in-memory `users=[]`, validate email/password, chặn email trùng).
+	- `login` trả JWT bằng `jsonwebtoken`, secret MVP hardcode (`mvp-auth-secret`).
+	- `gateway` proxy `/api/auth` sang `auth-service`.
+	- Tạo/hoàn thiện `package.json`, `scripts`, `.eslintrc.js`, `jest.config.js`, `.gitignore`, `.env.example`, test mẫu.
+
+- **Reasoning kỹ thuật**:
+	- Chọn in-memory store để bỏ chi phí setup DB ở Phase 1 và giữ tốc độ demo.
+	- Dùng gateway proxy để giữ shape microservices đúng kiến trúc MVP từ sớm.
+	- Dùng CommonJS để tương thích backend hiện tại, giảm migration overhead.
+	- Dùng npm workspaces để chạy đồng thời nhiều service trong local bằng một lệnh.
+
+- **Lỗi phát sinh**:
+	- Xung đột dependency: `eslint@10` không tương thích `eslint-config-airbnb-base@15`.
+	- Test lỗi đường dẫn config Jest trong workspace (`../../jest.config.js`).
+	- Parse lỗi `package.json` do BOM encoding khi ghi file từ PowerShell.
+	- Gateway proxy ban đầu timeout với `POST` JSON body (`/api/auth/*`) vì body parser consume body trước proxy.
+
+- **Cách fix**:
+	- Hạ ESLint xuống `^8.57.0` cho `gateway/auth-service`.
+	- Sửa script test sang `--config ../jest.config.js`.
+	- Ghi lại `package.json` theo UTF-8 no BOM.
+	- Thêm `fixRequestBody` trong `http-proxy-middleware` (`on.proxyReq`) để forward body đúng.
+	- Điều chỉnh eslint rules cross-platform (`linebreak-style: off`) để tránh lỗi CRLF trên Windows.
+
+- **Review của developer**:
+	- Đã xác nhận import path, dependency, scripts và endpoint hoạt động end-to-end.
+	- Ưu tiên runnable MVP được đáp ứng tốt hơn clean architecture hoàn hảo.
+
+- **Kết quả cuối**:
+	- `npm install` thành công tại `app/backend`.
+	- `npm test` pass toàn bộ (health/signup/login tests).
+	- `npm run lint` chạy thành công (chỉ còn warning console ở chế độ dev).
+	- `npm run dev` chạy đồng thời gateway + auth-service.
+	- Kiểm thử thực tế thành công qua:
+	  - `GET http://localhost:5000/health`
+	  - `GET http://localhost:5001/health`
+	  - `POST http://localhost:5000/api/auth/signup`
+	  - `POST http://localhost:5000/api/auth/login`
+
+- **Lesson learned**:
+	- Runnable MVP cần ưu tiên xử lý lỗi thực thi thật (deps/encoding/proxy body) hơn việc tối ưu cấu trúc sớm.
+	- API gateway với proxy POST body là điểm dễ lỗi, cần test end-to-end ngay từ đầu.
+	- Dùng workspace giúp scale số lượng service dễ hơn mà vẫn giữ local DX tốt.
+
 
