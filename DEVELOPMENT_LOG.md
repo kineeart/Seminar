@@ -273,4 +273,22 @@ Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts
 	- API gateway với proxy POST body là điểm dễ lỗi, cần test end-to-end ngay từ đầu.
 	- Dùng workspace giúp scale số lượng service dễ hơn mà vẫn giữ local DX tốt.
 
+---
+
+### 2026-05-17 — Phase: Design (UI/UX / Vibe Coding)
+
+- **Mục tiêu**: Soạn thảo `UI_DESIGN_REASONING.md` đầy đủ để mô phỏng quy trình AI-assisted UI/UX design cho AI Tutor English Learning System (Vibe Coding style). Tài liệu cần mang tính học thuật, production-oriented, bao gồm design concept, design system, UX goals, page-by-page reasoning, AI prompt engineering, AI output summary, developer review và vibe coding workflow.
+- **Prompt đã dùng**:
+
+	> "Dựa trên TemplateUI/*, ARCHITECTURE.md, PROJECT_STRUCTURE.md, IMPLEMENTATION_ROADMAP.md, hãy xây dựng một tài liệu hoàn chỉnh `UI_DESIGN_REASONING.md` bằng tiếng Việt. Nội dung phải học thuật, chuyên nghiệp, mô phỏng quy trình AI-assisted UI/UX design cho AI Tutor English Learning System theo phong cách Vibe Coding. Bao gồm: Design Concept, Design System, UX Goals, Page-by-page reasoning cho mỗi file trong TemplateUI, AI Prompt Engineering (detailed prompts per page), AI Output Summary (strengths/weaknesses/refinements), Developer Review & Refinement, Vibe Coding Workflow, Conclusion, và một section Development Log tóm tắt prompt/decision/issues/review."
+
+- **AI trả kết quả gì**: Một tài liệu Markdown chi tiết (`UI_DESIGN_REASONING.md`) được thêm vào repository, tương thích với yêu cầu (Tiếng Việt, học thuật, production-oriented). Tài liệu bao gồm prompt mẫu cho generate UI (TailwindCSS), mô phỏng phản hồi AI (strengths/weaknesses), và guidance cho developer review.
+- **Tôi review gì**: Kiểm tra cấu trúc tài liệu, đảm bảo đủ các phần: concept, system, UX goals, page-by-page, prompt engineering, AI output summary, developer workflow, conclusion và development log. Xác minh rằng các đề xuất thiết kế khớp với chiến lược trong `ARCHITECTURE.md` và `IMPLEMENTATION_ROADMAP.md` (desktop-first, componentization, accessibility).
+- **Tôi sửa gì**: Chỉnh wording để phù hợp ngôn ngữ chuyên môn, đảm bảo consistency (color token names, spacing rules), bổ sung mục 'prompt template' cho `chat.html` làm ví dụ mẫu và tóm tắt entry để cho vào DEVELOPMENT_LOG.md.
+- **Kết quả cuối**: `UI_DESIGN_REASONING.md` được thêm vào repository (tại root). DEVELOPMENT_LOG.md được cập nhật với entry này. Tài liệu sẵn sàng dùng làm base để generate prototypes (HTML/Tailwind) cho từng page.
+- **Vấn đề gặp phải**: Cần cân bằng chi tiết prompt (quá chi tiết gây verbose vs quá ngắn không đủ thông tin). Cân bằng visual gradient để tránh overwhelming UI.
+- **Review của developer**: Xác nhận cần thêm bước tiếp theo: generate HTML/Tailwind prototype cho `chat.html` và chạy accessibility audit (axe / lighthouse) trên prototype.
+- **Kết luận**: Tài liệu UI_DESIGN_REASONING.md hoàn tất như một bản reference; bước tiếp theo đề nghị: 1) Generate prototype cho `chat.html`, 2) Run accessibility checks, 3) Iterate based on results.
+
+
 
