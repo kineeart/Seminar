@@ -1,22 +1,8 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const SYSTEM_PROMPT = [
-  'You are an AI English Tutor helping university students learn English.',
-  '',
-  'Your teaching style:',
-  '* friendly',
-  '* concise',
-  '* educational',
-  '* easy to understand',
-  '* supportive',
-  '',
-  'You help with:',
-  '* grammar',
-  '* vocabulary',
-  '* conversation',
-  '* writing',
-  '* pronunciation explanations',
-].join('\n');
+const { validateChatRequest, normalizeLevel } = require('../utils/chat-validator');
+const { appendConversationMessages, getConversationHistory } = require('../utils/conversation-memory');
+const { SYSTEM_PROMPT, buildTutorPrompt } = require('../utils/prompt-builder');
 
 const MAX_INPUT_LENGTH = 2000;
 const DEFAULT_TIMEOUT_MS = 10000;
@@ -55,27 +41,24 @@ function getModel() {
 }
 
 function withTimeout(promise, timeoutMs) {
+  let timeoutId;
+
   return Promise.race([
     promise,
     new Promise((_, reject) => {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         reject(new Error('Request timed out'));
       }, timeoutMs);
     }),
-  ]);
+  ]).finally(() => {
+    clearTimeout(timeoutId);
+  });
 }
 
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
-}
-
-function getRequestContext(message) {
-  return {
-    model: getModelName(),
-    promptLength: message.length,
-  };
 }
 
 function getUpstreamErrorInfo(error) {
@@ -95,73 +78,98 @@ function getCooldownRemainingMs() {
   return Math.max(0, cooldownUntil - Date.now());
 }
 
-function buildFallbackReply(message) {
+function buildFallbackReply(message, level) {
+  const learnerLevel = normalizeLevel(level);
   const lowerMessage = message.toLowerCase();
+  const beginnerLead = learnerLevel === 'Beginner'
+    ? 'Here is a simple explanation:'
+    : 'Here is a clear explanation:';
 
   if (lowerMessage.includes('present perfect')) {
-    return 'Present perfect uses have/has + past participle to connect a past action with the present. Example: I have studied English for three years.';
+    return `${beginnerLead} present perfect uses have/has + past participle to connect the past with now. Example: I have studied English for three years.`;
   }
 
   if (lowerMessage.includes('grammar')) {
-    return 'Grammar tip: break the sentence into subject, verb, and object, then check tense and agreement. Example: She studies English every day.';
+    return `${beginnerLead} break the sentence into subject, verb, and object, then check tense and agreement. Example: She studies English every day.`;
   }
 
   if (lowerMessage.includes('vocabulary')) {
-    return 'Vocabulary tip: learn words in short chunks with an example sentence. Example: improve — I want to improve my speaking skills.';
+    return `${beginnerLead} learn words in small chunks with one example sentence. Example: improve means to get better.`;
+  }
+
+  if (learnerLevel === 'Advanced') {
+    return 'I am here to help with English learning. Ask a specific grammar, vocabulary, or writing question and I will answer concisely.';
   }
 
   return 'I am here to help with English learning. Ask me about grammar, vocabulary, conversation, writing, or pronunciation with a specific example.';
 }
 
+function logEvent(event, payload) {
+  // eslint-disable-next-line no-console
+  console.info(JSON.stringify({ event, ...payload }));
+}
+
+function logWarning(event, payload) {
+  // eslint-disable-next-line no-console
+  console.warn(JSON.stringify({ event, ...payload }));
+}
+
 async function executeGeminiRequest({
   model,
+  prompt,
   message,
-  requestContext,
+  level,
+  conversationId,
   requestStartedAt,
   timeoutMs,
   retryAttempts,
+  historyCount,
+  retryDelayMs,
   attempt = 0,
 }) {
   const attemptStartedAt = Date.now();
-  // eslint-disable-next-line no-console
-  console.info(JSON.stringify({
-    event: 'gemini_request_start',
-    model: requestContext.model,
+  const modelName = getModelName();
+
+  logEvent('gemini_request_start', {
+    model: modelName,
+    level,
+    conversationId,
     attempt: attempt + 1,
-    promptLength: requestContext.promptLength,
-  }));
+    promptLength: prompt.length,
+    historyCount,
+  });
 
   try {
-    const result = await withTimeout(model.generateContent(message), timeoutMs);
-
+    const result = await withTimeout(model.generateContent(prompt), timeoutMs);
     const response = result && result.response;
     const text = response && typeof response.text === 'function' ? response.text() : '';
     const reply = String(text || '').trim();
 
-    // eslint-disable-next-line no-console
-    console.info(JSON.stringify({
-      event: 'gemini_request_success',
-      model: requestContext.model,
+    logEvent('gemini_request_success', {
+      model: modelName,
+      level,
+      conversationId,
       attempt: attempt + 1,
       durationMs: Date.now() - attemptStartedAt,
       totalDurationMs: Date.now() - requestStartedAt,
       responseLength: reply.length,
-    }));
+    });
 
     return {
-      reply: reply || 'I am here to help with English learning.',
+      reply: reply || buildFallbackReply(message, level),
       source: 'gemini',
-      model: requestContext.model,
+      model: modelName,
       attempts: attempt + 1,
       fallbackReason: null,
+      fallbackStatus: null,
     };
   } catch (error) {
     const errorInfo = getUpstreamErrorInfo(error);
 
-    // eslint-disable-next-line no-console
-    console.warn(JSON.stringify({
-      event: 'gemini_request_failure',
-      model: requestContext.model,
+    logWarning('gemini_request_failure', {
+      model: modelName,
+      level,
+      conversationId,
       attempt: attempt + 1,
       durationMs: Date.now() - attemptStartedAt,
       totalDurationMs: Date.now() - requestStartedAt,
@@ -169,55 +177,60 @@ async function executeGeminiRequest({
       statusText: errorInfo.statusText,
       message: errorInfo.message,
       details: errorInfo.details,
-    }));
+    });
 
     if (errorInfo.status === 429) {
-      const retryAfterMs = Math.max(
+      const backoffMs = Math.max(
         COOLDOWN_ON_QUOTA_MS,
-        (requestContext.retryDelayMs || BASE_BACKOFF_MS) * (2 ** attempt),
+        (retryDelayMs || BASE_BACKOFF_MS) * (2 ** attempt),
       );
-      cooldownUntil = Date.now() + retryAfterMs;
 
-      // eslint-disable-next-line no-console
-      console.warn(JSON.stringify({
-        event: 'gemini_cooldown_set',
-        model: requestContext.model,
-        cooldownMs: retryAfterMs,
+      cooldownUntil = Date.now() + backoffMs;
+
+      logWarning('gemini_cooldown_set', {
+        model: modelName,
+        level,
+        conversationId,
+        cooldownMs: backoffMs,
         cooldownUntil,
-      }));
+      });
     }
 
     const shouldRetry = attempt < retryAttempts && isRetryableUpstreamError(errorInfo);
     if (shouldRetry) {
       const backoffMs = Math.min(
         5000,
-        (requestContext.retryDelayMs || BASE_BACKOFF_MS) * (2 ** attempt),
+        (retryDelayMs || BASE_BACKOFF_MS) * (2 ** attempt),
       );
 
-      // eslint-disable-next-line no-console
-      console.info(JSON.stringify({
-        event: 'gemini_retry_scheduled',
-        model: requestContext.model,
+      logEvent('gemini_retry_scheduled', {
+        model: modelName,
+        level,
+        conversationId,
         attempt: attempt + 1,
         backoffMs,
-      }));
+      });
 
       await sleep(backoffMs);
       return executeGeminiRequest({
         model,
+        prompt,
         message,
-        requestContext,
+        level,
+        conversationId,
         requestStartedAt,
         timeoutMs,
         retryAttempts,
+        historyCount,
+        retryDelayMs,
         attempt: attempt + 1,
       });
     }
 
     return {
-      reply: buildFallbackReply(message),
+      reply: buildFallbackReply(message, level),
       source: 'fallback',
-      model: requestContext.model,
+      model: modelName,
       attempts: attempt + 1,
       fallbackReason: errorInfo.message,
       fallbackStatus: errorInfo.status,
@@ -225,14 +238,9 @@ async function executeGeminiRequest({
   }
 }
 
-async function generateResponse(rawMessage, options = {}) {
-  const message = String(rawMessage || '').trim();
-
-  if (!message) {
-    const error = new Error('Empty message');
-    error.code = 'EMPTY_MESSAGE';
-    throw error;
-  }
+async function generateResponse(rawInput, options = {}) {
+  const request = typeof rawInput === 'string' ? { message: rawInput } : rawInput || {};
+  const { message, level, conversationId } = validateChatRequest(request);
 
   if (message.length > MAX_INPUT_LENGTH) {
     const error = new Error('Message too long');
@@ -241,21 +249,38 @@ async function generateResponse(rawMessage, options = {}) {
   }
 
   const model = getModel();
+  const history = getConversationHistory(conversationId);
+  const prompt = buildTutorPrompt({
+    message,
+    level,
+    history,
+  });
+
   if (!model) {
-    return `AI not configured (no GEMINI_API_KEY). Received: "${message}"`;
+    const reply = buildFallbackReply(message, level);
+    appendConversationMessages(conversationId, [
+      { role: 'user', content: message },
+      { role: 'assistant', content: reply },
+    ]);
+    return reply;
   }
 
-  const requestContext = getRequestContext(message);
   const initialCooldownRemaining = getCooldownRemainingMs();
   if (initialCooldownRemaining > 0) {
-    const cooldownMessage = [
-      `Gemini cooldown active for ${initialCooldownRemaining}ms.`,
-      `Using fallback reply for model=${requestContext.model}.`,
-    ].join(' ');
+    logWarning('gemini_cooldown_active', {
+      model: getModelName(),
+      level,
+      conversationId,
+      cooldownRemainingMs: initialCooldownRemaining,
+      historyCount: history.length,
+    });
 
-    // eslint-disable-next-line no-console
-    console.warn(cooldownMessage);
-    return buildFallbackReply(message);
+    const reply = buildFallbackReply(message, level);
+    appendConversationMessages(conversationId, [
+      { role: 'user', content: message },
+      { role: 'assistant', content: reply },
+    ]);
+    return reply;
   }
 
   const requestStartedAt = Date.now();
@@ -263,41 +288,54 @@ async function generateResponse(rawMessage, options = {}) {
   const retryAttempts = Number.isInteger(options.retryAttempts)
     ? options.retryAttempts
     : MAX_RETRY_ATTEMPTS;
+  const retryDelayMs = Number.isInteger(options.retryDelayMs)
+    ? options.retryDelayMs
+    : BASE_BACKOFF_MS;
 
   try {
     const execution = await executeGeminiRequest({
       model,
+      prompt,
       message,
-      requestContext: {
-        ...requestContext,
-        retryDelayMs: options.retryDelayMs,
-      },
+      level,
+      conversationId,
       requestStartedAt,
       timeoutMs,
       retryAttempts,
+      historyCount: history.length,
+      retryDelayMs,
     });
 
     if (execution.source === 'fallback') {
-      // eslint-disable-next-line no-console
-      console.warn(JSON.stringify({
-        event: 'gemini_fallback_reply',
+      logWarning('gemini_fallback_reply', {
         model: execution.model,
+        level,
+        conversationId,
         attempts: execution.attempts,
         status: execution.fallbackStatus || null,
         reason: execution.fallbackReason || 'Gemini unavailable',
-      }));
+      });
     }
+
+    appendConversationMessages(conversationId, [
+      { role: 'user', content: message },
+      { role: 'assistant', content: execution.reply },
+    ]);
 
     return execution.reply;
   } catch (error) {
+    const errorMessage = error?.message || '';
     // Defensive only; the main flow already returns fallback on upstream failure.
     // eslint-disable-next-line no-console
-    const errorMessage = error?.message || '';
-    console.warn(
-      'Gemini request failed unexpectedly; using fallback reply. ',
-      errorMessage,
-    );
-    return buildFallbackReply(message);
+    console.warn('Gemini request failed unexpectedly; using fallback reply.', errorMessage);
+
+    const reply = buildFallbackReply(message, level);
+    appendConversationMessages(conversationId, [
+      { role: 'user', content: message },
+      { role: 'assistant', content: reply },
+    ]);
+
+    return reply;
   }
 }
 

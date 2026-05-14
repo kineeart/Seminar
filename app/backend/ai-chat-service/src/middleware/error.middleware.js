@@ -7,6 +7,8 @@ function errorMiddleware(err, req, res, next) { // eslint-disable-line no-unused
     status = 400;
   } else if (code === 'TOO_LONG') {
     status = 413;
+  } else if (code === 'INVALID_LEVEL') {
+    status = 400;
   }
   res.status(status).json({ success: false, error: err.message || 'Internal error' });
 }

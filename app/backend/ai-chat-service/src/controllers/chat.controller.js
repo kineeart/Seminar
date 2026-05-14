@@ -1,13 +1,10 @@
 const geminiService = require('../services/gemini.service');
+const { validateChatRequest } = require('../utils/chat-validator');
 
 async function handleChat(req, res, next) {
   try {
-    const { message } = req.body || {};
-    if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      return res.status(400).json({ success: false, error: 'Empty message' });
-    }
-
-    const reply = await geminiService.generateResponse(message);
+    const chatRequest = validateChatRequest(req.body);
+    const reply = await geminiService.generateResponse(chatRequest);
 
     return res.json({ success: true, reply });
   } catch (err) {

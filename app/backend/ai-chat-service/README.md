@@ -12,7 +12,9 @@ cp .env.example .env
 
 2. Fill `GEMINI_API_KEY` in `.env` if you have one.
 
-3. Install dependencies:
+3. Optional: set `GEMINI_MODEL=gemini-2.5-flash` for the verified model used in local runtime tests.
+
+4. Install dependencies:
 
 ```
 npm install
@@ -28,10 +30,15 @@ API
 
 - `GET /health` — basic health check
 - `POST /chat` — body `{ "message": "..." }` returns `{ success: true, reply: "..." }`
+- Optional request fields for tutoring workflow:
+	- `level`: `Beginner`, `Intermediate`, or `Advanced`
+	- `conversationId`: string used to keep the last 10 messages in memory
 
 Notes
 
 - The service uses `@google/generative-ai` when `GEMINI_API_KEY` is provided. When the key is not set, the service returns an explanatory message so the server remains runnable for local development and testing.
+- Conversation memory is stored in-memory only and keeps the last 10 messages per conversation.
+- The prompt builder injects learner level and recent context into every Gemini request.
 - No database is used in Phase 2.
 
 Troubleshooting Gemini API

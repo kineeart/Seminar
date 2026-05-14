@@ -20,6 +20,16 @@ describe('AI Chat Service', () => {
     expect(res.body).toHaveProperty('success', false);
   });
 
+  test('POST /chat with invalid level returns 400', async () => {
+    const res = await request(app).post('/chat').send({
+      message: 'Explain present perfect tense',
+      level: 'Expert',
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('success', false);
+  });
+
   test('POST /chat returns reply from gemini service', async () => {
     geminiService.generateResponse.mockResolvedValue('Short explanatory reply with example');
 

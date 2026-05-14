@@ -436,6 +436,26 @@ This incident demonstrated the importance of combining AI-assisted code generati
 - **Verified result**: `npm install`, `npm test`, `npm run lint` đều pass; dev server chạy ổn định trên Windows PowerShell với port fallback tự động; `/chat` trả AI response thật từ Gemini khi dùng model `gemini-2.5-flash`. Fallback local chỉ xuất hiện khi upstream bị rate-limit/quota fail thật.
 - **Reflection**: Incident này cho thấy sự khác biệt quan trọng giữa lỗi cấu hình dependency (package/version mismatch) và lỗi vận hành upstream (rate-limit/quota). AI-assisted development cần cả two-layer verification: dependency verification trước install và runtime verification sau khi tích hợp API thật. Đối với các dịch vụ AI, production-readiness không chỉ là code chạy được, mà còn phải có observability, retry policy, cooldown, và explicit fallback path để hệ thống vẫn phục vụ được trong điều kiện upstream bị giới hạn.
 
+---
+
+### 2026-05-18 — Phase: Educational Tutor Upgrade (Memory + Adaptive Difficulty)
+
+- **Mục tiêu**: Nâng cấp `ai-chat-service` từ một chat endpoint đơn lẻ thành một educational AI module hoàn chỉnh cho AI Tutor English Learning System. Mục tiêu mới gồm conversation memory, adaptive difficulty, prompt builder tái sử dụng, và tutoring workflow rõ ràng cho learner levels Beginner / Intermediate / Advanced.
+- **Prompt đã dùng**:
+
+	> "Dựa trên Phase 2 hiện tại của AI Tutor English Learning System, hãy nâng cấp AI Conversational Tutor để trở thành educational AI module hoàn chỉnh. Implement AI chat tutoring workflow, add conversation memory (last 10 messages in-memory), adaptive difficulty, inject user level into prompt context, improve system prompt, create reusable prompt builder utility, add validation / centralized error handling / timeout / retry handling, maintain architecture routes/controllers/services/utils, update DEVELOPMENT_LOG.md and PHASE_2_AI_CHAT_REASONING.md, and verify everything locally with npm install, npm test, npm run dev."
+
+- **AI output summary**: Refactor `ai-chat-service` để dùng prompt builder tái sử dụng, conversation memory in-memory (last 10 messages per conversation), và adaptive tutoring based on learner level. The implementation keeps the service CommonJS-based, local-first, and production-oriented while remaining lightweight.
+- **Educational workflow**: Request validation → context normalization → memory lookup → prompt construction → Gemini call → retry/cooldown handling → fallback only on real upstream failure → memory append. This workflow makes the assistant behave like a tutoring session rather than a stateless response generator.
+- **Prompt engineering decisions**: The system prompt was rewritten to be friendly, concise, beginner-friendly, and example-driven. A reusable prompt builder now injects learner level, recent conversation history, and response requirements. The prompt is structured to prevent overly academic answers and to keep explanations compact.
+- **Adaptive difficulty reasoning**: Beginner prompts emphasize plain English and one short example; Intermediate prompts add moderate detail and common mistakes; Advanced prompts use precise grammar terminology while staying concise. The level is validated centrally and injected into the prompt context on every request.
+- **Conversation memory design**: Memory is stored in-memory only and capped at the last 10 messages per conversationId. This keeps the service lightweight, preserves short-term tutoring context, and avoids database overhead in Phase 2. The second live turn confirmed the prompt included prior history (`historyCount: 2`).
+- **Technical decisions**: Added `src/utils/chat-validator.js`, `src/utils/prompt-builder.js`, and `src/utils/conversation-memory.js`. Kept central error handling and retry/cooldown policy. Added `GEMINI_MODEL=gemini-2.5-flash` as the verified model for local runtime, while preserving fallback behavior when upstream is unavailable.
+- **Human review**: Developer confirmed the live runtime with `GET /health` and two sequential `POST /chat` requests in the same `conversationId`. Logs showed the real Gemini path on `gemini-2.5-flash`, increasing prompt length on the second turn, and actual memory-backed context usage.
+- **Final verified result**: `npm install` successful, `npm test` successful, `npm run lint` successful, `npm run dev` successful. Live `POST /chat` returned a real Gemini response for the tutoring question, and the second request reused context from the first request.
+- **Lesson learned**: Educational AI features are not just about model access; they depend on prompt discipline, memory boundaries, and adaptive explanation strategy. A small amount of structured context can substantially improve tutoring quality without adding heavy infrastructure.
+
+
 
 
 
