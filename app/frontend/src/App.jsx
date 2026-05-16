@@ -1,35 +1,29 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import LandingPage from './pages/LandingPage'
+import './styles/landing.css'
 
-function App() {
-  const [apiStatus, setApiStatus] = useState('Checking backend...')
+const routes = {
+  '/': LandingPage,
+  '/landing': LandingPage,
+}
 
-  useEffect(() => {
-    const fetchHealth = async () => {
-      try {
-        const response = await fetch('/api/health')
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`)
-        }
-
-        const data = await response.json()
-        setApiStatus(`Connected: ${data.service} (${data.status})`)
-      } catch (error) {
-        setApiStatus(`Cannot connect backend: ${error.message}`)
-      }
-    }
-
-    fetchHealth()
-  }, [])
-
+function NotFoundPage() {
   return (
-    <main style={{ padding: '32px', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>Flash Card App</h1>
-      <p>Frontend - Backend connection status:</p>
-      <strong>{apiStatus}</strong>
+    <main className="landing-page">
+      <div className="landing-app fade-in" style={{ alignItems: 'center', textAlign: 'center' }}>
+        <h1 style={{ color: '#2d2d3a', marginTop: 40 }}>Page not found</h1>
+        <a className="btn" href="/landing" style={{ maxWidth: 280 }}>
+          Go to Landing Page
+        </a>
+      </div>
     </main>
   )
+}
+
+function App() {
+  const pathname = window.location.pathname
+  const ActivePage = routes[pathname] ?? NotFoundPage
+
+  return <ActivePage />
 }
 
 export default App
