@@ -4,21 +4,37 @@ import AuthLayout from '../components/layout/AuthLayout'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import TextInput from '../components/ui/TextInput'
+import { useAuth } from '../contexts/AuthContext'
 
 function AuthPage() {
   const [mode, setMode] = useState('login')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { login, signup } = useAuth()
 
   const update = (key) => (event) => setForm((prev) => ({ ...prev, [key]: event.target.value }))
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault()
     if (mode === 'signup' && !form.name.trim()) return setError('Please enter your name.')
     if (!form.email.trim() || !form.password.trim()) return setError('Email and password are required.')
+    setLoading(true)
     setError('')
-    navigate(mode === 'signup' ? '/onboarding' : '/dashboard')
+
+    try {
+      if (mode === 'login') {
+        await login(form.email.trim(), form.password)
+      } else {
+        await signup(form.name.trim(), form.email.trim(), form.password)
+      }
+      navigate(mode === 'signup' ? '/onboarding' : '/dashboard')
+    } catch (err) {
+      setError(err.message || 'Authentication failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -40,7 +56,7 @@ function AuthPage() {
           <TextInput label="Email" value={form.email} onChange={update('email')} placeholder="you@example.com" type="email" />
           <TextInput label="Password" value={form.password} onChange={update('password')} placeholder="At least 6 characters" type="password" />
           {error ? <p className="form-error">{error}</p> : null}
-          <Button>{mode === 'login' ? 'Log in' : 'Create account'}</Button>
+          <Button type="submit" disabled={loading}>{loading ? 'Please wait...' : (mode === 'login' ? 'Log in' : 'Create account')}</Button>
           <Button variant="ghost" to="/onboarding">Continue as Guest</Button>
         </form>
       </Card>

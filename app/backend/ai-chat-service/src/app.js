@@ -17,6 +17,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'ai-chat-service' });
 });
 
+// Mount at both root and /chat for gateway compatibility
+app.use('/', chatRouter);
 app.use('/chat', chatRouter);
 
 // Error handler

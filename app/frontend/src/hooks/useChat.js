@@ -1,0 +1,59 @@
+import { useCallback, useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import chatService from '../services/chat.service'
+
+export default function useChat() {
+  const { user } = useAuth()
+  const [messages, setMessages] = useState([
+    { id: 1, role: 'ai', text: 'Hi! Ask me anything about English, TOEIC, IELTS, or daily communication.' },
+  ])
+  const [input, setInput] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [mode, setMode] = useState('knowledge')
+  const [conversationId, setConversationId] = useState(null)
+
+  const send = useCallback(
+    async (overrideText) => {
+      const text = typeof overrideText === 'string' ? overrideText : input
+      if (!text.trim()) return
+
+      const userMsg = { id: Date.now(), role: 'user', text }
+      setMessages((prev) => [...prev, userMsg])
+      setInput('')
+      setIsTyping(true)
+
+      try {
+        const data = await chatService.sendMessage(text, conversationId, mode, user)
+        if (data.conversationId) {
+          setConversationId(data.conversationId)
+        }
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now() + 1,
+            role: 'ai',
+            text: data.reply || data.message || 'Sorry, I could not process that.',
+          },
+        ])
+      } catch (err) {
+        setMessages((prev) => [
+          ...prev,
+          { id: Date.now() + 1, role: 'ai', text: `Error: ${err.message}` },
+        ])
+      } finally {
+        setIsTyping(false)
+      }
+    },
+    [input, conversationId, mode, user],
+  )
+
+  const handleQuick = useCallback(
+    (text) => {
+      setInput(text)
+      send(text)
+    },
+    [send],
+  )
+
+  return { messages, input, setInput, isTyping, mode, setMode, send, handleQuick, conversationId }
+}

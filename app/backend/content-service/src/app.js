@@ -19,6 +19,8 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Mount at both root and /lessons for gateway compatibility
+app.use('/', lessonRoutes);
 app.use('/lessons', lessonRoutes);
 
 app.use(errorMiddleware);

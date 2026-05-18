@@ -1,44 +1,51 @@
-﻿import MainLayout from '../components/layout/MainLayout'
+﻿import { useEffect, useRef } from 'react'
+import MainLayout from '../components/layout/MainLayout'
 import Button from '../components/ui/Button'
-import Badge from '../components/ui/Badge'
-import { useChatDemo } from '../hooks/useChatDemo'
+import ChatMessage from '../components/ui/ChatMessage'
+import useChat from '../hooks/useChat'
 
 function ChatPage() {
-  const demo = useChatDemo()
+  const { messages, input, setInput, isTyping, mode, setMode, send, handleQuick } = useChat()
+  const messageListRef = useRef(null)
+
+  useEffect(() => {
+    const node = messageListRef.current
+    if (!node) return
+    node.scrollTop = node.scrollHeight
+  }, [messages, isTyping])
 
   return (
     <MainLayout navActive="chat" className="chat-shell">
       <header className="page-header row-between">
         <h1>AI Tutor</h1>
         <div className="mode-toggle">
-          <button className={demo.mode === 'knowledge' ? 'active' : ''} onClick={() => demo.setMode('knowledge')} type="button">Knowledge</button>
-          <button className={demo.mode === 'roleplay' ? 'active' : ''} onClick={() => demo.setMode('roleplay')} type="button">Roleplay</button>
+          <button className={mode === 'knowledge' ? 'active' : ''} onClick={() => setMode('knowledge')} type="button" aria-pressed={mode === 'knowledge'}>Knowledge</button>
+          <button className={mode === 'roleplay' ? 'active' : ''} onClick={() => setMode('roleplay')} type="button" aria-pressed={mode === 'roleplay'}>Roleplay</button>
         </div>
       </header>
 
-      <div className="message-list">
-        {demo.messages.map((m) => (
-          <div key={m.id} className={m.role === 'user' ? 'message user' : 'message ai'}>
-            {m.role === 'ai' ? <Badge>AI</Badge> : null}
-            <p>{m.text}</p>
-          </div>
+      <div className="message-list" ref={messageListRef}>
+        {messages.map((m) => (
+          <ChatMessage key={m.id} message={m} />
         ))}
-        {demo.isTyping ? <div className="message ai typing"><span>.</span><span>.</span><span>.</span></div> : null}
       </div>
 
-      <div className="quick-actions">
-        <Button size="sm" variant="ghost" onClick={() => demo.handleQuick('Explain more about phrasal verbs.')}>Explain More</Button>
-        <Button size="sm" variant="ghost" onClick={() => demo.handleQuick('Create flashcards for me.')}>Create Flashcards</Button>
-        <Button size="sm" variant="ghost" onClick={() => demo.handleQuick('Give me a quick quiz.')}>Create Quiz</Button>
-      </div>
+      <div className="chat-compose">
+        <div className="quick-actions">
+          <Button size="sm" variant="ghost" onClick={() => handleQuick('Explain more about phrasal verbs.')}>Explain More</Button>
+          <Button size="sm" variant="ghost" onClick={() => handleQuick('Create flashcards for me.')}>Create Flashcards</Button>
+          <Button size="sm" variant="ghost" onClick={() => handleQuick('Give me a quick quiz.')}>Create Quiz</Button>
+        </div>
 
-      <form className="input-bar" onSubmit={(e) => { e.preventDefault(); demo.send() }}>
-        <input value={demo.input} onChange={(e) => demo.setInput(e.target.value)} placeholder="Ask anything..." />
-        <Button type="submit" size="sm">Send</Button>
-      </form>
+        {isTyping ? <div className="typing typing-fixed"><span>.</span><span>.</span><span>.</span></div> : null}
+
+        <form className="input-bar" onSubmit={(e) => { e.preventDefault(); send() }}>
+          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask anything..." />
+          <Button type="submit" size="sm">Send</Button>
+        </form>
+      </div>
     </MainLayout>
   )
 }
 
 export default ChatPage
-

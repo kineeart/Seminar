@@ -21,6 +21,8 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Mount at both root and /quizzes for gateway compatibility
+app.use('/', quizRoutes);
 app.use('/quizzes', quizRoutes);
 app.use('/attempts', attemptRoutes);
 app.use('/progress', progressRoutes);

@@ -6,11 +6,11 @@ const { SYSTEM_PROMPT, buildTutorPrompt } = require('../utils/prompt-builder');
 const progressClient = require('../utils/progress-client');
 
 const MAX_INPUT_LENGTH = 2000;
-const DEFAULT_TIMEOUT_MS = 10000;
+const DEFAULT_TIMEOUT_MS = 15000;
 const DEFAULT_MODEL_NAME = 'gemini-2.5-flash';
 const MAX_RETRY_ATTEMPTS = 2;
 const BASE_BACKOFF_MS = 500;
-const COOLDOWN_ON_QUOTA_MS = 60000;
+const COOLDOWN_ON_QUOTA_MS = 10000;
 
 let cachedModel = null;
 let cooldownUntil = 0;

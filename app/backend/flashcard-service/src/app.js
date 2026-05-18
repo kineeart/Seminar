@@ -17,6 +17,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'flashcard-service' });
 });
 
+// Mount at both root and /flashcards for gateway compatibility
+app.use('/', flashcardRouter);
 app.use('/flashcards', flashcardRouter);
 
 // Error handler

@@ -129,6 +129,48 @@ app.use(
   }),
 );
 
+app.use(
+  '/api/progress',
+  createProxyMiddleware({
+    target: QUIZ_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/progress': '',
+    },
+    on: {
+      proxyReq: fixRequestBody,
+    },
+    onError(error, _req, res) {
+      console.error('Gateway proxy error:', error.message);
+      res.status(502).json({
+        status: 'error',
+        message: 'Progress service unavailable',
+      });
+    },
+  }),
+);
+
+app.use(
+  '/api/attempts',
+  createProxyMiddleware({
+    target: QUIZ_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/attempts': '',
+    },
+    on: {
+      proxyReq: fixRequestBody,
+    },
+    onError(error, _req, res) {
+      console.error('Gateway proxy error:', error.message);
+      res.status(502).json({
+        status: 'error',
+        message: 'Attempts service unavailable',
+      });
+    },
+  }),
+);
+
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`gateway running on port ${PORT}`);

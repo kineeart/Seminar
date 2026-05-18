@@ -1,11 +1,12 @@
 import MainLayout from '../components/layout/MainLayout'
-import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
+import Button from '../components/ui/Button'
+import ChatMessage from '../components/ui/ChatMessage'
 import ProgressBar from '../components/ui/ProgressBar'
-import { useRoleplayDemo } from '../hooks/useChatDemo'
+import useRoleplay from '../hooks/useRoleplay'
 
 function RoleplayPage() {
-  const demo = useRoleplayDemo()
+  const { messages, input, setInput, step, isTyping, send, handleQuick, quickReplies } = useRoleplay()
 
   return (
     <MainLayout navActive="chat" className="chat-shell">
@@ -18,26 +19,23 @@ function RoleplayPage() {
       </header>
 
       <div className="progress-bar-label">
-        <span>Conversation {demo.step} / 8</span>
-        <ProgressBar value={demo.step} max={8} />
+        <span>Conversation {step} / 8</span>
+        <ProgressBar value={step} max={8} />
       </div>
 
       <div className="message-list">
-        {demo.messages.map((m) => (
-          <div key={m.id} className={m.role === 'user' ? 'message user' : 'message ai'}>
-            {m.label ? <Badge>{m.label}</Badge> : null}
-            <p>{m.text}</p>
-          </div>
+        {messages.map((m) => (
+          <ChatMessage key={m.id} message={m} />
         ))}
-        {demo.isTyping ? <div className="message ai typing"><span>.</span><span>.</span><span>.</span></div> : null}
+        {isTyping ? <div className="message ai typing"><span>.</span><span>.</span><span>.</span></div> : null}
       </div>
 
       <div className="quick-actions">
-        {demo.quickReplies?.map((r) => <Button key={r} size="sm" variant="ghost" onClick={() => demo.handleQuick(r)}>{r}</Button>)}
+        {quickReplies?.map((r) => <Button key={r} size="sm" variant="ghost" onClick={() => handleQuick(r)}>{r}</Button>)}
       </div>
 
-      <form className="input-bar" onSubmit={(e) => { e.preventDefault(); demo.send() }}>
-        <input value={demo.input} onChange={(e) => demo.setInput(e.target.value)} placeholder="Type your reply..." />
+      <form className="input-bar" onSubmit={(e) => { e.preventDefault(); send() }}>
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your reply..." />
         <Button type="submit" size="sm">Send</Button>
       </form>
     </MainLayout>

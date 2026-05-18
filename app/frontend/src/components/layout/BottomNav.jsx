@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
-  { to: '/dashboard', label: 'Home', icon: 'HOME', key: 'home' },
-  { to: '/chat', label: 'Chat', icon: 'CHAT', key: 'chat' },
-  { to: '/flashcards', label: 'Cards', icon: 'CARD', key: 'cards' },
-  { to: '/quiz', label: 'Quiz', icon: 'QUIZ', key: 'quiz' },
-  { to: '/profile', label: 'Profile', icon: 'USER', key: 'profile' },
+  { to: '/dashboard', label: 'Home', icon: '🏠', key: 'home' },
+  { to: '/chat', label: 'Chat', icon: '💬', key: 'chat' },
+  { to: '/flashcards', label: 'Cards', icon: '🃏', key: 'cards' },
+  { to: '/quiz', label: 'Quiz', icon: '🎯', key: 'quiz' },
+  { to: '/profile', label: 'Profile', icon: '👤', key: 'profile' },
 ]
 
 function BottomNav({ active }) {
@@ -14,11 +14,11 @@ function BottomNav({ active }) {
       {navItems.map((item) => (
         <NavLink
           key={item.to}
-          className={({ isActive }) => (isActive || active === item.key ? 'bottom-nav-item active' : 'bottom-nav-item')}
+          className={({ isActive }) => (isActive || active === item.key ? 'nav-item active' : 'nav-item')}
           to={item.to}
         >
-          <span>{item.icon}</span>
-          <small>{item.label}</small>
+          <span className="ico">{item.icon}</span>
+          {item.label}
         </NavLink>
       ))}
     </nav>

@@ -1,12 +1,8 @@
+/* Landing page inherits the global gradient background from body */
+
 .landing-page {
   min-height: 100vh;
   padding: 24px;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(240, 93, 35, 0.2), transparent 45%),
-    radial-gradient(circle at 80% 10%, rgba(31, 157, 139, 0.2), transparent 45%),
-    radial-gradient(circle at 70% 80%, rgba(246, 187, 66, 0.18), transparent 50%),
-    var(--bg-cream);
-  background-attachment: fixed;
 }
 
 .landing-app {
@@ -19,52 +15,22 @@
   padding-bottom: 40px;
 }
 
-.fade-in {
-  animation: fadeUp 0.45s ease both;
-}
-
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .landing-header {
   text-align: center;
   padding-top: 40px;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(240, 93, 35, 0.12);
-  color: #a63a18;
-  font-size: 12px;
-  font-weight: 600;
-}
-
 .landing-header h1 {
-  margin-top: 18px;
   font-size: 42px;
+  margin-top: 18px;
   line-height: 1.1;
   letter-spacing: -0.6px;
-  color: var(--ink);
 }
 
 .landing-header p {
   margin-top: 14px;
   font-size: 16px;
   line-height: 1.5;
-  color: var(--ink-soft);
 }
 
 .landing-actions {
@@ -74,39 +40,6 @@
   margin-top: 18px;
 }
 
-.btn {
-  border: 0;
-  border-radius: 999px;
-  padding: 14px 22px;
-  width: 100%;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-align: center;
-  text-decoration: none;
-  color: #fff;
-  background: linear-gradient(135deg, #f05d23, #f6bb42);
-  box-shadow: 0 8px 20px rgba(240, 93, 35, 0.25);
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(240, 93, 35, 0.35);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn.ghost {
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-}
-
 .features {
   display: flex;
   flex-direction: column;
@@ -114,42 +47,16 @@
   margin-top: 24px;
 }
 
-.card-base {
-  background: #fff;
-  border-radius: 22px;
-  box-shadow:
-    0 14px 40px rgba(50, 50, 93, 0.12),
-    0 4px 12px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-}
-
-.row {
+.features .card-base {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
 .feature-icon {
-  min-width: 44px;
+  font-size: 30px;
+  min-width: 40px;
   text-align: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent);
-  background: rgba(240, 93, 35, 0.1);
-  border-radius: 999px;
-  padding: 6px 10px;
-}
-
-.card-base h3 {
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.muted {
-  margin-top: 2px;
-  color: var(--ink-soft);
-  font-size: 13px;
 }
 
 .landing-footer {

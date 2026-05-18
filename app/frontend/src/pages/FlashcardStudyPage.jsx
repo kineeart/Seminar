@@ -1,10 +1,39 @@
-import MainLayout from '../components/layout/MainLayout'
+﻿import MainLayout from '../components/layout/MainLayout'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import useFlashcardStudy from '../hooks/useFlashcardStudy'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+import { useFlashcardStudyAPI } from '../hooks/useFlashcards'
 
 function FlashcardStudyPage() {
-  const demo = useFlashcardStudy()
+  const demo = useFlashcardStudyAPI()
+
+  const handleFlashcardKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      demo.flip()
+    }
+  }
+
+  if (demo.loading) {
+    return (
+      <MainLayout className="study-shell">
+        <LoadingSpinner text="Loading flashcards..." />
+      </MainLayout>
+    )
+  }
+
+  if (demo.error || demo.total === 0) {
+    return (
+      <MainLayout className="study-shell">
+        <Card className="finish-card">
+          <h1>No cards available</h1>
+          <p>{demo.error || 'Generate some flashcards first via AI Chat.'}</p>
+          <Button to="/chat">Go to AI Chat</Button>
+          <Button variant="ghost" to="/dashboard">Back to home</Button>
+        </Card>
+      </MainLayout>
+    )
+  }
 
   if (demo.finished) {
     return (
@@ -36,7 +65,14 @@ function FlashcardStudyPage() {
         </div>
       </header>
 
-      <Card className={['flashcard', demo.swipeDir === 'right' ? 'swipe-right' : demo.swipeDir === 'left' ? 'swipe-left' : '', demo.flipped ? 'flipped' : ''].filter(Boolean).join(' ')} onClick={demo.flip}>
+      <Card
+        className={['flashcard', demo.swipeDir === 'right' ? 'swipe-right' : demo.swipeDir === 'left' ? 'swipe-left' : '', demo.flipped ? 'flipped' : ''].filter(Boolean).join(' ')}
+        onClick={demo.flip}
+        onKeyDown={handleFlashcardKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-pressed={demo.flipped}
+      >
         <div className="card-front">
           <h2>{demo.current?.front}</h2>
           <small>Tap to reveal</small>

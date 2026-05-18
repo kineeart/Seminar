@@ -3,7 +3,7 @@ function ProgressBar({ value, max = 100, className = '' }) {
 
   return (
     <div className={['progress-bar', className].filter(Boolean).join(' ')} aria-valuemin="0" aria-valuemax={max} aria-valuenow={value} role="progressbar">
-      <span style={{ width: `${percent}%` }} />
+      <div className="progress-fill" style={{ width: `${percent}%` }} />
     </div>
   )
 }

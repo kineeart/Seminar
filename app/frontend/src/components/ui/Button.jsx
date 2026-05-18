@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 
-function Button({ children, to, variant = 'primary', size = 'md', fullWidth = false, className = '', ...props }) {
-  const classes = ['btn', `btn-${variant}`, `btn-${size}`, fullWidth ? 'btn-full' : '', className]
-    .filter(Boolean)
-    .join(' ')
+function Button({ children, to, variant = 'primary', size = 'md', className = '', ...props }) {
+  const variantClass = variant === 'ghost' ? 'ghost' : variant === 'danger' ? 'red' : variant === 'success' ? 'green' : ''
+  const sizeClass = size === 'sm' ? 'btn-inline' : ''
+  const classes = ['btn', variantClass, sizeClass, className].filter(Boolean).join(' ')
 
   if (to) {
     return (
@@ -14,7 +14,7 @@ function Button({ children, to, variant = 'primary', size = 'md', fullWidth = fa
   }
 
   return (
-    <button className={classes} type="button" {...props}>
+    <button className={classes} type={props.type || 'button'} {...props}>
       {children}
     </button>
   )

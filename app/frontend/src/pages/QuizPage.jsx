@@ -1,49 +1,29 @@
-﻿import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import MainLayout from '../components/layout/MainLayout'
+﻿import MainLayout from '../components/layout/MainLayout'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
-import { questions } from '../data/mockQuiz'
+import LoadingSpinner from '../components/ui/LoadingSpinner'
+import useQuiz from '../hooks/useQuiz'
 
 function QuizPage() {
-  const navigate = useNavigate()
-  const [index, setIndex] = useState(0)
-  const [selected, setSelected] = useState(null)
-  const [answers, setAnswers] = useState([])
+  const { current, index, total, selected, feedback, loading, error, select, onContinue, isLast } = useQuiz()
 
-  const current = questions[index]
-  const isLast = index === questions.length - 1
+  if (loading) {
+    return (
+      <MainLayout navActive="quiz">
+        <LoadingSpinner text="Generating quiz..." />
+      </MainLayout>
+    )
+  }
 
-  const feedback = useMemo(() => {
-    if (selected === null) return null
-    const correct = selected === current.correct
-    return {
-      correct,
-      text: correct ? 'Correct answer.' : `Not quite. ${current.explanation}`,
-    }
-  }, [selected, current])
-
-  const onContinue = () => {
-    if (selected === null) return
-    const nextAnswers = [...answers, selected === current.correct ? 1 : 0]
-    setAnswers(nextAnswers)
-    setSelected(null)
-
-    if (isLast) {
-      const score = nextAnswers.reduce((sum, value) => sum + value, 0)
-      navigate('/quiz/result', {
-        state: {
-          score,
-          total: questions.length,
-          weakTopics: questions
-            .filter((_, i) => !nextAnswers[i])
-            .map((q) => q.tag),
-        },
-      })
-      return
-    }
-
-    setIndex((prev) => prev + 1)
+  if (error || !current) {
+    return (
+      <MainLayout navActive="quiz">
+        <Card>
+          <p>{error || 'No questions available. Please try again.'}</p>
+          <Button to="/dashboard">Back to home</Button>
+        </Card>
+      </MainLayout>
+    )
   }
 
   return (
@@ -52,7 +32,7 @@ function QuizPage() {
         <div>
           <span className="chip">Quiz mode</span>
           <h1>Quick Practice</h1>
-          <p>Question {index + 1} of {questions.length}</p>
+          <p>Question {index + 1} of {total}</p>
         </div>
       </header>
 
@@ -60,14 +40,24 @@ function QuizPage() {
         <small>{current.tag}</small>
         <h2>{current.prompt}</h2>
         <div className="option-grid">
-          {current.answers.map((option, optionIndex) => {
+          {(current.answers || current.options || []).map((option, optionIndex) => {
             const active = selected === optionIndex
+            const onKeyDown = (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                select(optionIndex)
+              }
+            }
             return (
               <button
                 key={option}
                 className={active ? 'option-card selected' : 'option-card'}
-                onClick={() => setSelected(optionIndex)}
+                onClick={() => select(optionIndex)}
+                onKeyDown={onKeyDown}
                 type="button"
+                role="button"
+                tabIndex={0}
+                aria-pressed={active}
               >
                 <strong>{option}</strong>
               </button>
@@ -92,4 +82,3 @@ function QuizPage() {
 }
 
 export default QuizPage
-
