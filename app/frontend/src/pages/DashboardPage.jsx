@@ -1,4 +1,4 @@
-import MainLayout from '../components/layout/MainLayout'
+﻿import MainLayout from '../components/layout/MainLayout'
 import Button from '../components/ui/Button'
 import Card from '../components/ui/Card'
 import ProgressBar from '../components/ui/ProgressBar'
@@ -22,7 +22,7 @@ function DashboardPage() {
 
       <Card className="continue-card card-gradient">
         <span>Continue learning</span>
-        <h2>TOEIC Vocabulary · Set 3</h2>
+        <h2>TOEIC Vocabulary - Set 3</h2>
         <ProgressBar value={68} />
         <Button to="/flashcards/study">Resume</Button>
       </Card>

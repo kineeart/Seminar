@@ -1,17 +1,44 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "gateway",
+    "auth-service",
+    "ai-chat-service",
+    "flashcard-service",
+    "content-service",
+    "quiz-service"
+  ],
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "concurrently \"npm run dev --workspace gateway\" \"npm run dev --workspace auth-service\" \"npm run dev --workspace ai-chat-service\" \"npm run dev --workspace flashcard-service\" \"npm run dev --workspace content-service\" \"npm run dev --workspace quiz-service\"",
+    "dev:gateway": "npm run dev --workspace gateway",
+    "dev:auth": "npm run dev --workspace auth-service",
+    "dev:chat": "npm run dev --workspace ai-chat-service",
+    "dev:flashcards": "npm run dev --workspace flashcard-service",
+    "dev:content": "npm run dev --workspace content-service",
+    "dev:quiz": "npm run dev --workspace quiz-service",
+    "start": "npm run dev",
+    "test": "npm run test --workspace auth-service && npm run test --workspace gateway && npm run test --workspace ai-chat-service && npm run test --workspace flashcard-service && npm run test --workspace content-service && npm run test --workspace quiz-service",
+    "test:auth": "npm run test --workspace auth-service",
+    "test:gateway": "npm run test --workspace gateway",
+    "test:chat": "npm run test --workspace ai-chat-service",
+    "test:flashcards": "npm run test --workspace flashcard-service",
+    "test:content": "npm run test --workspace content-service",
+    "test:quiz": "npm run test --workspace quiz-service",
+    "lint": "npm run lint --workspace gateway && npm run lint --workspace auth-service && npm run lint --workspace ai-chat-service && npm run lint --workspace flashcard-service && npm run lint --workspace content-service && npm run lint --workspace quiz-service",
+    "lint:chat": "npm run lint --workspace ai-chat-service",
+    "lint:flashcards": "npm run lint --workspace flashcard-service",
+    "lint:content": "npm run lint --workspace content-service",
+    "lint:quiz": "npm run lint --workspace quiz-service"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
   }
 }
