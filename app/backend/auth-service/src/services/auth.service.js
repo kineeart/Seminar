@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
-
-const users = [];
-const JWT_SECRET = process.env.JWT_SECRET || 'mvp-auth-secret';
+const userRepository = require('../repositories/user.repository');
+const { createId } = require('../utils/id');
 
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
@@ -25,14 +24,24 @@ function validateCredentials({ email, password }) {
   };
 }
 
-function signup(payload) {
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    const error = new Error('JWT_SECRET is required');
+    error.code = 'CONFIG_MISSING';
+    throw error;
+  }
+  return secret;
+}
+
+async function signup(payload) {
   const validation = validateCredentials(payload);
 
   if (validation.error) {
     return validation;
   }
 
-  const existingUser = users.find((user) => user.email === validation.email);
+  const existingUser = await userRepository.findByEmail(validation.email);
 
   if (existingUser) {
     return {
@@ -41,49 +50,54 @@ function signup(payload) {
     };
   }
 
-  const user = {
-    id: `${Date.now()}-${users.length + 1}`,
+  const user = await userRepository.createUser({
+    id: createId('user'),
     email: validation.email,
-    password: validation.password,
-    createdAt: new Date().toISOString(),
-  };
-
-  users.push(user);
+    passwordHash: validation.password,
+  });
 
   return {
     user: {
       id: user.id,
       email: user.email,
-      createdAt: user.createdAt,
+      createdAt: user.created_at ? new Date(user.created_at).toISOString() : null,
     },
   };
 }
 
-function login(payload) {
+async function login(payload) {
   const validation = validateCredentials(payload);
 
   if (validation.error) {
     return validation;
   }
 
-  const existingUser = users.find((user) => user.email === validation.email);
+  const existingUser = await userRepository.findByEmail(validation.email);
 
-  if (!existingUser || existingUser.password !== validation.password) {
+  if (!existingUser || existingUser.password_hash !== validation.password) {
     return {
       error: 'invalid_credentials',
       message: 'Invalid email or password',
     };
   }
 
-  const token = jwt.sign(
-    {
-      sub: existingUser.id,
-      email: existingUser.email,
-      role: 'user',
-    },
-    JWT_SECRET,
-    { expiresIn: '1h' },
-  );
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        sub: existingUser.id,
+        email: existingUser.email,
+        role: existingUser.role || 'user',
+      },
+      getJwtSecret(),
+      { expiresIn: '1h' },
+    );
+  } catch (err) {
+    return {
+      error: 'config',
+      message: err.message,
+    };
+  }
 
   return {
     token,
@@ -95,12 +109,11 @@ function login(payload) {
 }
 
 function resetStore() {
-  users.length = 0;
+  return userRepository.clearUsers();
 }
 
 module.exports = {
   signup,
   login,
   resetStore,
-  _users: users,
 };

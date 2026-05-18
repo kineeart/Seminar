@@ -1,3 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+
+:root {
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-display: 'Fraunces', serif;
+  --ink: #1f1c18;
+  --ink-soft: #5a5249;
+  --bg-cream: #f6efe6;
+  --bg-warm: #f9f4ec;
+  --accent: #f05d23;
+  --accent-deep: #a63a18;
+  --accent-mint: #1f9d8b;
+  --card-bg: #ffffff;
+  --border-soft: rgba(25, 20, 16, 0.1);
+  --shadow-soft: 0 16px 40px rgba(19, 14, 10, 0.12);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,7 +27,9 @@ body,
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--bg-cream);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

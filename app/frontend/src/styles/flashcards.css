@@ -1,18 +1,171 @@
-.flashcards-page { padding: 24px; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
-.toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px }
-.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:12px }
-.flashcard { perspective: 1000px; cursor: pointer; height:160px }
-.flashcard > .front, .flashcard > .back { transition: transform 0.6s; transform-style: preserve-3d; position:relative; height:100%; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.08); padding:12px }
-.flashcard .front { background: #fff; }
-.flashcard .back { background: #f9fafb; transform: rotateY(180deg); position:absolute; top:0; left:0; width:100%; }
-.flashcard.flipped .front { transform: rotateY(180deg); }
-.flashcard.flipped .back { transform: rotateY(360deg); }
-.word { font-weight:700; font-size:18px }
-.ipa { color:#6b7280 }
-.meaning { font-size:14px; margin-bottom:8px }
-.example { font-size:13px; color:#374151 }
-.progress { margin:12px 0 }
-.progress .bar { background:#e5e7eb; height:8px; border-radius:6px; overflow:hidden }
-.progress .fill { background:#10b981; height:100%; transition:width .3s }
-.empty { margin-top:24px; color:#6b7280 }
-.error { color:#b91c1c }
+.flashcards-page {
+	min-height: 100vh;
+	padding: 32px;
+	background:
+		radial-gradient(circle at top right, rgba(240, 93, 35, 0.18), transparent 48%),
+		radial-gradient(circle at bottom left, rgba(31, 157, 139, 0.18), transparent 45%),
+		var(--bg-warm);
+}
+
+.toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 18px;
+	gap: 16px;
+}
+
+.toolbar h2 {
+	font-family: var(--font-display);
+	font-size: 28px;
+	margin: 0;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 16px;
+}
+
+.flashcard {
+	perspective: 1000px;
+	cursor: pointer;
+	height: 170px;
+}
+
+.flashcard > .front,
+.flashcard > .back {
+	transition: transform 0.6s;
+	transform-style: preserve-3d;
+	position: relative;
+	height: 100%;
+	border-radius: 16px;
+	box-shadow: var(--shadow-soft);
+	padding: 16px;
+	border: 1px solid var(--border-soft);
+	background: var(--card-bg);
+}
+
+.flashcard .back {
+	background: #fff7f2;
+	transform: rotateY(180deg);
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+
+.flashcard.flipped .front {
+	transform: rotateY(180deg);
+}
+
+.flashcard.flipped .back {
+	transform: rotateY(360deg);
+}
+
+.word {
+	font-weight: 700;
+	font-size: 18px;
+}
+
+.ipa {
+	color: var(--ink-soft);
+	margin-top: 6px;
+}
+
+.meaning {
+	font-size: 14px;
+	margin-bottom: 8px;
+}
+
+.example {
+	font-size: 13px;
+	color: var(--ink-soft);
+}
+
+.progress {
+	margin: 16px 0 22px;
+}
+
+.progress .bar {
+	background: rgba(31, 29, 24, 0.08);
+	height: 8px;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.progress .fill {
+	background: linear-gradient(120deg, var(--accent), var(--accent-mint));
+	height: 100%;
+	transition: width 0.3s;
+}
+
+.empty {
+	margin-top: 24px;
+	color: var(--ink-soft);
+}
+
+.error {
+	color: #b42318;
+}
+
+.history-panel {
+	margin-top: 32px;
+	background: rgba(255, 255, 255, 0.7);
+	border-radius: 20px;
+	padding: 20px;
+	border: 1px solid var(--border-soft);
+	box-shadow: var(--shadow-soft);
+}
+
+.history-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.history-header h3 {
+	margin: 0;
+	font-family: var(--font-display);
+}
+
+.history-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 12px;
+}
+
+.history-card {
+	border-radius: 16px;
+	padding: 14px;
+	background: #fff;
+	border: 1px solid var(--border-soft);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.history-word {
+	font-weight: 700;
+	margin: 0 0 4px;
+}
+
+.history-meaning {
+	margin: 0;
+	color: var(--ink-soft);
+	font-size: 13px;
+}
+
+.history-meta {
+	font-size: 12px;
+	color: var(--ink-soft);
+}
+
+@media (max-width: 720px) {
+	.toolbar {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}

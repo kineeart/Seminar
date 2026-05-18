@@ -1,12 +1,14 @@
-# AI Tutor Backend — Authentication + Content + Quiz MVP
+# AI Tutor Backend — Persistent Learning Platform
 
 Backend MVP được refactor theo hướng nhẹ, chạy thật, không dùng Docker ở phase này.
 
 ## Cấu trúc
 
-- `gateway/` — API gateway Express, proxy `/api/auth` tới auth-service
-- `auth-service/` — Express auth service, lưu user in-memory cho MVP
-- `content-service/` — Lessons/content CRUD, in-memory with optional MongoDB
+- `gateway/` — API gateway Express, proxy `/api/*` tới các services
+- `auth-service/` — Auth service, lưu user trong MongoDB
+- `ai-chat-service/` — Conversational tutor + conversation persistence
+- `flashcard-service/` — Flashcard generation + history persistence
+- `content-service/` — Lessons/content CRUD với MongoDB
 - `quiz-service/` — Quiz generation, scoring, attempts, progress tracking
 - `jest.config.js` — cấu hình test dùng chung
 - `.eslintrc.js` — cấu hình ESLint dùng chung
@@ -31,6 +33,8 @@ npm run dev
 Lệnh này sẽ chạy đồng thời:
 - `gateway` tại `http://localhost:5000`
 - `auth-service` tại `http://localhost:5001`
+- `ai-chat-service` tại `http://localhost:5002`
+- `flashcard-service` tại `http://localhost:3003`
 - `content-service` tại `http://localhost:5003`
 - `quiz-service` tại `http://localhost:5004`
 
@@ -39,6 +43,8 @@ Lệnh này sẽ chạy đồng thời:
 ```bash
 npm run dev:gateway
 npm run dev:auth
+npm run dev:chat
+npm run dev:flashcards
 npm run dev:content
 npm run dev:quiz
 ```
@@ -68,6 +74,9 @@ npm run lint
 - `GET /health`
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
+- `POST /api/chat`
+- `GET /api/chat/conversations?userId=...`
+- `GET /api/flashcards/history?userId=...`
 - `GET /api/content/lessons`
 - `POST /api/quizzes/generate`
 - `POST /api/quizzes/:id/submit`
@@ -90,10 +99,8 @@ npm run lint
 4. Mở job và xem step bị đỏ
 5. Chạy lại command tương ứng local để sửa lỗi
 
-## Ghi chú MVP
+## Ghi chú Phase 5
 
-- Chưa dùng database
-- User lưu in-memory trong `auth-service`
-- JWT dùng secret hardcode để ưu tiên runnable MVP
-- Khi scale tiếp, thay in-memory bằng database và tách auth contract rõ hơn
-- `content-service` và `quiz-service` có thể bật MongoDB bằng `MONGODB_URI`
+- MongoDB Atlas là bắt buộc cho toàn bộ persistence
+- Mỗi service có `.env.example` với `MONGODB_URI` và `DATABASE_NAME`
+- Không còn in-memory fallback

@@ -5,6 +5,7 @@ async function listAttempts(req, res, next) {
     const attempts = await attemptService.listAttempts({
       userId: req.query.userId,
       quizId: req.query.quizId,
+      limit: req.query.limit,
     });
     return res.status(200).json({ success: true, attempts });
   } catch (err) {

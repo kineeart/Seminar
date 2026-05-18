@@ -1,7 +1,11 @@
 .landing-page {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(135deg, #f6d5f7 0%, #fbe9d7 50%, #c2e9fb 100%);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(240, 93, 35, 0.2), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(31, 157, 139, 0.2), transparent 45%),
+    radial-gradient(circle at 70% 80%, rgba(246, 187, 66, 0.18), transparent 50%),
+    var(--bg-cream);
   background-attachment: fixed;
 }
 
@@ -42,8 +46,8 @@
   gap: 6px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(106, 130, 251, 0.12);
-  color: #5664c7;
+  background: rgba(240, 93, 35, 0.12);
+  color: #a63a18;
   font-size: 12px;
   font-weight: 600;
 }
@@ -53,14 +57,14 @@
   font-size: 42px;
   line-height: 1.1;
   letter-spacing: -0.6px;
-  color: #2d2d3a;
+  color: var(--ink);
 }
 
 .landing-header p {
   margin-top: 14px;
   font-size: 16px;
   line-height: 1.5;
-  color: #5a5a72;
+  color: var(--ink-soft);
 }
 
 .landing-actions {
@@ -82,14 +86,14 @@
   text-align: center;
   text-decoration: none;
   color: #fff;
-  background: linear-gradient(135deg, #6a82fb, #fc5c7d);
-  box-shadow: 0 8px 20px rgba(106, 130, 251, 0.25);
+  background: linear-gradient(135deg, #f05d23, #f6bb42);
+  box-shadow: 0 8px 20px rgba(240, 93, 35, 0.25);
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(106, 130, 251, 0.35);
+  box-shadow: 0 12px 28px rgba(240, 93, 35, 0.35);
 }
 
 .btn:active {
@@ -97,7 +101,7 @@
 }
 
 .btn.ghost {
-  color: #3a3a52;
+  color: var(--ink);
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
@@ -130,21 +134,21 @@
   text-align: center;
   font-size: 12px;
   font-weight: 700;
-  color: #6a82fb;
-  background: rgba(106, 130, 251, 0.08);
+  color: var(--accent);
+  background: rgba(240, 93, 35, 0.1);
   border-radius: 999px;
   padding: 6px 10px;
 }
 
 .card-base h3 {
-  color: #3a3a52;
+  color: var(--ink);
   font-size: 15px;
   font-weight: 700;
 }
 
 .muted {
   margin-top: 2px;
-  color: #888;
+  color: var(--ink-soft);
   font-size: 13px;
 }
 

@@ -8,8 +8,8 @@ function health(_req, res) {
   });
 }
 
-function signup(req, res) {
-  const result = authService.signup(req.body || {});
+async function signup(req, res) {
+  const result = await authService.signup(req.body || {});
 
   if (result.error === 'validation') {
     return res.status(400).json({
@@ -32,8 +32,8 @@ function signup(req, res) {
   });
 }
 
-function login(req, res) {
-  const result = authService.login(req.body || {});
+async function login(req, res) {
+  const result = await authService.login(req.body || {});
 
   if (result.error === 'validation') {
     return res.status(400).json({
@@ -44,6 +44,13 @@ function login(req, res) {
 
   if (result.error === 'invalid_credentials') {
     return res.status(401).json({
+      status: 'error',
+      message: result.message,
+    });
+  }
+
+  if (result.error === 'config') {
+    return res.status(500).json({
       status: 'error',
       message: result.message,
     });

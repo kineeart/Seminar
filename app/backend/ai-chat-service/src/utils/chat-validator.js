@@ -38,6 +38,19 @@ function normalizeConversationId(inputConversationId) {
   return value.slice(0, 100);
 }
 
+function normalizeUserId(inputUserId) {
+  if (inputUserId === undefined || inputUserId === null) {
+    return null;
+  }
+
+  const value = String(inputUserId).trim();
+  if (!value) {
+    return null;
+  }
+
+  return value.slice(0, 120);
+}
+
 function validateChatRequest(body) {
   const payload = body || {};
   const message = typeof payload.message === 'string' ? payload.message.trim() : '';
@@ -54,6 +67,7 @@ function validateChatRequest(body) {
     message,
     level: normalizeLevel(payload.level),
     conversationId: normalizeConversationId(payload.conversationId),
+    userId: normalizeUserId(payload.userId),
   };
 }
 
@@ -61,6 +75,7 @@ module.exports = {
   ALLOWED_LEVELS,
   MAX_MESSAGE_LENGTH,
   normalizeConversationId,
+  normalizeUserId,
   normalizeLevel,
   validateChatRequest,
 };
