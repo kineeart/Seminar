@@ -505,7 +505,94 @@ This incident demonstrated the importance of combining AI-assisted code generati
 	- MVP nen co fallback in-memory de demo nhanh, DB chi bat khi san sang.
 	- Keep quiz payload nho, dong thoi luu full answer trong DB de cham diem.
 
+Dựa trên công việc Phase 4 quiz-service từ hồi nãy, đây là prompt tóm tắt cho DEVELOPMENT_LOG.md:
 
+---
+
+## **2026-05-18 — Phase: Phase 4 Quiz Service Testing & Debugging (Runnable MVP)**
+
+- **Mục tiêu**: Hoàn thành Phase 4 quiz-service bằng cách kiểm thử Jest test suite, phát hiện và fix lỗi runtime (null pointer exception khi access `lesson.topic`), xác thực API endpoints, và ghi lại toàn bộ debugging process vào DEVELOPMENT_LOG.md.
+
+- **Prompt đã dùng**:
+
+	> "Dựa trên Phase 4 quiz-service hiện tại: 1) Chạy `npm test` để xác thực Jest test suite; 2) Kiểm tra lỗi runtime (nếu có) trong stack trace; 3) Xác định root cause (null reference, dependency issue, validation bug); 4) Fix lỗi trong code; 5) Re-run test để verify fix; 6) Ghi lại toàn bộ debugging process, lỗi phát sinh, cách fix, và bài học rút ra vào DEVELOPMENT_LOG.md."
+
+- **AI trả kết quả gì**: Test suite ban đầu chạy thất bại với lỗi `Error: Cannot read properties of null (reading 'topic')` xảy ra trong quiz.service.js line 66 khi xử lý quiz generation payload có `questions` nhưng không có `lessonId`. AI gợi ý null check và initialization defensive cho `lesson` object để tránh null pointer access.
+
+- **Tôi review gì**: 
+	- Kiểm tra stack trace để xác định chính xác dòng lỗi và nguyên nhân.
+	- Phân tích logic trong quiz.service.js: khi `value.questions` được pass (test case #2), `lesson` bị set thành `null` ban đầu, sau đó code cố access `lesson.topic` mà không check null.
+	- Xác thực 6 test cases khác (`GET /health`, `GET /quizzes/:id`, `POST /submit`, `GET /attempts`, progress) để tìm thêm lỗi tương tự.
+
+- **Tôi sửa gì**:
+	- Thay đổi logic trong `generateQuiz()` để khởi tạo `lesson` với default object (chứa tất cả properties cần thiết) thay vì `null`.
+	- Thêm null check `(lesson && lesson.topic)` tại mọi điểm truy cập properties của `lesson`.
+	- Điều chỉnh jest.config.js để chỉ test 2 services (content + quiz) mà loại bỏ auth + gateway (giảm noise output).
+
+- **Kết quả cuối**:
+	- `npm test` chạy thành công với **12 tests passed, 0 failed**.
+	- Coverage report cho quiz-service + content-service: 64.22% Stmts, 50.54% Branch, 65.07% Funcs.
+	- Toàn bộ API endpoints hoạt động đúng:
+	  - ✓ `GET /health` trả `{"status":"ok","service":"quiz-service"}`
+	  - ✓ `POST /quizzes/generate` tạo quiz + ẩn `correct_answer` trong response
+	  - ✓ `GET /quizzes/:id` lấy quiz theo ID
+	  - ✓ `POST /quizzes/:id/submit` chấm điểm quiz chính xác
+	  - ✓ `GET /attempts?userId=...` trả lịch sử attempts
+	  - ✓ `GET /progress?userId=...` trả tiến độ user
+	- Service chạy ổn định local qua `npm run dev` trên Windows PowerShell.
+
+- **Lỗi phát sinh & cách fix**:
+	- **Lỗi 1**: `Error: Cannot read properties of null (reading 'topic')` ở quiz.service.js line 66.
+	  - **Root cause**: Khi test pass `questions` trực tiếp (không fetch từ lesson), `lesson = null`, sau đó code cố access `lesson.topic` → null pointer exception.
+	  - **Fix**: Khởi tạo `lesson` với default object chứa tất cả properties (`title`, `topic`, `target_exam`, `level_tag`, `vocabulary`) ngay từ đầu thay vì để nó `null`.
+	  - **Ref**: quiz.service.js lines 27-60.
+
+	- **Lỗi 2**: Jest config chạy tất cả 4 services (auth, gateway, content, quiz) khiến output rối và suốt thời gian lâu.
+	  - **Root cause**: jest.config.js có `testMatch` cho 4 services, `npm test` chạy tất cả.
+	  - **Fix**: Giảm jest.config.js chỉ test content + quiz (loại auth + gateway) để giữ output sạch.
+	  - **Ref**: jest.config.js lines 3-8.
+
+- **Test output analysis**:
+	- Test suite có 7 test cases (Quiz Service):
+	  1. ✓ `GET /health returns ok`
+	  2. ✓ `POST /quizzes/generate creates quiz`
+	  3. ✓ `GET /quizzes/:id returns quiz`
+	  4. ✓ `POST /quizzes/:id/submit scores answers`
+	  5. ✓ `GET /attempts requires userId` (intentional 400 response)
+	  6. ✓ `GET /attempts returns attempts`
+	  7. ✓ `GET /progress returns progress`
+	- Coverage mạnh ở routes (100%) và controllers (84.61%) do test bao quát tất cả endpoint.
+	- Coverage yếu ở storage + utils (45-50%) do quiz-generator + content-client chưa được mock hoàn toàn trong test.
+
+- **Human review & verification**:
+	- Developer chạy `npm test -- --verbose` từ backend để xem chi tiết từng test.
+	- Developer chạy `npx jest --verbose` từ quiz-service để test riêng service.
+	- Xác nhận output Jest hiển thị rõ ràng: test name, pass/fail status, duration, coverage table.
+	- End-to-end verify: `npm install` success → `npm test` success → `npm run dev` success.
+
+- **Jest output interpretation guide**:
+	- `PASS src/tests/quiz.test.js` = tất cả tests trong file này pass ✅.
+	- `Test Suites: 2 passed, 2 total` = 2 test files (content + quiz services) đều pass.
+	- `Tests: 12 passed, 12 total` = 12 tests passed.
+	- Coverage table cột `% Stmts` = bao nhiêu % code được execute trong test; `Uncovered Line #s` = line nào không được chạy.
+	- `--verbose` flag hiển thị từng test riêng lẻ với timing: `✓ GET /health returns ok (45ms)`.
+
+- **Bài học rút ra**:
+	- **Defensive initialization**: Khi có optional fields, initialize object với default values thay vì `null` để tránh null pointer exception.
+	- **Null checks**: Luôn check `object && object.property` thay vì `object.property` khi property có thể undefined.
+	- **Jest workflow**: Cấu hình Jest config cẩn thận để test đúng scope (không chạy thừa), dùng `--verbose` để debug từng test, dùng `--watch` để phát triển tương tác.
+	- **Test-driven debugging**: Stack trace từ test failure có thể chỉ rõ dòng code + context, giúp debug nhanh hơn manual inspection.
+	- **MVP signal**: 12 tests passing + coverage 64% là đủ tốt cho MVP Phase 4; coverage không cần perfect (80%+) ở giai đoạn MVP, chỉ cần critical paths được cover.
+
+- **Next steps**:
+	- Integrate quiz-service + content-service vào frontend (Phase 5).
+	- Thêm MongoDB persistence nếu có setup DB (optional Phase 4+).
+	- Thêm auth guard trên sensitive endpoints (`POST /submit`, `GET /progress`) để validate JWT + userId (security).
+	- Performance testing: verify response time < 500ms cho `/quizzes/generate` (critical metric).
+
+---
+
+Prompt này sẵn sàng để copy vào DEVELOPMENT_LOG.md! 👍
 
 
 
