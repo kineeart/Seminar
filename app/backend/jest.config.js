@@ -1,6 +1,7 @@
 ﻿module.exports = {
   testEnvironment: 'node',
   coverageDirectory: 'coverage',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testMatch: [
     '<rootDir>/auth-service/src/**/*.test.js',
     '<rootDir>/gateway/src/**/*.test.js',
