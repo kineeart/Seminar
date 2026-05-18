@@ -1,3 +1,5 @@
+﻿import { Link } from 'react-router-dom'
+
 const featureCards = [
   {
     title: 'AI Tutor Chat',
@@ -33,12 +35,12 @@ function LandingPage() {
         </header>
 
         <div className="landing-actions">
-          <a className="btn" href="/login">
+          <Link className="btn btn-primary" to="/login">
             Start Learning
-          </a>
-          <a className="btn ghost" href="/onboarding">
+          </Link>
+          <Link className="btn btn-ghost" to="/onboarding">
             Continue as Guest
-          </a>
+          </Link>
         </div>
 
         <section className="features">
@@ -64,3 +66,4 @@ function LandingPage() {
 }
 
 export default LandingPage
+
