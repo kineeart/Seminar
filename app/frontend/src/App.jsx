@@ -1,9 +1,11 @@
 import LandingPage from './pages/LandingPage'
+import FlashcardsPage from './pages/FlashcardsPage'
 import './styles/landing.css'
 
 const routes = {
   '/': LandingPage,
   '/landing': LandingPage,
+  '/flashcards': FlashcardsPage,
 }
 
 function NotFoundPage() {

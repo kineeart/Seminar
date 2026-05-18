@@ -1,0 +1,18 @@
+.flashcards-page { padding: 24px; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+.toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:12px }
+.flashcard { perspective: 1000px; cursor: pointer; height:160px }
+.flashcard > .front, .flashcard > .back { transition: transform 0.6s; transform-style: preserve-3d; position:relative; height:100%; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.08); padding:12px }
+.flashcard .front { background: #fff; }
+.flashcard .back { background: #f9fafb; transform: rotateY(180deg); position:absolute; top:0; left:0; width:100%; }
+.flashcard.flipped .front { transform: rotateY(180deg); }
+.flashcard.flipped .back { transform: rotateY(360deg); }
+.word { font-weight:700; font-size:18px }
+.ipa { color:#6b7280 }
+.meaning { font-size:14px; margin-bottom:8px }
+.example { font-size:13px; color:#374151 }
+.progress { margin:12px 0 }
+.progress .bar { background:#e5e7eb; height:8px; border-radius:6px; overflow:hidden }
+.progress .fill { background:#10b981; height:100%; transition:width .3s }
+.empty { margin-top:24px; color:#6b7280 }
+.error { color:#b91c1c }
