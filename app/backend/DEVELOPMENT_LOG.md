@@ -1,5 +1,33 @@
 ﻿---
 
+### 2026-05-18 — Phase: Phase 4 Quiz + Content Backend (Runnable MVP)
+
+- **Mục tiêu**: Trien khai `content-service` va `quiz-service` theo Phase 4, co scoring, attempts, progress; chay duoc khong can DB va co the bat MongoDB bang env.
+- **Prompt da dung**:
+
+> "Trien khai Phase 4 backend (content-service + quiz-service) theo MVP runnable. Co CRUD lessons, quiz generate, submit, score, attempts, progress. In-memory fallback, optional MongoDB qua MONGODB_URI. Cap nhat gateway proxy, scripts, jest config, va README." 
+
+- **AI tra ket qua gi**:
+	- Tao `content-service/` va `quiz-service/` (Express CommonJS).
+	- Tao endpoints va tests can thiet.
+	- Cap nhat gateway proxy va workspace scripts.
+
+- **Toi review gi**:
+	- Kiem tra schema payload, scoring logic, va progress update.
+	- Kiem tra jest config co pick up tests moi.
+
+- **Toi sua gi**:
+	- Them seed lessons de quiz generate khong bi rong.
+	- Them fallback khi khong co content-service hoac DB.
+
+- **Ket qua cuoi**:
+	- `content-service`: CRUD lessons + seed data + optional MongoDB.
+	- `quiz-service`: generate, submit, attempts, progress + optional MongoDB.
+	- Gateway proxy `/api/content` va `/api/quizzes`.
+
+- **Lesson learned**:
+	- Phan tach storage layer giup de test va de nang cap DB.
+
 ### 2026-05-16 — Phase: Phase 1 Authentication Implementation (Runnable MVP)
 
 - **Mục tiêu**: Triển khai Phase 1 authentication theo hướng chạy được thật: `gateway/` + `auth-service/`, Express CommonJS, in-memory users, JWT mock, test mẫu, local dev chạy được không cần Docker.

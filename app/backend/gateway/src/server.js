@@ -8,6 +8,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.GATEWAY_PORT || process.env.PORT || 5000;
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5001';
+const CONTENT_SERVICE_URL = process.env.CONTENT_SERVICE_URL || 'http://localhost:5003';
+const QUIZ_SERVICE_URL = process.env.QUIZ_SERVICE_URL || 'http://localhost:5004';
 
 app.use(cors());
 app.use(express.json());
@@ -41,10 +43,54 @@ app.use(
   }),
 );
 
+app.use(
+  '/api/content',
+  createProxyMiddleware({
+    target: CONTENT_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/content': '',
+    },
+    on: {
+      proxyReq: fixRequestBody,
+    },
+    onError(error, _req, res) {
+      console.error('Gateway proxy error:', error.message);
+      res.status(502).json({
+        status: 'error',
+        message: 'Content service unavailable',
+      });
+    },
+  }),
+);
+
+app.use(
+  '/api/quizzes',
+  createProxyMiddleware({
+    target: QUIZ_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/quizzes': '',
+    },
+    on: {
+      proxyReq: fixRequestBody,
+    },
+    onError(error, _req, res) {
+      console.error('Gateway proxy error:', error.message);
+      res.status(502).json({
+        status: 'error',
+        message: 'Quiz service unavailable',
+      });
+    },
+  }),
+);
+
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`gateway running on port ${PORT}`);
     console.log(`proxying /api/auth -> ${AUTH_SERVICE_URL}`);
+    console.log(`proxying /api/content -> ${CONTENT_SERVICE_URL}`);
+    console.log(`proxying /api/quizzes -> ${QUIZ_SERVICE_URL}`);
   });
 }
 

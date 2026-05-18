@@ -1,4 +1,4 @@
-# AI Tutor Backend Phase 1 — Authentication MVP
+# AI Tutor Backend — Authentication + Content + Quiz MVP
 
 Backend MVP được refactor theo hướng nhẹ, chạy thật, không dùng Docker ở phase này.
 
@@ -6,6 +6,8 @@ Backend MVP được refactor theo hướng nhẹ, chạy thật, không dùng D
 
 - `gateway/` — API gateway Express, proxy `/api/auth` tới auth-service
 - `auth-service/` — Express auth service, lưu user in-memory cho MVP
+- `content-service/` — Lessons/content CRUD, in-memory with optional MongoDB
+- `quiz-service/` — Quiz generation, scoring, attempts, progress tracking
 - `jest.config.js` — cấu hình test dùng chung
 - `.eslintrc.js` — cấu hình ESLint dùng chung
 - `.env.example` — biến môi trường mẫu
@@ -29,12 +31,16 @@ npm run dev
 Lệnh này sẽ chạy đồng thời:
 - `gateway` tại `http://localhost:5000`
 - `auth-service` tại `http://localhost:5001`
+- `content-service` tại `http://localhost:5003`
+- `quiz-service` tại `http://localhost:5004`
 
 ### 3. Chạy từng service riêng
 
 ```bash
 npm run dev:gateway
 npm run dev:auth
+npm run dev:content
+npm run dev:quiz
 ```
 
 ### 4. Chạy test
@@ -62,6 +68,9 @@ npm run lint
 - `GET /health`
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
+- `GET /api/content/lessons`
+- `POST /api/quizzes/generate`
+- `POST /api/quizzes/:id/submit`
 
 ## CI hoạt động thế nào
 
@@ -87,3 +96,4 @@ npm run lint
 - User lưu in-memory trong `auth-service`
 - JWT dùng secret hardcode để ưu tiên runnable MVP
 - Khi scale tiếp, thay in-memory bằng database và tách auth contract rõ hơn
+- `content-service` và `quiz-service` có thể bật MongoDB bằng `MONGODB_URI`

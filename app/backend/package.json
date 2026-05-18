@@ -4,17 +4,25 @@
   "private": true,
   "workspaces": [
     "gateway",
-    "auth-service"
+    "auth-service",
+    "content-service",
+    "quiz-service"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace gateway\" \"npm run dev --workspace auth-service\"",
+    "dev": "concurrently \"npm run dev --workspace gateway\" \"npm run dev --workspace auth-service\" \"npm run dev --workspace content-service\" \"npm run dev --workspace quiz-service\"",
     "dev:gateway": "npm run dev --workspace gateway",
     "dev:auth": "npm run dev --workspace auth-service",
+    "dev:content": "npm run dev --workspace content-service",
+    "dev:quiz": "npm run dev --workspace quiz-service",
     "start": "npm run dev",
-    "test": "npm run test --workspace auth-service && npm run test --workspace gateway",
+    "test": "npm run test --workspace auth-service && npm run test --workspace gateway && npm run test --workspace content-service && npm run test --workspace quiz-service",
     "test:auth": "npm run test --workspace auth-service",
     "test:gateway": "npm run test --workspace gateway",
-    "lint": "npm run lint --workspace gateway && npm run lint --workspace auth-service"
+    "test:content": "npm run test --workspace content-service",
+    "test:quiz": "npm run test --workspace quiz-service",
+    "lint": "npm run lint --workspace gateway && npm run lint --workspace auth-service && npm run lint --workspace content-service && npm run lint --workspace quiz-service",
+    "lint:content": "npm run lint --workspace content-service",
+    "lint:quiz": "npm run lint --workspace quiz-service"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"
