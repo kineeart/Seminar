@@ -162,6 +162,22 @@ Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts
 	- Cả hai file được commit vào repo, ghi link trong DEVELOPMENT_LOG.md.
 
 - **Bài học rút ra**: 
+
+---
+
+### 2026-05-18 — Phase: Phase 3 Implementation (Flashcard Generation)
+
+- **Mục tiêu**: Implement a runnable microservice `flashcard-service` that integrates with Gemini to extract vocabulary and produce stable JSON flashcards; add frontend `FlashcardsPage` and components; add tests, logging, parser, prompt engineering; verify runtime locally.
+- **Prompt đã dùng**:
+
+	> "You are an AI English vocabulary extraction assistant helping university students learn English. Only produce a JSON array of flashcards (no surrounding text). Each flashcard must include the fields: word, ipa, meaning, example. Rules: only educational vocabulary, avoid duplicates, concise explanation, clear IPA, practical examples, suitable for intermediate learners. Extract from the following conversation: {{conversation}}"
+
+- **AI trả kết quả gì**: (recorded during runtime verification if available) — expected JSON array of flashcards.
+- **Tôi review gì**: Ensure service endpoints `/health` and `/flashcards/generate` exist and follow API contract; validate AI responses; ensure logger emits required markers; validate frontend calls API and renders cards.
+- **Tôi sửa gì**: Scaffolding service and frontend, implement parser retries & validation, add tests that skip heavy AI calls if no API key, document env variables.
+- **Kết quả cuối**: `app/backend/flashcard-service` and frontend `FlashcardsPage` created. Parser & logger implemented. Tests added. Instructions for running and env variables included in service README.
+- **Bài học rút ra**: Real LLM integration requires robust parsing and retries; always validate AI output server-side and dedupe before returning to clients.
+
 	- Project structure phải dễ mở rộng (dự tính khi thêm service, scale DB, chuyển Kubernetes).
 	- Roadmap phải cân bằng timeline áp lực vs quality; Phase dependencies phải rõ (critical path = Setup → Auth → Chat → Launch).
 	- Mỗi phase cần DoD và success metrics rõ ràng để tránh scope creep.
