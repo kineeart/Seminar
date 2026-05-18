@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const app = require('./app');
 const { connectWithRetry, registerGracefulShutdown } = require('../../shared/database');
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const PORT = process.env.QUIZ_SERVICE_PORT || process.env.PORT || 5004;
 

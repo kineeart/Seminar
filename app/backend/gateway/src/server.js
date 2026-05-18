@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware');
 
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 const app = express();
 const PORT = process.env.GATEWAY_PORT || process.env.PORT || 5000;
