@@ -33,10 +33,10 @@ function LandingPage() {
         </header>
 
         <div className="landing-actions">
-          <a className="btn" href="/login">
+          <a className="btn" href="/dashboard">
             Start Learning
           </a>
-          <a className="btn ghost" href="/onboarding">
+          <a className="btn ghost" href="/flashcards">
             Continue as Guest
           </a>
         </div>

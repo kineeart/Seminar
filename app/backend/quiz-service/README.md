@@ -22,7 +22,9 @@ cp .env.example .env
 
 Optional:
 - Set `CONTENT_SERVICE_URL` (default `http://localhost:5003`).
-- Set `MONGODB_URI` to enable MongoDB storage.
+
+Required:
+- Set `MONGODB_URI` and `DATABASE_NAME` for MongoDB persistence.
 
 ## Run
 
@@ -43,6 +45,5 @@ Service runs on `http://localhost:5004` by default.
 
 ## Notes
 
-- Uses in-memory storage by default.
-- Switches to MongoDB if `MONGODB_URI` is set.
+- Uses MongoDB Atlas for persistence (no in-memory fallback).
 - If content-service is not reachable, quiz generation falls back to local data.

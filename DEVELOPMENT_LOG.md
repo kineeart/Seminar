@@ -178,12 +178,75 @@ Lưu trữ prompts quan trọng dùng để gọi AI (đặt trong `docs/prompts
 - **Kết quả cuối**: `app/backend/flashcard-service` and frontend `FlashcardsPage` created. Parser & logger implemented. Tests added. Instructions for running and env variables included in service README.
 - **Bài học rút ra**: Real LLM integration requires robust parsing and retries; always validate AI output server-side and dedupe before returning to clients.
 
-	- Project structure phải dễ mở rộng (dự tính khi thêm service, scale DB, chuyển Kubernetes).
-	- Roadmap phải cân bằng timeline áp lực vs quality; Phase dependencies phải rõ (critical path = Setup → Auth → Chat → Launch).
-	- Mỗi phase cần DoD và success metrics rõ ràng để tránh scope creep.
-	- Risk management từ sớm giúp team chuẩn bị contingency (mock LLM khi API chậm, fallback UI, etc.).
+---
+
+### 2026-05-18 — Phase: Phase 5 MongoDB Persistence Layer
+
+- **Mục tiêu**: Hoàn thiện persistence layer dùng MongoDB Atlas cho AI Tutor, đồng bộ các service với MongoDB, và đảm bảo learning dashboard đọc dữ liệu thật từ database thay vì in-memory.
+- **Prompt đã dùng**:
+
+  > “Dựa trên ARCHITECTURE.md, PROJECT_STRUCTURE.md, IMPLEMENTATION_ROADMAP.md, toàn bộ các phase trước: triển khai Phase 5 — MongoDB Persistence Layer cho hệ thống AI Tutor English Learning System.”
+
+- **AI trả kết quả gì**:
+  - Shared database module tại `app/backend/shared/database/` với config tập trung, retry handling, graceful shutdown.
+  - MongoDB-backed persistence cho `users`, `conversations`, `flashcards`, `quizzes`, `quiz_results`, và `progress`.
+  - Dashboard / history endpoints để frontend load recent conversations, flashcard history, quiz attempts và progress summary từ MongoDB.
+  - Test coverage cho schema validation, repository behavior và progress integration.
+
+- **Tôi review gì**:
+  - Kiểm tra `MONGODB_URI` và `DATABASE_NAME` là bắt buộc, không hardcode credentials.
+  - Kiểm tra schema có `timestamps`, `indexes`, validation phù hợp với query patterns của dashboard.
+  - Kiểm tra persistence workflow thật cho chat history, flashcards và quiz attempts.
+  - Kiểm tra progress metrics có phản ánh đúng learning loop: Chat → Flashcard → Quiz → Dashboard.
+
+- **Tôi sửa gì**:
+  - Giữ và tái sử dụng shared connection manager hiện có ở `shared/database/config.js`, `shared/database/connection.js`, `shared/database/index.js`.
+  - Bổ sung cross-service progress integration:
+    - `flashcard-service` gọi `quiz-service` endpoint `/progress/flashcard-review` để cập nhật `flashcards_completed`, `learned_words_count`, `daily_activity`, `streak_days`.
+    - `ai-chat-service` gọi `quiz-service` endpoint `/progress/chat-activity` để cập nhật `total_chat_sessions`, `messages_sent`, `daily_activity`, `streak_days`.
+  - Mở rộng `quiz-service/src/services/progress.service.js` để track nhiều loại hoạt động học tập thay vì chỉ quiz attempts.
+  - Thêm tests cho progress integration (`progress.service.test.js`, cập nhật `quiz.test.js`).
+  - Cập nhật `PHASE_5_DATABASE_REASONING.md` với reasoning cho unified progress tracking, cross-service integration, persistence workflow và known limitations.
+  - **Hoàn tất verification cuối cùng**:
+    - Vá bug null-guard còn lại ở `quiz.service.js` (các dòng `lesson.target_exam` và `lesson.level_tag`).
+    - Chạy lại toàn bộ backend tests với MongoDB Atlas thật:
+      - quiz-service: 20/20 test suites pass, 48/48 tests pass.
+      - ai-chat-service: 6/6 test suites pass, 14/14 tests pass.
+      - flashcard-service: 4/4 test suites pass, 9/9 tests pass.
+    - Thực hiện smoke test persistence end-to-end với Atlas:
+      - Tạo quiz, submit quiz → `quiz_results` được ghi thật.
+      - Lưu conversation → `conversations` được ghi thật.
+      - Tạo flashcard, record review → `flashcards` và `progress` được ghi thật.
+      - Đọc lại trực tiếp từ MongoDB Atlas để xác nhận data tồn tại.
+
+- **Kết quả cuối**:
+  - MongoDB persistence không chỉ lưu chat / flashcards / quizzes mà còn nuôi được dashboard bằng dữ liệu thật.
+  - Dashboard hiện có thể phản ánh:
+    - `streak_days`
+    - `quiz_accuracy`
+    - `flashcards_completed` / `learned_words_count`
+    - `total_chat_sessions`
+    - `recent conversations`
+    - `quiz history`
+    - `flashcard history`
+  - Test suite được mở rộng để cover progress integration paths.
+  - **Phase 5 đã hoàn tất với verification thực tế trên MongoDB Atlas**.
+
+- **Lỗi / vấn đề phát sinh**:
+  - Dashboard ban đầu đọc nhiều chỉ số nhưng backend chỉ cập nhật progress từ quiz attempts, dẫn đến dữ liệu progress chưa đầy đủ.
+  - Cross-service progress update tạo coupling qua HTTP giữa `flashcard-service`, `ai-chat-service` và `quiz-service`; đây là trade-off chấp nhận được cho MVP nhưng nên chuyển sang event-driven trong phase sau.
+  - Khi patch `gemini.service.js` có một lần replace sai import block; đã sửa ngay để khôi phục `prompt-builder` và thêm progress client đúng cách.
+  - **Bug null-guard trong `quiz.service.js`**: Sau khi fix `lesson.topic` vẫn còn lỗi tương tự ở `lesson.target_exam` và `lesson.level_tag` khi `lesson === null`; đã vá trước khi chạy smoke test.
+  - **Jest open handles**: Một số service báo “Jest did not exit one second after the test run has completed” nhưng tests vẫn pass hoàn toàn.
+
+- **Bài học rút ra**:
+  - Persistence cho learning platform không chỉ là “lưu document”, mà phải đảm bảo toàn bộ learning signals được gom lại thành progress có ý nghĩa cho dashboard.
+  - Một `progress` collection tập trung đơn giản hóa UI metrics, nhưng cần thiết kế rõ ràng luồng cập nhật liên service để tránh inconsistency.
+  - Shared Mongo connection + validation + indexes giúp MVP ổn định hơn nhiều so với in-memory, đặc biệt khi restart app và đọc lại history.
+  - **Verification quan trọng hơn implementation**: Code đã viết chưa có nghĩa là đã xong; phải chạy thật với production-like environment (MongoDB Atlas) và validate end-to-end mới chốt được phase.
 
 ---
+
 
 ### 2026-05-16 — Phase: Phase 0 Implementation (Setup & Infrastructure, Lightweight MVP)
 

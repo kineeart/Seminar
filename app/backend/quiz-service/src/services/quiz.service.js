@@ -58,7 +58,7 @@ async function generateQuiz(payload) {
     lesson = fallback.lesson;
   }
 
-  const now = new Date().toISOString();
+  const now = new Date();
   const quiz = {
     id: createId('quiz'),
     user_id: value.userId || null,
@@ -66,13 +66,13 @@ async function generateQuiz(payload) {
     source: value.source || 'manual',
     generated_from: {
       lesson_id: value.lessonId || null,
-      topic: lesson.topic || value.topic || null,
+      topic: (lesson && lesson.topic) || value.topic || null,
       weak_topics: value.weakTopics || [],
       chat_session_ids: value.chatSessionIds || [],
       flashcard_ids: value.flashcardIds || [],
     },
-    target_exam: value.targetExam || lesson.target_exam || null,
-    level_tag: value.levelTag || lesson.level_tag || null,
+    target_exam: value.targetExam || (lesson && lesson.target_exam) || null,
+    level_tag: value.levelTag || (lesson && lesson.level_tag) || null,
     difficulty: value.difficulty || 'easy',
     questions: questions.map((question) => ({
       ...question,
@@ -147,7 +147,7 @@ async function submitQuiz(quizId, payload) {
   const score = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
   const weakTopics = computeWeakTopics(quiz.questions, results);
 
-  const now = new Date().toISOString();
+  const now = new Date();
   const attempt = {
     id: createId('attempt'),
     user_id: value.userId || 'guest',

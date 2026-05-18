@@ -9,6 +9,14 @@ function errorMiddleware(err, req, res, next) { // eslint-disable-line no-unused
     status = 413;
   } else if (code === 'INVALID_LEVEL') {
     status = 400;
+  } else if (code === 'VALIDATION_ERROR') {
+    status = 400;
+  } else if (code === 'NOT_FOUND') {
+    status = 404;
+  } else if (code === 'MONGO_CONFIG_MISSING') {
+    status = 500;
+  } else if (code === 'DB_UNAVAILABLE') {
+    status = 503;
   }
   res.status(status).json({ success: false, error: err.message || 'Internal error' });
 }

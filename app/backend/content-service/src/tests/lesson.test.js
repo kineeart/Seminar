@@ -1,7 +1,10 @@
 const request = require('supertest');
 const app = require('../app');
 
-describe('Content Service', () => {
+const hasMongo = Boolean(process.env.MONGODB_URI && process.env.DATABASE_NAME);
+const describeIf = hasMongo ? describe : describe.skip;
+
+describeIf('Content Service', () => {
   test('GET /health returns ok', async () => {
     const res = await request(app).get('/health');
     expect(res.statusCode).toBe(200);

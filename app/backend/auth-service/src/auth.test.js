@@ -2,9 +2,18 @@ const request = require('supertest');
 const app = require('./server');
 const authService = require('./services/auth.service');
 
-describe('Auth Service MVP', () => {
-  beforeEach(() => {
-    authService.resetStore();
+const hasMongo = Boolean(process.env.MONGODB_URI && process.env.DATABASE_NAME);
+const describeIf = hasMongo ? describe : describe.skip;
+
+describeIf('Auth Service MVP', () => {
+  beforeAll(() => {
+    if (!process.env.JWT_SECRET) {
+      process.env.JWT_SECRET = 'test-secret';
+    }
+  });
+
+  beforeEach(async () => {
+    await authService.resetStore();
   });
 
   test('GET /health returns ok', async () => {

@@ -4,7 +4,7 @@ export default function FlashcardGrid({ cards }) {
   return (
     <div className="grid">
       {cards.map((c) => (
-        <Flashcard key={c.word} card={c} />
+        <Flashcard key={c.id || c.word} card={c} />
       ))}
     </div>
   )

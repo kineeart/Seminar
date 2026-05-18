@@ -1,5 +1,8 @@
 const memory = require('../utils/conversation-memory');
 
+const hasMongo = Boolean(process.env.MONGODB_URI && process.env.DATABASE_NAME);
+const describeIf = hasMongo ? describe : describe.skip;
+
 let mockGenerateContent;
 
 jest.mock('@google/generative-ai', () => ({
@@ -12,8 +15,8 @@ jest.mock('@google/generative-ai', () => ({
 
 const geminiService = require('../services/gemini.service');
 
-describe('gemini service prompt integration', () => {
-  beforeEach(() => {
+describeIf('gemini service prompt integration', () => {
+  beforeEach(async () => {
     process.env.GEMINI_API_KEY = 'test-key';
     mockGenerateContent = jest
       .fn()
@@ -24,13 +27,13 @@ describe('gemini service prompt integration', () => {
         response: { text: () => 'Second tutor reply' },
       });
 
-    memory.resetConversationMemory();
+    await memory.resetConversationMemory();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     delete process.env.GEMINI_API_KEY;
     delete process.env.GEMINI_MODEL;
-    memory.resetConversationMemory();
+    await memory.resetConversationMemory();
     jest.clearAllMocks();
   });
 

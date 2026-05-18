@@ -1,9 +1,13 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../../.env' });
 const app = require('./app');
+const { connectWithRetry, registerGracefulShutdown } = require('../../shared/database');
 
 const BASE_PORT = Number(process.env.PORT || 5002);
 
-function startServer(port, retriesLeft = 10) {
+async function startServer(port, retriesLeft = 10) {
+  await connectWithRetry({ appName: 'ai-chat-service' });
+  registerGracefulShutdown();
+
   const server = app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`ai-chat-service listening on port ${port}`);
@@ -25,4 +29,8 @@ function startServer(port, retriesLeft = 10) {
   return server;
 }
 
-startServer(BASE_PORT);
+startServer(BASE_PORT).catch((err) => {
+  // eslint-disable-next-line no-console
+  console.error('Failed to start ai-chat-service:', err.message);
+  process.exit(1);
+});

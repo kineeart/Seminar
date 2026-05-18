@@ -20,8 +20,8 @@ Copy env file:
 cp .env.example .env
 ```
 
-Optional:
-- Set `MONGODB_URI` to enable MongoDB storage.
+Required:
+- Set `MONGODB_URI` and `DATABASE_NAME` for MongoDB storage.
 
 ## Run
 
@@ -42,5 +42,4 @@ Service runs on `http://localhost:5003` by default.
 
 ## Notes
 
-- Uses in-memory storage by default with seed lessons.
-- Switches to MongoDB if `MONGODB_URI` is set.
+- Uses MongoDB Atlas for persistence and seeds lessons on first run.

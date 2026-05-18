@@ -6,7 +6,7 @@ const attemptRoutes = require('./routes/attempt.routes');
 const progressRoutes = require('./routes/progress.routes');
 const errorMiddleware = require('./middleware/error.middleware');
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const app = express();
 

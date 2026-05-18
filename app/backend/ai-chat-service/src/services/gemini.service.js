@@ -3,6 +3,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { validateChatRequest, normalizeLevel } = require('../utils/chat-validator');
 const { appendConversationMessages, getConversationHistory } = require('../utils/conversation-memory');
 const { SYSTEM_PROMPT, buildTutorPrompt } = require('../utils/prompt-builder');
+const progressClient = require('../utils/progress-client');
 
 const MAX_INPUT_LENGTH = 2000;
 const DEFAULT_TIMEOUT_MS = 10000;
@@ -238,9 +239,41 @@ async function executeGeminiRequest({
   }
 }
 
+async function persistConversationActivity(conversationId, userId, level, message, reply) {
+  await appendConversationMessages(
+    conversationId,
+    [
+      { role: 'user', content: message },
+      { role: 'assistant', content: reply },
+    ],
+    { userId, level },
+  );
+
+  if (userId) {
+    try {
+      await progressClient.recordChatActivity({
+        userId,
+        messageCount: 1,
+        activityAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      logWarning('progress_chat_activity_failure', {
+        userId,
+        conversationId,
+        message: error.message,
+      });
+    }
+  }
+}
+
 async function generateResponse(rawInput, options = {}) {
   const request = typeof rawInput === 'string' ? { message: rawInput } : rawInput || {};
-  const { message, level, conversationId } = validateChatRequest(request);
+  const {
+    message,
+    level,
+    conversationId,
+    userId,
+  } = validateChatRequest(request);
 
   if (message.length > MAX_INPUT_LENGTH) {
     const error = new Error('Message too long');
@@ -249,7 +282,7 @@ async function generateResponse(rawInput, options = {}) {
   }
 
   const model = getModel();
-  const history = getConversationHistory(conversationId);
+  const history = await getConversationHistory(conversationId);
   const prompt = buildTutorPrompt({
     message,
     level,
@@ -258,10 +291,7 @@ async function generateResponse(rawInput, options = {}) {
 
   if (!model) {
     const reply = buildFallbackReply(message, level);
-    appendConversationMessages(conversationId, [
-      { role: 'user', content: message },
-      { role: 'assistant', content: reply },
-    ]);
+    await persistConversationActivity(conversationId, userId, level, message, reply);
     return reply;
   }
 
@@ -276,10 +306,7 @@ async function generateResponse(rawInput, options = {}) {
     });
 
     const reply = buildFallbackReply(message, level);
-    appendConversationMessages(conversationId, [
-      { role: 'user', content: message },
-      { role: 'assistant', content: reply },
-    ]);
+    await persistConversationActivity(conversationId, userId, level, message, reply);
     return reply;
   }
 
@@ -317,10 +344,7 @@ async function generateResponse(rawInput, options = {}) {
       });
     }
 
-    appendConversationMessages(conversationId, [
-      { role: 'user', content: message },
-      { role: 'assistant', content: execution.reply },
-    ]);
+    await persistConversationActivity(conversationId, userId, level, message, execution.reply);
 
     return execution.reply;
   } catch (error) {
@@ -330,10 +354,7 @@ async function generateResponse(rawInput, options = {}) {
     console.warn('Gemini request failed unexpectedly; using fallback reply.', errorMessage);
 
     const reply = buildFallbackReply(message, level);
-    appendConversationMessages(conversationId, [
-      { role: 'user', content: message },
-      { role: 'assistant', content: reply },
-    ]);
+    await persistConversationActivity(conversationId, userId, level, message, reply);
 
     return reply;
   }

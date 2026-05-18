@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const lessonRoutes = require('./routes/lesson.routes');
 const errorMiddleware = require('./middleware/error.middleware');
 
-dotenv.config();
+dotenv.config({ path: '../../.env' });
 
 const app = express();
 

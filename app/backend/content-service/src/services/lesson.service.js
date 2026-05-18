@@ -21,7 +21,7 @@ async function createLesson(payload) {
     throw createError('VALIDATION_ERROR', errors.join(', '));
   }
 
-  const now = new Date().toISOString();
+  const now = new Date();
   const lesson = {
     ...value,
     id: createId('lesson'),
@@ -46,7 +46,7 @@ async function updateLesson(lessonId, payload) {
   const updated = {
     ...existing,
     ...value,
-    updated_at: new Date().toISOString(),
+    updated_at: new Date(),
   };
 
   return store.updateLesson(lessonId, updated);

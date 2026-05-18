@@ -1,10 +1,12 @@
 import LandingPage from './pages/LandingPage'
 import FlashcardsPage from './pages/FlashcardsPage'
+import DashboardPage from './pages/DashboardPage'
 import './styles/landing.css'
 
 const routes = {
   '/': LandingPage,
   '/landing': LandingPage,
+  '/dashboard': DashboardPage,
   '/flashcards': FlashcardsPage,
 }
 

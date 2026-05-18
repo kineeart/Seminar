@@ -1,5 +1,28 @@
 ﻿---
 
+### 2026-05-18 — Phase: Phase 5 MongoDB Persistence Layer
+
+- **Muc tieu**: Chuyen in-memory sang MongoDB Atlas, them shared database module, cap nhat schema + index + validation, va bo sung dashboard/lich su.
+- **Prompt da dung**:
+
+> "Trien khai Phase 5 MongoDB Persistence Layer cho he thong AI Tutor, bo mock storage, su dung mongoose va MongoDB Atlas."
+
+- **AI tra ket qua gi**:
+	- Them `shared/database/` voi config, retry, graceful shutdown.
+	- Cap nhat auth/chat/flashcard/content/quiz de dung MongoDB that.
+	- Bo sung endpoints cho history va dashboard.
+	- Cap nhat tests cho schema validation + repository + integration.
+
+- **Toi review gi**:
+	- Kiem tra MONGODB_URI + DATABASE_NAME bat buoc.
+	- Kiem tra index va timestamp tren schema.
+	- Kiem tra gateway proxy den chat + flashcard.
+
+- **Ket qua cuoi**:
+	- MongoDB Atlas da thay the in-memory storage trong backend.
+	- Lich su hoc tap va dashboard duoc mo rong de phuc vu frontend.
+
+
 ### 2026-05-18 — Phase: Phase 4 Quiz + Content Backend (Runnable MVP)
 
 - **Mục tiêu**: Trien khai `content-service` va `quiz-service` theo Phase 4, co scoring, attempts, progress; chay duoc khong can DB va co the bat MongoDB bang env.
