@@ -45,6 +45,14 @@ async function signup(payload) {
     return validation;
   }
 
+  const displayName = (payload.name || '').trim();
+  if (!displayName) {
+    return {
+      error: 'validation',
+      message: 'Name is required',
+    };
+  }
+
   const existingUser = await userRepository.findByEmail(validation.email);
 
   if (existingUser) {
@@ -58,6 +66,7 @@ async function signup(payload) {
     id: createId('user'),
     email: validation.email,
     passwordHash: validation.password,
+    displayName,
     role: validation.email === 'admin@gmail.com' ? 'admin' : 'user',
   });
 
@@ -65,6 +74,7 @@ async function signup(payload) {
     user: {
       id: user.id,
       email: user.email,
+      name: user.display_name,
       createdAt: user.created_at ? new Date(user.created_at).toISOString() : null,
     },
   };
@@ -120,6 +130,27 @@ async function login(payload) {
     user: {
       id: existingUser.id,
       email: existingUser.email,
+      name: existingUser.display_name,
+    },
+  };
+}
+
+async function getProfile(userId) {
+  const user = await userRepository.findById(userId);
+
+  if (!user) {
+    return {
+      error: 'not_found',
+      message: 'User not found',
+    };
+  }
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.display_name,
+      role: user.role,
     },
   };
 }
@@ -131,5 +162,6 @@ function resetStore() {
 module.exports = {
   signup,
   login,
+  getProfile,
   resetStore,
 };

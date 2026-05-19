@@ -72,8 +72,35 @@ async function login(req, res) {
   });
 }
 
+async function getProfile(req, res) {
+  const userId = req.user?.sub || req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'Unauthorized',
+    });
+  }
+
+  const result = await authService.getProfile(userId);
+
+  if (result.error) {
+    const statusCode = result.error === 'not_found' ? 404 : 500;
+    return res.status(statusCode).json({
+      status: 'error',
+      message: result.message,
+    });
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    user: result.user,
+  });
+}
+
 module.exports = {
   health,
   signup,
   login,
+  getProfile,
 };

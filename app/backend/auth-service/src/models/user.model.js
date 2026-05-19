@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    display_name: {
+      type: String,
+      default: '',
+    },
     role: {
       type: String,
       default: 'user',

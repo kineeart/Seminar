@@ -18,12 +18,13 @@ function normalizeUser(doc) {
   };
 }
 
-async function createUser({ id, email, passwordHash, role = 'user' }) {
+async function createUser({ id, email, passwordHash, displayName, role = 'user' }) {
   await ensureConnected();
   const doc = await User.create({
     _id: id,
     email,
     password_hash: passwordHash,
+    display_name: displayName || '',
     role,
   });
   return normalizeUser(doc);
@@ -35,12 +36,6 @@ async function findByEmail(email) {
   return normalizeUser(doc);
 }
 
-async function getAllUsers() {
-  await ensureConnected();
-  const docs = await User.find({}).lean();
-  return docs.map((doc) => normalizeUser(doc));
-}
-
 async function clearUsers() {
   await ensureConnected();
   await User.deleteMany({});
@@ -49,6 +44,5 @@ async function clearUsers() {
 module.exports = {
   createUser,
   findByEmail,
-  getAllUsers,
   clearUsers,
 };
