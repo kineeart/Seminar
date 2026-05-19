@@ -1,11 +1,15 @@
-﻿import MainLayout from '../components/layout/MainLayout'
+﻿import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import MainLayout from '../components/layout/MainLayout'
 import Button from '../components/ui/Button'
 import ProgressBar from '../components/ui/ProgressBar'
 import { useFlashcardStudyAPI } from '../hooks/useFlashcards'
 import useSwipe from '../hooks/useSwipe'
 
 function FlashcardStudyPage() {
-  const demo = useFlashcardStudyAPI()
+  const [searchParams] = useSearchParams()
+  const deck = useMemo(() => searchParams.get('deck') || 'all', [searchParams])
+  const demo = useFlashcardStudyAPI(deck)
 
   const swipe = useSwipe({
     onSwipeRight: demo.markKnown,
@@ -47,7 +51,6 @@ function FlashcardStudyPage() {
 
   const progressPercent = demo.total > 0 ? Math.round(((demo.known + demo.unknown) / demo.total) * 100) : 0
 
-  // Build card class
   const cardClass = [
     'study-card',
     demo.flipped ? 'flipped' : '',
@@ -69,13 +72,10 @@ function FlashcardStudyPage() {
         </div>
       </header>
 
-      {/* Card area — swipe handlers on wrapper */}
       <div className="study-card-area" {...swipe.handlers}>
-        {/* Overlays outside card so they don't flip */}
         <div className="swipe-overlay correct" style={{ opacity: swipe.showCorrect }}>KNOW ✓</div>
         <div className="swipe-overlay wrong" style={{ opacity: swipe.showWrong }}>DON'T KNOW ✗</div>
 
-        {/* Current card — key forces remount on index change */}
         <div
           key={`card-${demo.index}`}
           className={cardClass}
@@ -98,14 +98,12 @@ function FlashcardStudyPage() {
         </div>
       </div>
 
-      {/* Dots */}
       <div className="study-dots">
         {Array.from({ length: demo.total }).map((_, i) => (
           <span key={i} className={i === demo.index ? 'dot active' : i < demo.index ? 'dot done' : 'dot'} />
         ))}
       </div>
 
-      {/* Buttons */}
       <div className="study-buttons">
         <button className="btn red" onClick={demo.markUnknown}>✗ Don't Know</button>
         <button className="btn green" onClick={demo.markKnown}>✓ Know</button>

@@ -1,50 +1,145 @@
 ﻿import { useCallback, useEffect, useRef, useState } from 'react'
 import flashcardService from '../services/flashcard.service'
 
-const FALLBACK_DECKS = [
-  { id: 'toeic', title: 'TOEIC Vocabulary', category: 'TOEIC', count: 124, progress: 68 },
-  { id: 'ielts', title: 'IELTS Writing', category: 'IELTS', count: 42, progress: 35 },
-  { id: 'grammar', title: 'Grammar Essentials', category: 'Grammar', count: 75, progress: 76 },
-  { id: 'daily', title: 'Daily Phrases', category: 'Vocabulary', count: 58, progress: 42 },
-]
-
-const FALLBACK_CARDS = [
-  { id: 1, front: 'acquire', back: 'đạt được, thu được', example: 'She acquired new skills quickly.' },
-  { id: 2, front: 'deadline', back: 'hạn chót', example: 'The application deadline is Friday.' },
-  { id: 3, front: 'negotiate', back: 'đàm phán', example: 'They negotiated a better contract.' },
-  { id: 4, front: 'reliable', back: 'đáng tin cậy', example: 'This method is reliable for beginners.' },
-  { id: 5, front: 'implement', back: 'thực hiện, triển khai', example: 'We need to implement the new policy.' },
-  { id: 6, front: 'collaborate', back: 'hợp tác', example: 'Teams collaborate on large projects.' },
-  { id: 7, front: 'efficient', back: 'hiệu quả', example: 'This is a more efficient approach.' },
-  { id: 8, front: 'revenue', back: 'doanh thu', example: 'The company increased its revenue by 20%.' },
-]
-
 export function useFlashcardLibrary() {
   const [decks, setDecks] = useState([])
+  const [cardsByDeck, setCardsByDeck] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    let cancelled = false
+
     async function fetchDecks() {
+      // Try to get userId - retry a few times in case auth hasn't populated yet
+      let uid = window.localStorage.getItem('userId')
+      if (!uid) {
+        // Wait 500ms and try again
+        await new Promise((r) => setTimeout(r, 500))
+        uid = window.localStorage.getItem('userId')
+      }
+      if (!uid) {
+        // Wait another 1s
+        await new Promise((r) => setTimeout(r, 1000))
+        uid = window.localStorage.getItem('userId')
+      }
+
+      console.log('[useFlashcardLibrary] userId:', uid)
+
+      if (!uid) {
+        if (!cancelled) {
+          setDecks([])
+          setLoading(false)
+        }
+        return
+      }
+
       try {
-        setLoading(true)
-        const data = await flashcardService.getHistory()
-        const result = data.decks || data.history || data || []
-        setDecks(result.length > 0 ? result : FALLBACK_DECKS)
-      } catch {
-        setDecks(FALLBACK_DECKS)
+        if (!cancelled) setLoading(true)
+        const data = await flashcardService.getHistory(uid)
+        if (cancelled) return
+        
+        console.log('[useFlashcardLibrary] response:', JSON.stringify(data).substring(0, 200))
+        const flashcards = data.flashcards || data.cards || data || []
+        console.log('[useFlashcardLibrary] count:', flashcards.length)
+
+        if (flashcards.length > 0) {
+          const chatCards = flashcards.filter((fc) => fc.source === 'chat-inline')
+          const aiCards = flashcards.filter((fc) => fc.source === 'ai')
+          const seedCards = flashcards.filter((fc) => fc.source === 'seed')
+          const otherCards = flashcards.filter((fc) => !['chat-inline', 'ai', 'seed'].includes(fc.source))
+          const recentCards = [...flashcards]
+            .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+            .slice(0, 20)
+
+          const collections = []
+          const byDeck = {}
+
+          collections.push({
+            id: 'recent',
+            title: 'Recent',
+            category: 'Latest',
+            count: recentCards.length,
+            progress: Math.round((recentCards.filter((c) => c.reviewed_at).length / recentCards.length) * 100),
+          })
+          byDeck.recent = recentCards
+
+          collections.push({
+            id: 'all',
+            title: 'All Vocabulary',
+            category: 'All',
+            count: flashcards.length,
+            progress: Math.round((flashcards.filter((c) => c.reviewed_at).length / flashcards.length) * 100),
+          })
+          byDeck.all = flashcards
+
+          if (chatCards.length > 0) {
+            collections.push({
+              id: 'chat-inline',
+              title: 'Chat Flashcards',
+              category: 'From Chat',
+              count: chatCards.length,
+              progress: Math.round((chatCards.filter((c) => c.reviewed_at).length / chatCards.length) * 100),
+            })
+            byDeck['chat-inline'] = chatCards
+          }
+          if (aiCards.length > 0) {
+            collections.push({
+              id: 'ai-generated',
+              title: 'AI Generated',
+              category: 'AI',
+              count: aiCards.length,
+              progress: Math.round((aiCards.filter((c) => c.reviewed_at).length / aiCards.length) * 100),
+            })
+            byDeck['ai-generated'] = aiCards
+          }
+          if (seedCards.length > 0) {
+            collections.push({
+              id: 'seed',
+              title: 'Starter Pack',
+              category: 'Demo',
+              count: seedCards.length,
+              progress: Math.round((seedCards.filter((c) => c.reviewed_at).length / seedCards.length) * 100),
+            })
+            byDeck.seed = seedCards
+          }
+          if (otherCards.length > 0) {
+            collections.push({
+              id: 'other',
+              title: 'Other',
+              category: 'General',
+              count: otherCards.length,
+              progress: 0,
+            })
+            byDeck.other = otherCards
+          }
+
+          setDecks(collections)
+          setCardsByDeck(byDeck)
+        } else {
+          setDecks([])
+          setCardsByDeck({})
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('[useFlashcardLibrary] Error:', err)
+          setError(err.message)
+          setDecks([])
+          setCardsByDeck({})
+        }
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
 
     fetchDecks()
+    return () => { cancelled = true }
   }, [])
 
-  return { decks, loading, error }
+  return { decks, cardsByDeck, loading, error }
 }
 
-export function useFlashcardStudyAPI() {
+export function useFlashcardStudyAPI(deckId = 'all') {
   const [cards, setCards] = useState([])
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -59,18 +154,45 @@ export function useFlashcardStudyAPI() {
     async function fetchCards() {
       try {
         setLoading(true)
+        setError(null)
         const data = await flashcardService.getHistory()
-        const allCards = data.cards || data.flashcards || data || []
-        setCards(allCards.length > 0 ? allCards : FALLBACK_CARDS)
-      } catch {
-        setCards(FALLBACK_CARDS)
+        const raw = data.flashcards || data.cards || data || []
+        const sortedRecent = [...raw].sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+        let filtered = raw
+
+        if (deckId === 'recent') {
+          filtered = sortedRecent.slice(0, 20)
+        } else if (deckId === 'chat-inline') {
+          filtered = raw.filter((fc) => fc.source === 'chat-inline')
+        } else if (deckId === 'ai-generated') {
+          filtered = raw.filter((fc) => fc.source === 'ai')
+        } else if (deckId === 'seed') {
+          filtered = raw.filter((fc) => fc.source === 'seed')
+        } else if (deckId === 'other') {
+          filtered = raw.filter((fc) => !['chat-inline', 'ai', 'seed'].includes(fc.source))
+        } else if (deckId === 'all') {
+          filtered = raw
+        }
+
+        // Map API flashcard format to study card format
+        const mapped = filtered.map((fc) => ({
+          id: fc.id || fc._id,
+          front: fc.word || fc.front,
+          back: fc.meaning || fc.back,
+          pos: fc.ipa || fc.pos || '',
+          example: fc.example || '',
+        }))
+        setCards(mapped)
+      } catch (err) {
+        setError(err.message)
+        setCards([])
       } finally {
         setLoading(false)
       }
     }
 
     fetchCards()
-  }, [])
+  }, [deckId])
 
   const current = cards[index]
   const total = cards.length

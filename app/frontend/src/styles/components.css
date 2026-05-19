@@ -677,6 +677,18 @@
   flex-shrink: 0;
 }
 
+.deck-pick {
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.deck-pick-active {
+  border-color: rgba(106, 130, 251, 0.45);
+  box-shadow: 0 10px 26px rgba(106, 130, 251, 0.14);
+}
+
 /* Flashcard Study */
 .study-shell {
   align-items: center;

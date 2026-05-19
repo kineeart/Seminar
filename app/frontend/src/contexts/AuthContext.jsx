@@ -17,7 +17,13 @@ export function AuthProvider({ children }) {
 
     authService
       .getProfile()
-      .then((data) => setUser(data.user || data))
+      .then((data) => {
+        const profile = data.user || data
+        setUser(profile)
+        if (profile?.id) {
+          window.localStorage.setItem('userId', profile.id)
+        }
+      })
       .catch(() => {
         // Token invalid, clear it
         window.localStorage.removeItem('authToken')
