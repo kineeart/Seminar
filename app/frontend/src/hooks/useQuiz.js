@@ -64,15 +64,18 @@ export default function useQuiz() {
     const diff = opts.difficulty || difficulty || 'easy'
     const count = opts.questionCount || questionCount || 10
 
+    console.log('[useQuiz] startQuiz called', { diff, count, storedUserId })
     setLoading(true)
     setError(null)
     setIndex(0)
     setSelected(null)
     setAnswers([])
+    setQuestions([])
 
     setUserId(storedUserId)
 
     try {
+      console.log('[useQuiz] calling quizService.generate')
       const quiz = await quizService.generate({
         topic: 'mixed',
         count,
@@ -82,10 +85,14 @@ export default function useQuiz() {
         source: 'ai',
       })
 
+      console.log('[useQuiz] quiz received', { quizId: quiz?.id, questionCount: quiz?.questions?.length })
       setQuizId(quiz.id)
-      setQuestions((quiz.questions || []).map(mapQuestion))
+      const mappedQuestions = (quiz.questions || []).map(mapQuestion)
+      console.log('[useQuiz] mapped questions', mappedQuestions.length)
+      setQuestions(mappedQuestions)
       return { success: true, quizId: quiz.id, questionCount: quiz.questions?.length || count }
     } catch (err) {
+      console.error('[useQuiz] generate error', err)
       setError(err.message || 'Failed to generate quiz')
       return { success: false, error: err.message || 'Failed to generate quiz' }
     } finally {

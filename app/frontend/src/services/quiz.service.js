@@ -10,7 +10,9 @@ export const quizService = {
       useAi: true,
       source: 'ai',
     };
+    console.log('[quizService] generating quiz', finalPayload);
     const response = await api.post('/quizzes/generate', finalPayload);
+    console.log('[quizService] generate response', response);
     return response.quiz;
   },
 

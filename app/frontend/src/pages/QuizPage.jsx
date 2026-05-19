@@ -46,7 +46,7 @@ function QuizPage() {
     return ''
   }, [difficulty])
 
-  const hasStarted = Boolean(current)
+  const hasStarted = Boolean(current) && !loading
 
   if (!hasStarted && !loading) {
     return (

@@ -21,10 +21,12 @@ async function request(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`
   }
 
+  console.log('[api] request', { url, method: options.method, body: options.body });
   const response = await fetch(url, {
     ...options,
     headers,
   })
+  console.log('[api] response status', response.status);
 
   // Handle 401 - redirect to login
   if (response.status === 401) {
@@ -35,6 +37,7 @@ async function request(endpoint, options = {}) {
   }
 
   const data = await response.json().catch(() => ({}))
+  console.log('[api] response data', data);
 
   if (!response.ok) {
     const error = new Error(data.message || `Request failed (${response.status})`)
