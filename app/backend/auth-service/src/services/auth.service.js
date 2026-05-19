@@ -104,7 +104,7 @@ async function login(payload) {
         role: existingUser.role || 'user',
       },
       getJwtSecret(),
-      { expiresIn: '1h' },
+      { expiresIn: '7d' },
     );
   } catch (err) {
     return {

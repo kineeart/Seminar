@@ -75,8 +75,27 @@ async function markReviewed(flashcardId) {
   return flashcard;
 }
 
+async function batchCreate({ userId, conversationId, source, flashcards }) {
+  const ownerId = userId || 'guest';
+  const flashcardsWithIds = flashcards.map((card) => ({
+    _id: createId('flashcard'),
+    word: card.word,
+    ipa: card.ipa || '',
+    meaning: card.meaning,
+    example: card.example,
+  }));
+
+  return flashcardRepository.batchCreate({
+    userId: ownerId,
+    conversationId: String(conversationId || ''),
+    source: source || 'chat-inline',
+    flashcards: flashcardsWithIds,
+  });
+}
+
 module.exports = {
   generateFromConversation,
+  batchCreate,
   listHistory,
   getStats,
   markReviewed,

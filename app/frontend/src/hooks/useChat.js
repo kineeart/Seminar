@@ -57,6 +57,9 @@ export default function useChat() {
             id: Date.now() + 1,
             role: 'ai',
             text: data.reply || data.message || 'Sorry, I could not process that.',
+            flashcards: Array.isArray(data.flashcards) && data.flashcards.length > 0
+              ? data.flashcards
+              : undefined,
           },
         ])
       } catch (err) {
@@ -79,5 +82,14 @@ export default function useChat() {
     [send],
   )
 
-  return { messages, input, setInput, isTyping, mode, setMode, send, handleQuick, conversationId }
+  const startNewSession = useCallback(() => {
+    setMessages([
+      { id: Date.now(), role: 'ai', text: 'Hi! Ask me anything about English, TOEIC, IELTS, or daily communication.' },
+    ])
+    setInput('')
+    setConversationId(null)
+    setIsTyping(false)
+  }, [])
+
+  return { messages, input, setInput, isTyping, mode, setMode, send, handleQuick, conversationId, startNewSession }
 }

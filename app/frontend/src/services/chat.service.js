@@ -4,7 +4,7 @@ export const chatService = {
   /**
    * Send a chat message to the AI tutor.
    * Backend expects: { message, level, conversationId, userId, mode, scenario }
-   * Backend returns: { success, reply }
+   * Backend returns: { success, reply, goalProgress? }
    */
   sendMessage: (message, conversationId = null, mode = 'knowledge', user = null, scenario = null) => {
     const userId = user?.id || window.localStorage.getItem('userId') || null

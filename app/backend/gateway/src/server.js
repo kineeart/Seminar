@@ -50,6 +50,8 @@ app.use(
   createProxyMiddleware({
     target: AI_CHAT_SERVICE_URL,
     changeOrigin: true,
+    timeout: 120000,
+    proxyTimeout: 120000,
     pathRewrite: {
       '^/api/chat': '',
     },

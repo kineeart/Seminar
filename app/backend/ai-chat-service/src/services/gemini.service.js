@@ -2,20 +2,24 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const { validateChatRequest, normalizeLevel } = require('../utils/chat-validator');
 const { appendConversationMessages, getConversationHistory } = require('../utils/conversation-memory');
-const { SYSTEM_PROMPT, buildTutorPrompt, buildRoleplayPrompt } = require('../utils/prompt-builder');
+const { SYSTEM_PROMPT, buildTutorPrompt, buildRoleplayPrompt, isFlashcardRequest, buildFlashcardPrompt, FLASHCARD_SYSTEM_PROMPT } = require('../utils/prompt-builder');
 const progressClient = require('../utils/progress-client');
 
 const MAX_INPUT_LENGTH = 2000;
 const DEFAULT_TIMEOUT_MS = 30000;
+const FLASHCARD_TIMEOUT_MS = 90000;
 
 // ─── Provider: OpenAI-compatible (chiasegpu) ───────────────────────────────────
 
-async function callOpenAICompatible(prompt, systemPrompt) {
+async function callOpenAICompatible(prompt, systemPrompt, options = {}) {
   const apiKey = process.env.LLM_API_KEY;
   const baseUrl = process.env.LLM_BASE_URL;
-  const model = process.env.LLM_MODEL || 'MiniMax-M2.7';
+  const model = options.model || process.env.LLM_MODEL || 'MiniMax-M2.7';
 
   if (!apiKey || !baseUrl) return null;
+
+  const maxTokens = options.maxTokens || 1024;
+  const timeoutMs = options.timeoutMs || DEFAULT_TIMEOUT_MS;
 
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
@@ -29,10 +33,10 @@ async function callOpenAICompatible(prompt, systemPrompt) {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt },
       ],
-      max_tokens: 1024,
+      max_tokens: maxTokens,
       temperature: 0.7,
     }),
-    signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (!response.ok) {
@@ -130,36 +134,65 @@ async function generateResponse(rawInput, options = {}) {
 
   const history = await getConversationHistory(conversationId);
 
-  const prompt = mode === 'roleplay'
-    ? buildRoleplayPrompt({ message, level, history, scenario })
-    : buildTutorPrompt({ message, level, history });
+  // Determine if this is a flashcard request — use dedicated prompt
+  const needsFlashcards = mode !== 'roleplay' && isFlashcardRequest(message);
+
+  let prompt;
+  if (mode === 'roleplay') {
+    prompt = buildRoleplayPrompt({ message, level, history, scenario });
+  } else if (needsFlashcards) {
+    prompt = buildFlashcardPrompt({ message, level, history });
+  } else {
+    prompt = buildTutorPrompt({ message, level, history });
+  }
 
   let reply = null;
   let source = 'fallback';
 
-  // 1. Try OpenAI-compatible (chiasegpu) first
-  try {
-    logInfo('llm_request_start', { provider: 'openai-compatible', model: process.env.LLM_MODEL });
-    reply = await callOpenAICompatible(prompt, SYSTEM_PROMPT);
-    if (reply) {
-      source = 'openai-compatible';
-      logInfo('llm_request_success', { provider: 'openai-compatible', replyLength: reply.length });
-    }
-  } catch (err) {
-    logWarn('llm_request_failure', { provider: 'openai-compatible', status: err.status, message: err.message });
-  }
+  // Determine if this is a flashcard request (needs more tokens for JSON output)
+  const llmOptions = needsFlashcards ? { maxTokens: 4096, timeoutMs: FLASHCARD_TIMEOUT_MS } : {};
+  const systemPrompt = needsFlashcards ? FLASHCARD_SYSTEM_PROMPT : SYSTEM_PROMPT;
 
-  // 2. If failed, try Gemini as fallback
-  if (!reply) {
+  // For flashcard requests, use dedicated flashcard model via OpenAI-compatible API
+  // For normal requests, use OpenAI-compatible first, Gemini as fallback
+  if (needsFlashcards) {
+    // Use flashcard model (no fallback needed — single call)
     try {
-      logInfo('llm_request_start', { provider: 'gemini', model: process.env.GEMINI_MODEL });
-      reply = await callGemini(prompt);
+      const flashcardModel = process.env.FLASHCARD_LLM_MODEL || 'rhika/grok-4.20-0309-reasoning-super';
+      logInfo('llm_request_start', { provider: 'openai-compatible', model: flashcardModel, reason: 'flashcard' });
+      reply = await callOpenAICompatible(prompt, systemPrompt, { ...llmOptions, model: flashcardModel });
       if (reply) {
-        source = 'gemini';
-        logInfo('llm_request_success', { provider: 'gemini', replyLength: reply.length });
+        source = 'openai-compatible-flashcard';
+        logInfo('llm_request_success', { provider: 'openai-compatible', model: flashcardModel, replyLength: reply.length });
       }
     } catch (err) {
-      logWarn('llm_request_failure', { provider: 'gemini', status: err.status, message: err.message });
+      logWarn('llm_request_failure', { provider: 'openai-compatible-flashcard', status: err.status, message: err.message });
+    }
+  } else {
+    // 1. Try OpenAI-compatible (chiasegpu) first for normal chat
+    try {
+      logInfo('llm_request_start', { provider: 'openai-compatible', model: process.env.LLM_MODEL });
+      reply = await callOpenAICompatible(prompt, systemPrompt, llmOptions);
+      if (reply) {
+        source = 'openai-compatible';
+        logInfo('llm_request_success', { provider: 'openai-compatible', replyLength: reply.length });
+      }
+    } catch (err) {
+      logWarn('llm_request_failure', { provider: 'openai-compatible', status: err.status, message: err.message });
+    }
+
+    // 2. If failed, try Gemini as fallback
+    if (!reply) {
+      try {
+        logInfo('llm_request_start', { provider: 'gemini', model: process.env.GEMINI_MODEL });
+        reply = await callGemini(prompt);
+        if (reply) {
+          source = 'gemini';
+          logInfo('llm_request_success', { provider: 'gemini', replyLength: reply.length });
+        }
+      } catch (err) {
+        logWarn('llm_request_failure', { provider: 'gemini', status: err.status, message: err.message });
+      }
     }
   }
 
