@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics — AI Tutor Admin</title>
+  <link rel="stylesheet" href="styles/admin-shell.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AI</div><div><h1>AI Tutor</h1><p>Admin control</p></div></div>
+      <nav class="side-nav">
+        <a class="side-link" href="admin.html"><span>Dashboard</span><span>→</span></a>
+        <a class="side-link" href="users.html"><span>Users</span><span>→</span></a>
+        <a class="side-link active" href="analytics.html"><span>Analytics</span><span>→</span></a>
+        <a class="side-link" href="prompts.html"><span>Prompts</span><span>→</span></a>
+        <a class="side-link" href="system.html"><span>System</span><span>→</span></a>
+        <a class="side-link" href="chat.html"><span>Chat</span><span>→</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="hero">
+        <div><div class="eyebrow">Observability</div><h2>Analytics Console</h2><p class="muted" id="signedInAs">Signed in</p></div>
+        <div class="button-row"><button class="button secondary" id="refreshButton" type="button">Refresh</button><button class="button secondary" id="logoutButton" type="button">Logout</button></div>
+      </section>
+      <section class="grid overview-grid" id="overviewCards"></section>
+      <section class="section-grid grid">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">Recent requests</div><h3>Gateway log stream</h3><p class="muted">Newest request records from the analytics service.</p></div></div>
+          <div class="log-list" id="logList"></div>
+        </article>
+        <div class="stack">
+          <article class="panel"><div class="panel-head"><div><div class="eyebrow">Chat analytics</div><h3>Per-user requests</h3></div></div><div class="list" id="chatStats"></div></article>
+          <article class="panel"><div class="panel-head"><div><div class="eyebrow">Flashcard analytics</div><h3>Generated count</h3></div></div><div class="list" id="flashcardStats"></div></article>
+          <article class="panel"><div class="panel-head"><div><div class="eyebrow">Topics</div><h3>Topic extraction</h3></div></div><div class="list" id="topicStats"></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/api.js"></script>
+  <script type="module" src="js/analytics.js"></script>
+</body>
+</html>

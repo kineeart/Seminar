@@ -12,9 +12,133 @@ const AI_CHAT_SERVICE_URL = process.env.AI_CHAT_SERVICE_URL || 'http://localhost
 const FLASHCARD_SERVICE_URL = process.env.FLASHCARD_SERVICE_URL || 'http://localhost:3003';
 const CONTENT_SERVICE_URL = process.env.CONTENT_SERVICE_URL || 'http://localhost:5003';
 const QUIZ_SERVICE_URL = process.env.QUIZ_SERVICE_URL || 'http://localhost:5004';
+const ANALYTICS_SERVICE_URL = process.env.ANALYTICS_SERVICE_URL || 'http://localhost:5005';
+
+function decodeJwtPayload(token) {
+  if (!token || !token.includes('.')) {
+    return null;
+  }
+
+  try {
+    const payload = token.split('.')[1];
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const json = Buffer.from(normalized, 'base64').toString('utf8');
+    return JSON.parse(json);
+  } catch (_error) {
+    return null;
+  }
+}
+
+function classifyIntent(body = {}) {
+  const message = String(body.message || body.prompt || '').toLowerCase();
+
+  if (message.includes('translate') || message.includes('dịch')) {
+    return 'translation';
+  }
+
+  if (message.includes('explain') || message.includes('giải thích')) {
+    return 'explanation';
+  }
+
+  if (message.includes('quiz') || message.includes('test')) {
+    return 'assessment';
+  }
+
+  if (message.includes('flashcard') || message.includes('card')) {
+    return 'flashcard';
+  }
+
+  return message ? 'learning' : 'unknown';
+}
+
+function classifyTopic(body = {}) {
+  const text = JSON.stringify(body).toLowerCase();
+  const topics = [];
+
+  if (text.includes('grammar')) topics.push('grammar');
+  if (text.includes('vocabulary')) topics.push('vocabulary');
+  if (text.includes('speaking')) topics.push('speaking');
+  if (text.includes('listening')) topics.push('listening');
+  if (text.includes('reading')) topics.push('reading');
+  if (text.includes('writing')) topics.push('writing');
+  if (text.includes('toeic')) topics.push('toeic');
+  if (text.includes('ielts')) topics.push('ielts');
+
+  return topics.length ? topics : ['general'];
+}
+
+function estimateTokens(body = {}) {
+  const text = String(body.message || body.prompt || JSON.stringify(body) || '');
+  return Math.max(1, Math.ceil(text.length / 4));
+}
+
+function shouldLogRequest(req) {
+  if (!req.originalUrl.startsWith('/api/')) {
+    return false;
+  }
+
+  if (req.originalUrl.startsWith('/api/analytics')) {
+    return false;
+  }
+
+  return !['OPTIONS', 'HEAD'].includes(req.method);
+}
+
+function trackRequest(req, res) {
+  if (!shouldLogRequest(req)) {
+    return;
+  }
+
+  const startedAt = Date.now();
+  res.on('finish', () => {
+    const authorization = req.headers.authorization || '';
+    const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+    const payload = decodeJwtPayload(token);
+    const body = req.body || {};
+    const endpoint = req.originalUrl.split('?')[0];
+
+    const analyticsEvent = {
+      userId: payload?.sub || payload?.email || null,
+      endpoint,
+      method: req.method,
+      timestamp: new Date().toISOString(),
+      responseTime: Date.now() - startedAt,
+      statusCode: res.statusCode,
+      tokenEstimate: estimateTokens(body),
+      service: endpoint.startsWith('/api/auth')
+        ? 'auth-service'
+        : endpoint.startsWith('/api/chat')
+          ? 'ai-chat-service'
+          : endpoint.startsWith('/api/flashcards')
+            ? 'flashcard-service'
+            : endpoint.startsWith('/api/content')
+              ? 'content-service'
+              : endpoint.startsWith('/api/quizzes')
+                ? 'quiz-service'
+                : 'gateway',
+      intent: classifyIntent(body),
+      topic: classifyTopic(body).join(', '),
+    };
+
+    fetch(`${ANALYTICS_SERVICE_URL}/logs/ingest`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(analyticsEvent),
+    }).catch((error) => {
+      console.error('Gateway analytics log error:', error.message);
+    });
+  });
+}
 
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+  trackRequest(req, res);
+  next();
+});
 
 app.get('/health', (_req, res) => {
   return res.status(200).json({
@@ -130,6 +254,27 @@ app.use(
 );
 
 app.use(
+  '/api/analytics',
+  createProxyMiddleware({
+    target: ANALYTICS_SERVICE_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/analytics': '',
+    },
+    on: {
+      proxyReq: fixRequestBody,
+    },
+    onError(error, _req, res) {
+      console.error('Gateway proxy error:', error.message);
+      res.status(502).json({
+        status: 'error',
+        message: 'Analytics service unavailable',
+      });
+    },
+  }),
+);
+
+app.use(
   '/api/progress',
   createProxyMiddleware({
     target: QUIZ_SERVICE_URL,
@@ -179,6 +324,7 @@ if (require.main === module) {
     console.log(`proxying /api/flashcards -> ${FLASHCARD_SERVICE_URL}`);
     console.log(`proxying /api/content -> ${CONTENT_SERVICE_URL}`);
     console.log(`proxying /api/quizzes -> ${QUIZ_SERVICE_URL}`);
+    console.log(`proxying /api/analytics -> ${ANALYTICS_SERVICE_URL}`);
   });
 }
 

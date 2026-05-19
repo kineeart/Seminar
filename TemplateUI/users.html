@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users — AI Tutor Admin</title>
+  <link rel="stylesheet" href="styles/admin-shell.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <div><h1>AI Tutor</h1><p>Admin control</p></div>
+      </div>
+      <nav class="side-nav">
+        <a class="side-link" href="admin.html"><span>Dashboard</span><span>→</span></a>
+        <a class="side-link active" href="users.html"><span>Users</span><span>→</span></a>
+        <a class="side-link" href="analytics.html"><span>Analytics</span><span>→</span></a>
+        <a class="side-link" href="prompts.html"><span>Prompts</span><span>→</span></a>
+        <a class="side-link" href="system.html"><span>System</span><span>→</span></a>
+        <a class="side-link" href="chat.html"><span>Chat</span><span>→</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="hero">
+        <div><div class="eyebrow">Account control</div><h2>User Management</h2><p class="muted" id="signedInAs">Signed in</p></div>
+        <div class="button-row"><button class="button secondary" id="refreshButton" type="button">Refresh</button><button class="button secondary" id="logoutButton" type="button">Logout</button></div>
+      </section>
+      <section class="section-grid grid">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">Directory</div><h3>Auth users</h3><p class="muted" id="usersStatus">Loading users...</p></div></div>
+          <div class="empty-state" id="usersEmpty" hidden>Users endpoint is not available yet.</div>
+          <table class="table" aria-label="Users table">
+            <thead><tr><th>ID</th><th>Email</th><th>Role</th><th>Created</th></tr></thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </article>
+        <article class="panel"><div class="panel-head"><div><div class="eyebrow">Trace</div><h3>Activity</h3><p class="muted">Lightweight status while loading the directory.</p></div></div><div class="log-list" id="activityLog"></div></article>
+      </section>
+    </main>
+  </div>
+  <script src="js/api.js"></script>
+  <script type="module" src="js/users.js"></script>
+</body>
+</html>

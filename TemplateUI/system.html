@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>System — AI Tutor Admin</title>
+  <link rel="stylesheet" href="styles/admin-shell.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AI</div><div><h1>AI Tutor</h1><p>Admin control</p></div></div>
+      <nav class="side-nav">
+        <a class="side-link" href="admin.html"><span>Dashboard</span><span>→</span></a>
+        <a class="side-link" href="users.html"><span>Users</span><span>→</span></a>
+        <a class="side-link" href="analytics.html"><span>Analytics</span><span>→</span></a>
+        <a class="side-link" href="prompts.html"><span>Prompts</span><span>→</span></a>
+        <a class="side-link active" href="system.html"><span>System</span><span>→</span></a>
+        <a class="side-link" href="chat.html"><span>Chat</span><span>→</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="hero">
+        <div><div class="eyebrow">Infrastructure</div><h2>System Monitor</h2><p class="muted" id="signedInAs">Signed in</p></div>
+        <div class="button-row"><button class="button secondary" id="refreshButton" type="button">Refresh</button><button class="button secondary" id="logoutButton" type="button">Logout</button></div>
+      </section>
+      <section class="section-grid grid">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">Health</div><h3>Service status</h3><p class="muted">Gateway and backend service reachability.</p></div></div>
+          <div class="summary" id="healthSummary"></div>
+          <div class="cards two" id="healthGrid"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">Recent trace</div><h3>Activity</h3><p class="muted">Small status feed for the current session.</p></div></div>
+          <div class="log-list" id="activityLog"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script src="js/api.js"></script>
+  <script type="module" src="js/system.js"></script>
+</body>
+</html>
