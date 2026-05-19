@@ -5,11 +5,9 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -235,8 +233,8 @@
 }
 
 .btn-sm {
-  padding: 8px 12px;
-  font-size: 13px;
+  padding: 5px 8px;
+  font-size: 11px;
 }
 
 .btn-inline {
@@ -343,8 +341,67 @@
 
 .chat-shell {
   min-height: calc(100vh - 48px);
-  display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.chat-header {
+  flex: 0 0 auto;
+  padding: 8px 0 10px;
+  background: transparent;
+}
+
+.scenario-anim {
+  animation: scenarioPop 0.25s ease;
+}
+
+@keyframes scenarioPop {
+  from {
+    opacity: 0.6;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.roleplay-shell .scenario-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scenario-chip {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scenario-chip.active {
+  border-color: var(--brand);
+  background: rgba(106, 130, 251, 0.12);
+  color: var(--brand);
+}
+
+.scenario-pulse {
+  animation: scenarioPulse 0.25s ease;
+}
+
+@keyframes scenarioPulse {
+  from {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .mode-toggle {
@@ -373,12 +430,14 @@
 }
 
 .message-list {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-height: 0;
   overflow-y: auto;
   padding-right: 4px;
+  padding-top: 6px;
   padding-bottom: 220px;
 }
 
@@ -386,11 +445,14 @@
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  width: min(460px, calc(100% - 24px));
+  width: min(440px, calc(100% - 32px));
   bottom: calc(72px + env(safe-area-inset-bottom));
   z-index: 40;
   background: linear-gradient(to top, rgba(246, 213, 247, 0.92), rgba(246, 213, 247, 0.7) 55%, rgba(246, 213, 247, 0));
-  padding: 8px 0 0;
+  padding: 12px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .message {
@@ -457,12 +519,30 @@
 }
 
 .typing-fixed {
-  margin: 4px 0 6px;
+  margin: 0;
   width: fit-content;
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.chat-compose .quick-actions {
+  margin-bottom: 2px;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.chat-compose .quick-actions .btn-sm {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-compose .input-bar {
+  margin-top: 2px;
 }
 
 @media (max-width: 480px) {
@@ -471,8 +551,9 @@
   }
 
   .chat-compose {
-    width: calc(100% - 20px);
+    width: calc(100% - 24px);
     bottom: calc(74px + env(safe-area-inset-bottom));
+    padding: 8px 10px 10px;
   }
 }
 

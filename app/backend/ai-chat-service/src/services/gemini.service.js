@@ -2,7 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const { validateChatRequest, normalizeLevel } = require('../utils/chat-validator');
 const { appendConversationMessages, getConversationHistory } = require('../utils/conversation-memory');
-const { SYSTEM_PROMPT, buildTutorPrompt } = require('../utils/prompt-builder');
+const { SYSTEM_PROMPT, buildTutorPrompt, buildRoleplayPrompt } = require('../utils/prompt-builder');
 const progressClient = require('../utils/progress-client');
 
 const MAX_INPUT_LENGTH = 2000;
@@ -273,6 +273,8 @@ async function generateResponse(rawInput, options = {}) {
     level,
     conversationId,
     userId,
+    mode,
+    scenario,
   } = validateChatRequest(request);
 
   if (message.length > MAX_INPUT_LENGTH) {
@@ -283,11 +285,18 @@ async function generateResponse(rawInput, options = {}) {
 
   const model = getModel();
   const history = await getConversationHistory(conversationId);
-  const prompt = buildTutorPrompt({
-    message,
-    level,
-    history,
-  });
+  const prompt = mode === 'roleplay'
+    ? buildRoleplayPrompt({
+      message,
+      level,
+      history,
+      scenario,
+    })
+    : buildTutorPrompt({
+      message,
+      level,
+      history,
+    });
 
   if (!model) {
     const reply = buildFallbackReply(message, level);

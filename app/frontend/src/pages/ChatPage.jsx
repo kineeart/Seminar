@@ -1,10 +1,12 @@
 ﻿import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import MainLayout from '../components/layout/MainLayout'
 import Button from '../components/ui/Button'
 import ChatMessage from '../components/ui/ChatMessage'
 import useChat from '../hooks/useChat'
 
 function ChatPage() {
+  const navigate = useNavigate()
   const { messages, input, setInput, isTyping, mode, setMode, send, handleQuick } = useChat()
   const messageListRef = useRef(null)
 
@@ -16,11 +18,11 @@ function ChatPage() {
 
   return (
     <MainLayout navActive="chat" className="chat-shell">
-      <header className="page-header row-between">
+      <header className="page-header row-between chat-header">
         <h1>AI Tutor</h1>
         <div className="mode-toggle">
           <button className={mode === 'knowledge' ? 'active' : ''} onClick={() => setMode('knowledge')} type="button" aria-pressed={mode === 'knowledge'}>Knowledge</button>
-          <button className={mode === 'roleplay' ? 'active' : ''} onClick={() => setMode('roleplay')} type="button" aria-pressed={mode === 'roleplay'}>Roleplay</button>
+          <button className={mode === 'roleplay' ? 'active' : ''} onClick={() => navigate('/roleplay')} type="button" aria-pressed={mode === 'roleplay'}>Roleplay</button>
         </div>
       </header>
 

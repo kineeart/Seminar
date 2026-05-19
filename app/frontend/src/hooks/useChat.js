@@ -1,16 +1,40 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import chatService from '../services/chat.service'
 
+const CHAT_STORAGE_KEY = 'chat_state_knowledge_v1'
+
 export default function useChat() {
   const { user } = useAuth()
-  const [messages, setMessages] = useState([
+  const initialState = useMemo(() => {
+    try {
+      const raw = window.localStorage.getItem(CHAT_STORAGE_KEY)
+      if (!raw) return null
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed.messages) || !parsed.messages.length) return null
+      return parsed
+    } catch (_err) {
+      return null
+    }
+  }, [])
+
+  const [messages, setMessages] = useState(initialState?.messages || [
     { id: 1, role: 'ai', text: 'Hi! Ask me anything about English, TOEIC, IELTS, or daily communication.' },
   ])
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(initialState?.input || '')
   const [isTyping, setIsTyping] = useState(false)
-  const [mode, setMode] = useState('knowledge')
-  const [conversationId, setConversationId] = useState(null)
+  const [mode, setMode] = useState(initialState?.mode || 'knowledge')
+  const [conversationId, setConversationId] = useState(initialState?.conversationId || null)
+
+  useEffect(() => {
+    const snapshot = {
+      messages,
+      input,
+      mode,
+      conversationId,
+    }
+    window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(snapshot))
+  }, [messages, input, mode, conversationId])
 
   const send = useCallback(
     async (overrideText) => {

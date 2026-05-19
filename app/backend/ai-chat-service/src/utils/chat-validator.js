@@ -54,6 +54,8 @@ function normalizeUserId(inputUserId) {
 function validateChatRequest(body) {
   const payload = body || {};
   const message = typeof payload.message === 'string' ? payload.message.trim() : '';
+  const mode = typeof payload.mode === 'string' ? payload.mode.trim().toLowerCase() : 'knowledge';
+  const scenario = typeof payload.scenario === 'string' ? payload.scenario.trim() : '';
 
   if (!message) {
     throw createValidationError('Empty message', 'EMPTY_MESSAGE');
@@ -68,6 +70,8 @@ function validateChatRequest(body) {
     level: normalizeLevel(payload.level),
     conversationId: normalizeConversationId(payload.conversationId),
     userId: normalizeUserId(payload.userId),
+    mode: mode === 'roleplay' ? 'roleplay' : 'knowledge',
+    scenario: scenario.slice(0, 120),
   };
 }
 
