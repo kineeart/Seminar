@@ -1,0 +1,96 @@
+{
+  "id": "quiz_1779186508410_20",
+  "user_id": "user-2",
+  "title": "Score Quiz",
+  "source": "manual",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": "general",
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": []
+  },
+  "target_exam": null,
+  "level_tag": "beginner",
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779186508410_26",
+      "type": "MCQ",
+      "question": "Pick X",
+      "options": [
+        "X",
+        "Y"
+      ],
+      "correct_answer": "X",
+      "explanation": "",
+      "source": "manual",
+      "skill_tag": "vocab",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186508410_27",
+      "type": "MCQ",
+      "question": "Pick B",
+      "options": [
+        "A",
+        "B"
+      ],
+      "correct_answer": "B",
+      "explanation": "",
+      "source": "manual",
+      "skill_tag": "grammar",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186508410_21",
+      "type": "MCQ",
+      "question": "What is the meaning of \"deadline\"?",
+      "options": [
+        "official agreement or consent",
+        "a plan of times for tasks",
+        "a formal plan or suggestion",
+        "the latest time for completion"
+      ],
+      "correct_answer": "the latest time for completion",
+      "explanation": "A deadline is the latest time for completion.",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy",
+      "source": "fallback-vocabulary"
+    },
+    {
+      "question_id": "question_1779186508410_22",
+      "type": "MCQ",
+      "question": "What is the meaning of \"schedule\"?",
+      "options": [
+        "a formal plan or suggestion",
+        "a completion time limit",
+        "a plan of times for tasks",
+        "official agreement or consent"
+      ],
+      "correct_answer": "a plan of times for tasks",
+      "explanation": "A schedule is a plan of times for tasks.",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy",
+      "source": "fallback-vocabulary"
+    },
+    {
+      "question_id": "question_1779186508410_23",
+      "type": "MCQ",
+      "question": "What is the meaning of \"proposal\"?",
+      "options": [
+        "a completion time limit",
+        "a formal plan or suggestion",
+        "official agreement or consent",
+        "a plan of times for tasks"
+      ],
+      "correct_answer": "a formal plan or suggestion",
+      "explanation": "A proposal is a formal plan or suggestion.",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy",
+      "source": "fallback-vocabulary"
+    }
+  ],
+  "created_at": "2026-05-19T10:28:28.410Z",
+  "deleted_at": null
+}

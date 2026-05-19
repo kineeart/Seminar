@@ -1,0 +1,198 @@
+{
+  "user_id": "user_fefe0fbe-2890-4fc9-b962-da21b43aae15",
+  "title": "Air Travel Vocabulary Quiz",
+  "source": "ai",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": "mixed",
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": [
+      "flashcard_2c007179-8e90-4313-b0ca-af28ac205d27",
+      "flashcard_5c99da3e-8af6-49dd-9d36-93195ef394f1",
+      "flashcard_3257deff-732c-4602-a824-e09501855d18",
+      "flashcard_961bf342-dd4c-4d6a-84f7-79e3c566a178",
+      "flashcard_dcc902ce-6597-4ba1-96f6-22212835ee50",
+      "flashcard_2fa5a615-4136-4413-b58f-afdbb8f9d158",
+      "flashcard_98311b88-6b24-4b9a-b8be-fe3fd803d262",
+      "flashcard_9c143ee3-09f7-46ac-b2e8-dc6e932539e5",
+      "flashcard_f59ef386-871d-4e65-aa4d-7ef135460e98",
+      "flashcard_b4bc582e-99f2-4aa3-8b25-efb70b70c944",
+      "flashcard_90d9f3bb-b7be-45b3-8f6c-841a9fa22223",
+      "flashcard_c4c282b6-f153-469c-8048-a5caf71be341",
+      "flashcard_b1480132-25e3-42ed-b5ed-24b5d36e85b3",
+      "flashcard_5c063b16-cb6c-4f25-aa54-559969cac363",
+      "flashcard_c562314a-cf5f-4602-91fc-027bab5bc324"
+    ]
+  },
+  "target_exam": "TOEIC",
+  "level_tag": "beginner",
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779189777757_3",
+      "type": "fill_in_the_blank",
+      "question": "The pilot taxied the plane down the _____ before takeoff.",
+      "options": [
+        "runway",
+        "immigration",
+        "customs",
+        "baggage claim"
+      ],
+      "correct_answer": "runway",
+      "explanation": "Runway là đường băng.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_4",
+      "type": "fill_in_the_blank",
+      "question": "Foreign visitors must clear _____ before entering the country.",
+      "options": [
+        "immigration",
+        "overhead compartment",
+        "flight attendant",
+        "turbulence"
+      ],
+      "correct_answer": "immigration",
+      "explanation": "Immigration là kiểm soát nhập cảnh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_5",
+      "type": "fill_in_the_blank",
+      "question": "Travelers pass through _____ to check for prohibited items.",
+      "options": [
+        "customs",
+        "layover",
+        "jet lag",
+        "arrival"
+      ],
+      "correct_answer": "customs",
+      "explanation": "Customs là hải quan.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_6",
+      "type": "fill_in_the_blank",
+      "question": "Passengers retrieve their checked luggage from the _____.",
+      "options": [
+        "baggage claim",
+        "runway",
+        "turbulence",
+        "immigration"
+      ],
+      "correct_answer": "baggage claim",
+      "explanation": "Baggage claim là nơi nhận hành lý.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_7",
+      "type": "fill_in_the_blank",
+      "question": "During boarding, put your small bag in the _____ to keep the aisle clear.",
+      "options": [
+        "overhead compartment",
+        "customs",
+        "baggage claim",
+        "layover"
+      ],
+      "correct_answer": "overhead compartment",
+      "explanation": "Overhead compartment là ngăn hành lý trên đầu.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_8",
+      "type": "fill_in_the_blank",
+      "question": "The _____ demonstrated how to use the oxygen mask.",
+      "options": [
+        "flight attendant",
+        "jet lag",
+        "arrival",
+        "turbulence"
+      ],
+      "correct_answer": "flight attendant",
+      "explanation": "Flight attendant là tiếp viên hàng không.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_9",
+      "type": "fill_in_the_blank",
+      "question": "Passengers were asked to fasten seatbelts due to expected _____.",
+      "options": [
+        "turbulence",
+        "runway",
+        "immigration",
+        "overhead compartment"
+      ],
+      "correct_answer": "turbulence",
+      "explanation": "Turbulence là sự xáo động không khí.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_10",
+      "type": "fill_in_the_blank",
+      "question": "Crossing many time zones often causes _____ and difficulty sleeping.",
+      "options": [
+        "jet lag",
+        "customs",
+        "baggage claim",
+        "layover"
+      ],
+      "correct_answer": "jet lag",
+      "explanation": "Jet lag là hội chứng jet lag.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_11",
+      "type": "fill_in_the_blank",
+      "question": "During our _____ we explored the airport shops.",
+      "options": [
+        "layover",
+        "flight attendant",
+        "turbulence",
+        "arrival"
+      ],
+      "correct_answer": "layover",
+      "explanation": "Layover là chuyến trung chuyển.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189777757_12",
+      "type": "fill_in_the_blank",
+      "question": "The flight schedule shows the expected _____ time at the destination.",
+      "options": [
+        "arrival",
+        "runway",
+        "customs",
+        "immigration"
+      ],
+      "correct_answer": "arrival",
+      "explanation": "Arrival là đến nơi.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    }
+  ],
+  "deleted_at": null,
+  "created_at": "2026-05-19T11:22:57.757Z",
+  "updated_at": "2026-05-19T11:22:57.757Z",
+  "id": "quiz_1779189692744_1",
+  "completed_at": null
+}

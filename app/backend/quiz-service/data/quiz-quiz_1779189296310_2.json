@@ -1,0 +1,278 @@
+{
+  "user_id": "user_fefe0fbe-2890-4fc9-b962-da21b43aae15",
+  "title": "Air Travel Vocabulary Quiz",
+  "source": "ai",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": "mixed",
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": [
+      "flashcard_2c007179-8e90-4313-b0ca-af28ac205d27",
+      "flashcard_5c99da3e-8af6-49dd-9d36-93195ef394f1",
+      "flashcard_3257deff-732c-4602-a824-e09501855d18",
+      "flashcard_961bf342-dd4c-4d6a-84f7-79e3c566a178",
+      "flashcard_dcc902ce-6597-4ba1-96f6-22212835ee50",
+      "flashcard_2fa5a615-4136-4413-b58f-afdbb8f9d158",
+      "flashcard_98311b88-6b24-4b9a-b8be-fe3fd803d262",
+      "flashcard_9c143ee3-09f7-46ac-b2e8-dc6e932539e5",
+      "flashcard_f59ef386-871d-4e65-aa4d-7ef135460e98",
+      "flashcard_b4bc582e-99f2-4aa3-8b25-efb70b70c944",
+      "flashcard_90d9f3bb-b7be-45b3-8f6c-841a9fa22223",
+      "flashcard_c4c282b6-f153-469c-8048-a5caf71be341",
+      "flashcard_b1480132-25e3-42ed-b5ed-24b5d36e85b3",
+      "flashcard_5c063b16-cb6c-4f25-aa54-559969cac363",
+      "flashcard_c562314a-cf5f-4602-91fc-027bab5bc324"
+    ]
+  },
+  "target_exam": "TOEIC",
+  "level_tag": "beginner",
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779189381252_4",
+      "type": "MCQ",
+      "question": "What does 'runway' refer to?",
+      "options": [
+        "The paved strip where planes take off and land",
+        "The area where you collect your luggage",
+        "The process of checking passports upon arrival",
+        "The seat next to the walkway on a plane"
+      ],
+      "correct_answer": "The paved strip where planes take off and land",
+      "explanation": "Runway nghĩa là đường băng, nơi máy bay cất cánh và hạ cánh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_5",
+      "type": "MCQ",
+      "question": "What is 'immigration' at the airport?",
+      "options": [
+        "The area where passports and visas are checked when entering a country",
+        "The place where you declare goods",
+        "The counter for getting your boarding pass",
+        "The storage space above the seats"
+      ],
+      "correct_answer": "The area where passports and visas are checked when entering a country",
+      "explanation": "Immigration là kiểm soát nhập cảnh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_6",
+      "type": "MCQ",
+      "question": "What do you do at 'customs'?",
+      "options": [
+        "Declare items you are bringing into the country",
+        "Pick up your checked luggage",
+        "Board the plane",
+        "Store your bag overhead"
+      ],
+      "correct_answer": "Declare items you are bringing into the country",
+      "explanation": "Customs là hải quan, nơi khai báo hàng hóa.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_7",
+      "type": "MCQ",
+      "question": "Where is the 'baggage claim'?",
+      "options": [
+        "The area where passengers collect their luggage",
+        "The place for passport control",
+        "The gate for departing flights",
+        "The staff serving drinks on the plane"
+      ],
+      "correct_answer": "The area where passengers collect their luggage",
+      "explanation": "Baggage claim là nơi nhận hành lý.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_8",
+      "type": "MCQ",
+      "question": "What is an 'overhead compartment'?",
+      "options": [
+        "The storage area above the seats for carry-on bags",
+        "The line for checking passports",
+        "The area to pick up luggage",
+        "A seat by the window"
+      ],
+      "correct_answer": "The storage area above the seats for carry-on bags",
+      "explanation": "Overhead compartment là ngăn hành lý trên đầu.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_9",
+      "type": "MCQ",
+      "question": "Who is a 'flight attendant'?",
+      "options": [
+        "A person who helps and serves passengers on the plane",
+        "An officer who checks passports",
+        "The pilot of the plane",
+        "A person at the baggage claim"
+      ],
+      "correct_answer": "A person who helps and serves passengers on the plane",
+      "explanation": "Flight attendant là tiếp viên hàng không.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_10",
+      "type": "MCQ",
+      "question": "What is 'turbulence' during a flight?",
+      "options": [
+        "Sudden movements of the plane due to air currents",
+        "The delay between two flights",
+        "Tiredness after a long flight",
+        "The process of boarding the plane"
+      ],
+      "correct_answer": "Sudden movements of the plane due to air currents",
+      "explanation": "Turbulence là sự xáo động không khí, gây rung lắc máy bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_11",
+      "type": "MCQ",
+      "question": "What is 'jet lag'?",
+      "options": [
+        "The feeling of tiredness after flying across time zones",
+        "A long line at passport control",
+        "The area for collecting bags",
+        "A stop between connecting flights"
+      ],
+      "correct_answer": "The feeling of tiredness after flying across time zones",
+      "explanation": "Jet lag là hội chứng mệt mỏi do thay đổi múi giờ.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_12",
+      "type": "MCQ",
+      "question": "What is a 'layover'?",
+      "options": [
+        "A stop at an airport between connecting flights",
+        "The time when the plane leaves the gate",
+        "The document to board the plane",
+        "The seat next to the aisle"
+      ],
+      "correct_answer": "A stop at an airport between connecting flights",
+      "explanation": "Layover là chuyến trung chuyển hoặc dừng giữa các chuyến bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_13",
+      "type": "MCQ",
+      "question": "What does 'arrival' refer to at the airport?",
+      "options": [
+        "The gate or time when a plane lands",
+        "The gate or time when a plane takes off",
+        "The process of checking in",
+        "The area for luggage pickup"
+      ],
+      "correct_answer": "The gate or time when a plane lands",
+      "explanation": "Arrival là đến nơi, cổng đến của chuyến bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_14",
+      "type": "MCQ",
+      "question": "What does 'departure' mean?",
+      "options": [
+        "The gate or time when a plane leaves",
+        "The gate or time when a plane arrives",
+        "The control for entering the country",
+        "The staff serving on the plane"
+      ],
+      "correct_answer": "The gate or time when a plane leaves",
+      "explanation": "Departure là khởi hành, cổng khởi hành của chuyến bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_15",
+      "type": "MCQ",
+      "question": "What do you do at 'check-in'?",
+      "options": [
+        "Register for your flight and get your boarding pass",
+        "Collect your luggage after the flight",
+        "Go through passport control",
+        "Store your bag in the overhead compartment"
+      ],
+      "correct_answer": "Register for your flight and get your boarding pass",
+      "explanation": "Check-in là làm thủ tục trước khi bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_16",
+      "type": "MCQ",
+      "question": "What is a 'boarding pass'?",
+      "options": [
+        "The ticket or document needed to board the airplane",
+        "The area where you wait for your luggage",
+        "A seat by the window",
+        "The process of declaring items at customs"
+      ],
+      "correct_answer": "The ticket or document needed to board the airplane",
+      "explanation": "Boarding pass là thẻ lên máy bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_17",
+      "type": "MCQ",
+      "question": "What is a 'window seat'?",
+      "options": [
+        "A seat next to the window on the plane",
+        "A seat next to the aisle on the plane",
+        "The storage above the seats",
+        "The area for passport check"
+      ],
+      "correct_answer": "A seat next to the window on the plane",
+      "explanation": "Window seat là ghế cạnh cửa sổ.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189381252_18",
+      "type": "MCQ",
+      "question": "What is an 'aisle seat'?",
+      "options": [
+        "A seat next to the aisle on the plane",
+        "A seat next to the window on the plane",
+        "The place to collect luggage",
+        "The time between connecting flights"
+      ],
+      "correct_answer": "A seat next to the aisle on the plane",
+      "explanation": "Aisle seat là ghế cạnh lối đi.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    }
+  ],
+  "deleted_at": null,
+  "created_at": "2026-05-19T11:16:21.252Z",
+  "updated_at": "2026-05-19T11:16:21.252Z",
+  "id": "quiz_1779189296310_2",
+  "completed_at": null
+}

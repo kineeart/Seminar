@@ -1,0 +1,118 @@
+{
+  "user_id": "user_40c73467-a5eb-4800-af28-3c2bba73f6a2",
+  "title": "TOEIC Beginner Business Vocabulary Review",
+  "source": "ai",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": "mixed",
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": [
+      "flashcard_7834501c-895c-43d6-991f-622d48a9af22",
+      "flashcard_1ae12871-2e78-4b24-b6ec-2376d2f2fef4",
+      "flashcard_b20adcdf-459a-455b-a05c-664a938d3e46",
+      "flashcard_c5c51528-642b-4c8f-b025-238e20252058",
+      "flashcard_581bc84c-c5fe-4f72-a9db-877cbfcef444",
+      "flashcard_3d10e39b-6743-466f-a9d5-3b27a46fc4a8",
+      "flashcard_8ea0a7dd-c31f-42a1-a33b-e650e3c84d3c",
+      "flashcard_539c5da0-91fc-4812-a51a-d2143ba47ced",
+      "flashcard_3fc705ab-4c6b-4cac-b581-530abf27219c",
+      "flashcard_c7edbe53-555a-4ce1-af0b-50a84d593ad2",
+      "flashcard_51909f5e-f317-4675-8228-574539efcfb9",
+      "flashcard_7e9cf8d8-1215-4afb-93ff-a9ac103b156f",
+      "flashcard_47468c80-4941-4548-97c2-df0706a9a1b5",
+      "flashcard_2c3cb296-7182-4c6d-8c18-9ff0133802d1",
+      "flashcard_d36ba4f2-b0b7-489f-97ff-7017f7606b2e"
+    ]
+  },
+  "target_exam": "TOEIC",
+  "level_tag": "beginner",
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779186714079_3",
+      "type": "vocabulary_meaning",
+      "question": "What does 'competitor' mean?",
+      "options": [
+        "A person or company that competes with others in business",
+        "A person who manages a team",
+        "A formal business agreement",
+        "A customer who buys services"
+      ],
+      "correct_answer": "A person or company that competes with others in business",
+      "explanation": "Competitor nghĩa là đối thủ cạnh tranh. Ví dụ: We analyze our competitors to stay ahead.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186714079_4",
+      "type": "fill_in_the_blank",
+      "question": "The marketing _____ was very effective.",
+      "options": [
+        "strategy",
+        "contract",
+        "client",
+        "negotiate"
+      ],
+      "correct_answer": "strategy",
+      "explanation": "Strategy nghĩa là chiến lược.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186714079_5",
+      "type": "vocabulary_meaning",
+      "question": "What does 'negotiate' mean?",
+      "options": [
+        "To discuss something in order to reach an agreement",
+        "To lead a team meeting",
+        "To analyze business rivals",
+        "To sign an official document"
+      ],
+      "correct_answer": "To discuss something in order to reach an agreement",
+      "explanation": "Negotiate nghĩa là đàm phán. Ví dụ: We need to negotiate better terms for the deal.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186714079_6",
+      "type": "fill_in_the_blank",
+      "question": "They signed a long-term _____ with the supplier.",
+      "options": [
+        "contract",
+        "strategy",
+        "promotion",
+        "employee"
+      ],
+      "correct_answer": "contract",
+      "explanation": "Contract nghĩa là hợp đồng.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186714079_7",
+      "type": "vocabulary_meaning",
+      "question": "What does 'client' mean?",
+      "options": [
+        "A person or organization that uses the services of a professional firm",
+        "A rival company in the market",
+        "A plan for achieving business goals",
+        "An advancement in job position"
+      ],
+      "correct_answer": "A person or organization that uses the services of a professional firm",
+      "explanation": "Client nghĩa là khách hàng. Ví dụ: The firm has many international clients.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    }
+  ],
+  "deleted_at": null,
+  "created_at": "2026-05-19T10:31:54.079Z",
+  "updated_at": "2026-05-19T10:31:54.079Z",
+  "id": "quiz_1779186646563_1",
+  "completed_at": null
+}

@@ -1,0 +1,48 @@
+{
+  "id": "quiz_1779186754849_10",
+  "user_id": "user-2",
+  "title": "Score Quiz",
+  "source": "manual",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": null,
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": []
+  },
+  "target_exam": null,
+  "level_tag": null,
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779186754849_11",
+      "type": "MCQ",
+      "question": "Pick X",
+      "options": [
+        "X",
+        "Y"
+      ],
+      "correct_answer": "X",
+      "explanation": "",
+      "source": "manual",
+      "skill_tag": "vocab",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779186754849_12",
+      "type": "MCQ",
+      "question": "Pick B",
+      "options": [
+        "A",
+        "B"
+      ],
+      "correct_answer": "B",
+      "explanation": "",
+      "source": "manual",
+      "skill_tag": "grammar",
+      "difficulty": "easy"
+    }
+  ],
+  "created_at": "2026-05-19T10:32:34.849Z",
+  "deleted_at": null
+}

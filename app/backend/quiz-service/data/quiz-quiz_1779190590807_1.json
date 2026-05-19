@@ -1,0 +1,198 @@
+{
+  "user_id": "user_fefe0fbe-2890-4fc9-b962-da21b43aae15",
+  "title": "Air Travel Vocabulary Review",
+  "source": "ai",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": "mixed",
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": [
+      "flashcard_2c007179-8e90-4313-b0ca-af28ac205d27",
+      "flashcard_5c99da3e-8af6-49dd-9d36-93195ef394f1",
+      "flashcard_3257deff-732c-4602-a824-e09501855d18",
+      "flashcard_961bf342-dd4c-4d6a-84f7-79e3c566a178",
+      "flashcard_dcc902ce-6597-4ba1-96f6-22212835ee50",
+      "flashcard_2fa5a615-4136-4413-b58f-afdbb8f9d158",
+      "flashcard_98311b88-6b24-4b9a-b8be-fe3fd803d262",
+      "flashcard_9c143ee3-09f7-46ac-b2e8-dc6e932539e5",
+      "flashcard_f59ef386-871d-4e65-aa4d-7ef135460e98",
+      "flashcard_b4bc582e-99f2-4aa3-8b25-efb70b70c944",
+      "flashcard_90d9f3bb-b7be-45b3-8f6c-841a9fa22223",
+      "flashcard_c4c282b6-f153-469c-8048-a5caf71be341",
+      "flashcard_b1480132-25e3-42ed-b5ed-24b5d36e85b3",
+      "flashcard_5c063b16-cb6c-4f25-aa54-559969cac363",
+      "flashcard_c562314a-cf5f-4602-91fc-027bab5bc324"
+    ]
+  },
+  "target_exam": "TOEIC",
+  "level_tag": "beginner",
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779190676222_3",
+      "type": "fill_in_the_blank",
+      "question": "The plane is waiting to take off on the _____.",
+      "options": [
+        "runway",
+        "baggage claim",
+        "immigration",
+        "jet lag"
+      ],
+      "correct_answer": "runway",
+      "explanation": "Runway là đường băng nơi máy bay cất cánh và hạ cánh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_4",
+      "type": "vocabulary_meaning",
+      "question": "What does 'immigration' refer to at the airport?",
+      "options": [
+        "The process of checking passports and entry documents",
+        "The area to pick up luggage after landing",
+        "A crew member who serves passengers",
+        "A stop between two flights"
+      ],
+      "correct_answer": "The process of checking passports and entry documents",
+      "explanation": "Immigration là kiểm soát nhập cảnh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_5",
+      "type": "fill_in_the_blank",
+      "question": "You have to declare items at _____.",
+      "options": [
+        "customs",
+        "arrival",
+        "overhead compartment",
+        "turbulence"
+      ],
+      "correct_answer": "customs",
+      "explanation": "Customs là hải quan.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_6",
+      "type": "MCQ",
+      "question": "Where do you collect your luggage after arriving at the airport?",
+      "options": [
+        "baggage claim",
+        "runway",
+        "layover",
+        "flight attendant"
+      ],
+      "correct_answer": "baggage claim",
+      "explanation": "Baggage claim là nơi nhận hành lý.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_7",
+      "type": "fill_in_the_blank",
+      "question": "Please store your bag in the _____.",
+      "options": [
+        "overhead compartment",
+        "customs",
+        "immigration",
+        "layover"
+      ],
+      "correct_answer": "overhead compartment",
+      "explanation": "Overhead compartment là ngăn hành lý trên đầu.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_8",
+      "type": "vocabulary_meaning",
+      "question": "Who is a 'flight attendant'?",
+      "options": [
+        "A crew member who assists and serves passengers on the plane",
+        "An officer who checks passports",
+        "The path where planes take off",
+        "The feeling of tiredness after long flights"
+      ],
+      "correct_answer": "A crew member who assists and serves passengers on the plane",
+      "explanation": "Flight attendant là tiếp viên hàng không.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_9",
+      "type": "MCQ",
+      "question": "What causes the plane to shake during the flight?",
+      "options": [
+        "turbulence",
+        "jet lag",
+        "baggage claim",
+        "arrival"
+      ],
+      "correct_answer": "turbulence",
+      "explanation": "Turbulence là sự xáo động không khí.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_10",
+      "type": "vocabulary_meaning",
+      "question": "What is 'jet lag'?",
+      "options": [
+        "Tiredness after traveling across time zones",
+        "A connecting flight stop",
+        "Strong air movements during flight",
+        "The gate where passengers exit"
+      ],
+      "correct_answer": "Tiredness after traveling across time zones",
+      "explanation": "Jet lag là hội chứng mệt mỏi do chênh lệch múi giờ.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_11",
+      "type": "fill_in_the_blank",
+      "question": "We have a three-hour _____ in Singapore before our connecting flight.",
+      "options": [
+        "layover",
+        "turbulence",
+        "customs",
+        "runway"
+      ],
+      "correct_answer": "layover",
+      "explanation": "Layover là chuyến trung chuyển.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779190676222_12",
+      "type": "MCQ",
+      "question": "Passengers exit the plane at the _____ gate.",
+      "options": [
+        "arrival",
+        "overhead compartment",
+        "immigration",
+        "flight attendant"
+      ],
+      "correct_answer": "arrival",
+      "explanation": "Arrival là đến nơi.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    }
+  ],
+  "deleted_at": null,
+  "created_at": "2026-05-19T11:37:56.222Z",
+  "updated_at": "2026-05-19T11:37:56.222Z",
+  "id": "quiz_1779190590807_1",
+  "completed_at": null
+}

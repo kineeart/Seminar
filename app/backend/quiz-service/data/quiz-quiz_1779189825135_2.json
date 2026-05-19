@@ -1,0 +1,198 @@
+{
+  "user_id": "user_fefe0fbe-2890-4fc9-b962-da21b43aae15",
+  "title": "Airport Vocabulary Flashcard Review - TOEIC Beginner",
+  "source": "ai",
+  "generated_from": {
+    "lesson_id": null,
+    "topic": "mixed",
+    "weak_topics": [],
+    "chat_session_ids": [],
+    "flashcard_ids": [
+      "flashcard_2c007179-8e90-4313-b0ca-af28ac205d27",
+      "flashcard_5c99da3e-8af6-49dd-9d36-93195ef394f1",
+      "flashcard_3257deff-732c-4602-a824-e09501855d18",
+      "flashcard_961bf342-dd4c-4d6a-84f7-79e3c566a178",
+      "flashcard_dcc902ce-6597-4ba1-96f6-22212835ee50",
+      "flashcard_2fa5a615-4136-4413-b58f-afdbb8f9d158",
+      "flashcard_98311b88-6b24-4b9a-b8be-fe3fd803d262",
+      "flashcard_9c143ee3-09f7-46ac-b2e8-dc6e932539e5",
+      "flashcard_f59ef386-871d-4e65-aa4d-7ef135460e98",
+      "flashcard_b4bc582e-99f2-4aa3-8b25-efb70b70c944",
+      "flashcard_90d9f3bb-b7be-45b3-8f6c-841a9fa22223",
+      "flashcard_c4c282b6-f153-469c-8048-a5caf71be341",
+      "flashcard_b1480132-25e3-42ed-b5ed-24b5d36e85b3",
+      "flashcard_5c063b16-cb6c-4f25-aa54-559969cac363",
+      "flashcard_c562314a-cf5f-4602-91fc-027bab5bc324"
+    ]
+  },
+  "target_exam": "TOEIC",
+  "level_tag": "beginner",
+  "difficulty": "easy",
+  "questions": [
+    {
+      "question_id": "question_1779189889808_4",
+      "type": "MCQ",
+      "question": "The plane is waiting to take off on the _____.",
+      "options": [
+        "runway",
+        "immigration",
+        "customs",
+        "baggage claim"
+      ],
+      "correct_answer": "runway",
+      "explanation": "Runway là đường băng nơi máy bay cất cánh và hạ cánh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_5",
+      "type": "MCQ",
+      "question": "After arriving from another country, passengers must go through _____ control.",
+      "options": [
+        "baggage claim",
+        "immigration",
+        "overhead compartment",
+        "jet lag"
+      ],
+      "correct_answer": "immigration",
+      "explanation": "Immigration là kiểm soát nhập cảnh cho hành khách quốc tế.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_6",
+      "type": "MCQ",
+      "question": "You have to declare items at _____ when entering a country.",
+      "options": [
+        "customs",
+        "arrival",
+        "layover",
+        "turbulence"
+      ],
+      "correct_answer": "customs",
+      "explanation": "Customs là hải quan nơi khai báo hàng hóa.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_7",
+      "type": "MCQ",
+      "question": "Our luggage is at _____ area B after the flight.",
+      "options": [
+        "baggage claim",
+        "overhead compartment",
+        "flight attendant",
+        "turbulence"
+      ],
+      "correct_answer": "baggage claim",
+      "explanation": "Baggage claim là nơi nhận hành lý sau khi hạ cánh.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_8",
+      "type": "MCQ",
+      "question": "Please store your bag in the _____ during the flight.",
+      "options": [
+        "overhead compartment",
+        "baggage claim",
+        "layover",
+        "jet lag"
+      ],
+      "correct_answer": "overhead compartment",
+      "explanation": "Overhead compartment là ngăn hành lý trên đầu trong máy bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_9",
+      "type": "MCQ",
+      "question": "The _____ served us drinks during the flight.",
+      "options": [
+        "pilot",
+        "flight attendant",
+        "immigration officer",
+        "customs agent"
+      ],
+      "correct_answer": "flight attendant",
+      "explanation": "Flight attendant là tiếp viên hàng không phục vụ trên máy bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_10",
+      "type": "MCQ",
+      "question": "The plane experienced some _____ during the flight.",
+      "options": [
+        "turbulence",
+        "jet lag",
+        "layover",
+        "arrival"
+      ],
+      "correct_answer": "turbulence",
+      "explanation": "Turbulence là sự xáo động không khí khiến máy bay rung lắc.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_11",
+      "type": "MCQ",
+      "question": "It took me two days to recover from the _____.",
+      "options": [
+        "turbulence",
+        "jet lag",
+        "layover",
+        "runway"
+      ],
+      "correct_answer": "jet lag",
+      "explanation": "Jet lag là hội chứng mệt mỏi do thay đổi múi giờ khi bay xa.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_12",
+      "type": "MCQ",
+      "question": "We have a three-hour _____ in Singapore between flights.",
+      "options": [
+        "arrival",
+        "jet lag",
+        "layover",
+        "baggage claim"
+      ],
+      "correct_answer": "layover",
+      "explanation": "Layover là thời gian trung chuyển giữa hai chuyến bay.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    },
+    {
+      "question_id": "question_1779189889808_13",
+      "type": "MCQ",
+      "question": "The _____ gate is number 12.",
+      "options": [
+        "arrival",
+        "departure",
+        "boarding",
+        "exit"
+      ],
+      "correct_answer": "arrival",
+      "explanation": "Arrival nghĩa là đến nơi; arrival gate là cổng đến của hành khách.",
+      "source": "ai",
+      "skill_tag": "vocabulary",
+      "difficulty": "easy"
+    }
+  ],
+  "deleted_at": null,
+  "created_at": "2026-05-19T11:24:49.808Z",
+  "updated_at": "2026-05-19T11:24:49.808Z",
+  "id": "quiz_1779189825135_2",
+  "completed_at": null
+}
