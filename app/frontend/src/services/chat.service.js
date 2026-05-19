@@ -3,10 +3,10 @@ import api from './api'
 export const chatService = {
   /**
    * Send a chat message to the AI tutor.
-   * Backend expects: { message, level, conversationId, userId }
+   * Backend expects: { message, level, conversationId, userId, mode, scenario }
    * Backend returns: { success, reply }
    */
-  sendMessage: (message, conversationId = null, mode = 'knowledge', user = null) => {
+  sendMessage: (message, conversationId = null, mode = 'knowledge', user = null, scenario = null) => {
     const userId = user?.id || window.localStorage.getItem('userId') || null
     const level = user?.level || 'Intermediate'
 
@@ -16,6 +16,7 @@ export const chatService = {
       userId,
       level,
       mode,
+      scenario: scenario || undefined,
     })
   },
 

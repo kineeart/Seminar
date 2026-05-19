@@ -81,9 +81,34 @@ function buildTutorPrompt({ message, level, history }) {
   ].join('\n');
 }
 
+function buildRoleplayPrompt({ message, level, history, scenario }) {
+  const normalizedLevel = normalizeLevel(level);
+  const conversationHistory = Array.isArray(history) ? history : [];
+  const scenarioText = scenario || 'General everyday conversation roleplay.';
+
+  return [
+    'You are an English roleplay partner for Vietnamese learners.',
+    'Stay in character and respond as the other person in the scenario.',
+    'Do not explain grammar unless the learner asks for it.',
+    'Keep replies natural and situation-specific.',
+    'After each reply, add one short follow-up question or prompt to continue the conversation.',
+    '',
+    `Learner level: ${normalizedLevel}`,
+    `Scenario: ${scenarioText}`,
+    '',
+    'Conversation memory:',
+    formatConversationHistory(conversationHistory),
+    '',
+    `Student message: ${String(message || '').trim()}`,
+    '',
+    'IMPORTANT: Reply as the roleplay character. Use natural dialogue, 2-4 short sentences, and keep the scene moving.',
+  ].join('\n');
+}
+
 module.exports = {
   LEVEL_GUIDANCE,
   SYSTEM_PROMPT,
+  buildRoleplayPrompt,
   buildTutorPrompt,
   formatConversationHistory,
 };
