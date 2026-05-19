@@ -215,7 +215,7 @@ Tài liệu này định nghĩa timeline, phase, deliverables, và dependencies 
 ### Architecture decisions
 - **SM-2 algorithm**: standard spaced repetition (intervals: 1d, 3d, 1w, 2w, 1m).
 - **Progress model**: stores review history (date, difficulty, interval).
-- **Auto-generate**: frontend can POST chat topics → content-service suggests card templates.
+- **Auto-generate**: frontend can POST chat topics → backend suggests card templates.
 
 ### Key tasks
 - [ ] Design flashcard schema (cards, sets, user_progress, review_history).
@@ -243,15 +243,10 @@ Tài liệu này định nghĩa timeline, phase, deliverables, và dependencies 
 
 ### Objectives
 - Build `quiz-service` (generate quizzes, evaluate answers, scoring).
-- Build `content-service` (manage lesson content as quiz source).
 - Implement scoring and feedback.
 - Build frontend quiz UI.
 
 ### Deliverables
-- **Content Service**:
-  - GET `/lessons` → list lessons/topics.
-  - GET `/lessons/{id}` → lesson details (text, examples, metadata).
-  - Database: Postgres with lessons, topics, examples.
 - **Quiz Service**:
   - POST `/quizzes/generate` → generate quiz from lesson/AI.
   - GET `/quizzes/{id}` → quiz questions.
@@ -266,12 +261,10 @@ Tài liệu này định nghĩa timeline, phase, deliverables, và dependencies 
 ### Architecture decisions
 - **Quiz generation**: AI-generated questions + manually curated. Start with manual for MVP.
 - **Scoring**: multiple choice = 1 point each, partial credit for multi-select.
-- **Content source**: lessons from content-service, not hard-coded.
+- **Content source**: curated lessons stored locally for MVP (can be upgraded later).
 
 ### Key tasks
 - [ ] Design quiz schema (quizzes, questions, answers, attempts).
-- [ ] Design lesson schema (content-service).
-- [ ] Implement content-service (CRUD lessons).
 - [ ] Implement quiz service (generate, submit, score, explain).
 - [ ] Implement quiz generation logic (template-based for MVP, AI later).
 - [ ] Build frontend quiz UI.

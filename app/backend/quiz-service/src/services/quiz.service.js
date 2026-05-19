@@ -2,7 +2,6 @@ const store = require('../storage');
 const { validateGenerateRequest, validateSubmitRequest } = require('../utils/quiz-validator');
 const { createError } = require('../utils/errors');
 const { createId } = require('../utils/id');
-const { fetchLesson } = require('../utils/content-client');
 const { buildQuizFromLesson, buildFallbackQuiz } = require('../utils/quiz-generator');
 const progressService = require('./progress.service');
 
@@ -30,19 +29,13 @@ async function generateQuiz(payload) {
   let lesson = null;
 
   if (!questions) {
-    if (value.lessonId) {
-      lesson = await fetchLesson(value.lessonId);
-    }
-
-    if (!lesson) {
-      lesson = {
-        title: value.title || 'Quick Practice',
-        topic: value.topic || 'general',
-        target_exam: value.targetExam || null,
-        level_tag: value.levelTag || null,
-        vocabulary: value.vocabulary || [],
-      };
-    }
+    lesson = {
+      title: value.title || 'Quick Practice',
+      topic: value.topic || 'general',
+      target_exam: value.targetExam || null,
+      level_tag: value.levelTag || null,
+      vocabulary: value.vocabulary || [],
+    };
 
     const generated = buildQuizFromLesson(lesson, {
       count: value.count,

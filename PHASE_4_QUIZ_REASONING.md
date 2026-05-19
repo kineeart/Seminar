@@ -8,18 +8,10 @@ This document explains the reasoning behind Phase 4 (Quiz + Content). The focus 
 - Provide short quizzes that reinforce vocabulary and grammar.
 - Show quick feedback so learners can adjust immediately.
 
-## Content service rationale
-
-- Lessons are separated into a dedicated service to keep quiz logic clean.
-- CRUD lessons allow manual curation for MVP quality.
-- Seed lessons give a working demo even without database setup.
-- Optional MongoDB keeps the service upgrade path simple.
-
 ## Quiz service rationale
 
 - Quiz generation is template-based for MVP stability.
 - Questions are derived from lesson vocabulary to keep content grounded.
-- When content-service is down, quiz-service still works with fallback data.
 - `GET /quizzes/:id` hides `correct_answer` to prevent cheating before submit.
 
 ## Scoring and feedback design
@@ -50,4 +42,4 @@ This document explains the reasoning behind Phase 4 (Quiz + Content). The focus 
 
 ## Conclusion
 
-Phase 4 delivers a minimal but complete quiz loop with content sourcing, scoring, and progress. The design trades advanced AI generation for stability and offline-friendly MVP behavior, while keeping a direct path to persistence and richer quiz logic later.
+Phase 4 delivers a minimal but complete quiz loop with curated content, scoring, and progress. The design trades advanced AI generation for stability and offline-friendly MVP behavior, while keeping a direct path to persistence and richer quiz logic later.

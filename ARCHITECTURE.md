@@ -2,10 +2,10 @@
 
 Phiên bản: MVP (focus)
 
-Tài liệu này mô tả kiến trúc microservices tối giản cho MVP, bao gồm frontend, api gateway, auth, ai-chat, flashcard, quiz, content.
+Tài liệu này mô tả kiến trúc microservices tối giản cho MVP, bao gồm frontend, api gateway, auth, ai-chat, flashcard, quiz.
 
 ## Mục tiêu
-- Hỗ trợ các user stories cốt lõi: conversation-based tutoring, flashcard review, quizzes, content management.
+- Hỗ trợ các user stories cốt lõi: conversation-based tutoring, flashcard review, quizzes.
 - Tối giản dịch vụ để dễ phát triển và scale theo nhu cầu.
 
 ---
@@ -17,7 +17,6 @@ Tài liệu này mô tả kiến trúc microservices tối giản cho MVP, bao g
 - **AI Chat Service** (`ai-chat-service` + `ai-worker`): nhận chat request, quản lý session, enqueue jobs; worker gọi LLM provider và stream responses.
 - **Flashcard Service** (`flashcard-service`): CRUD flashcards, SM-2 scheduling, user progress per card.
 - **Quiz Service** (`quiz-service`): generate/serve quizzes, score evaluation, store attempts.
-- **Content Service** (`content-service`): canonical lessons, examples, tags — dùng làm source cho quiz/flashcards.
 
 Mỗi service chịu trách nhiệm database riêng (DB-per-service) và API công khai nội bộ.
 
@@ -40,9 +39,6 @@ Mỗi service chịu trách nhiệm database riêng (DB-per-service) và API cô
 - **Quiz Service**:
   - Generate quiz from content or AI, evaluate answers, store attempts and scores.
   - DB: Postgres.
-- **Content Service**:
-  - Manage canonical lessons, versioning metadata.
-  - DB: Postgres.
 
 ---
 
@@ -51,7 +47,6 @@ Mỗi service chịu trách nhiệm database riêng (DB-per-service) và API cô
 - `ai-chat-service`: MongoDB (transcripts) + Redis (context, rate-limit).
 - `flashcard-service`: PostgreSQL.
 - `quiz-service`: PostgreSQL.
-- `content-service`: PostgreSQL.
 - Object storage: MinIO (dev) / S3 (prod) for media assets.
 - Message Broker: RabbitMQ (or Kafka when scaling) for async jobs and events.
 
@@ -106,7 +101,6 @@ graph LR
   GW --> Chat[AI Chat Service]
   GW --> Flash[Flashcard Service]
   GW --> Quiz[Quiz Service]
-  GW --> Content[Content Service]
 
   Chat --> Broker[RabbitMQ]
   Broker --> Worker[AI Worker Pool]
@@ -114,7 +108,6 @@ graph LR
   Auth --> AuthDB[(Auth DB)]
   Flash --> FlashDB[(Flashcard DB)]
   Quiz --> QuizDB[(Quiz DB)]
-  Content --> ContentDB[(Content DB)]
 
   Worker -->|Store media| MinIO[(Object Storage)]
   GW -->|metrics| Prom[Prometheus]
@@ -154,7 +147,7 @@ graph LR
 ---
 
 ## Docker & Local dev
-- Provide `docker-compose.yml` to run: gateway, auth, chat, worker, flashcard, quiz, content, Postgres instances, Mongo, Redis, RabbitMQ, MinIO.
+- Provide `docker-compose.yml` to run: gateway, auth, chat, worker, flashcard, quiz, Postgres instances, Mongo, Redis, RabbitMQ, MinIO.
 - Keep service images small; each service includes `Dockerfile` and health/readiness endpoints.
 
 ---

@@ -549,17 +549,16 @@ This incident demonstrated the importance of combining AI-assisted code generati
 - **Final verified result**: `npm install` successful, `npm test` successful, `npm run lint` successful, `npm run dev` successful. Live `POST /chat` returned a real Gemini response for the tutoring question, and the second request reused context from the first request.
 - **Lesson learned**: Educational AI features are not just about model access; they depend on prompt discipline, memory boundaries, and adaptive explanation strategy. A small amount of structured context can substantially improve tutoring quality without adding heavy infrastructure.
 
-### 2026-05-18 — Phase: Phase 4 Quiz + Content Backend (Runnable MVP)
+### 2026-05-18 — Phase: Phase 4 Quiz Backend (Runnable MVP)
 
-- **Mục tiêu**: Hoan thien backend Phase 4: `content-service` + `quiz-service` theo MVP runnable (in-memory), co the bat MongoDB khi co `MONGODB_URI`. Bo sung gateway proxy, tests, va tracking progress sau quiz.
+- **Mục tiêu**: Hoan thien backend Phase 4: `quiz-service` theo MVP runnable (in-memory), co the bat MongoDB khi co `MONGODB_URI`. Bo sung gateway proxy, tests, va tracking progress sau quiz.
 - **Prompt da dung**:
 
-	> "Dua tren IMPLEMENTATION_ROADMAP.md, DB_SCHEMA.md, PRD.md: trien khai Phase 4 backend gom content-service (lessons CRUD) va quiz-service (generate quiz, submit, score, attempts, progress). MVP chay duoc khong can DB, nhung neu co MONGODB_URI thi dung Mongoose. Cap nhat gateway proxy, scripts, jest config, README va DEVELOPMENT_LOG." 
+	> "Dua tren IMPLEMENTATION_ROADMAP.md, DB_SCHEMA.md, PRD.md: trien khai Phase 4 backend gom quiz-service (generate quiz, submit, score, attempts, progress). MVP chay duoc khong can DB, nhung neu co MONGODB_URI thi dung Mongoose. Cap nhat gateway proxy, scripts, jest config, README va DEVELOPMENT_LOG." 
 
 - **AI tra ket qua gi**:
-	- `content-service/` Express service voi CRUD lessons, seed data, optional Mongo store, tests.
 	- `quiz-service/` Express service voi quiz generation, submit/scoring, attempts, progress tracking, optional Mongo store, tests.
-	- Gateway proxy cho `/api/content` va `/api/quizzes`.
+	- Gateway proxy cho `/api/quizzes`.
 	- Update backend workspaces, scripts, jest config.
 
 - **Toi review gi**:

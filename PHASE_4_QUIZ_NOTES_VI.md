@@ -4,15 +4,12 @@ Ngày: 2026-05-18
 
 Tóm tắt:
 
-- Thêm `content-service` để quản lý bài học với dữ liệu seed và MongoDB tùy chọn.
 - Thêm `quiz-service` để tạo quiz, chấm điểm, lưu lần thử và theo dõi tiến độ.
-- Tạo quiz sử dụng từ vựng từ bài học hoặc dữ liệu fallback cục bộ khi content-service không khả dụng.
 - `GET /quizzes/:id` ẩn `correct_answer` để ngăn chặn rò rỉ trước khi submit.
-- Gateway proxy `/api/content` và `/api/quizzes` tới các service mới.
+- Gateway proxy `/api/quizzes` tới service mới.
 
 Các file:
 
-- app/backend/content-service/
 - app/backend/quiz-service/
 - app/backend/gateway/src/server.js
 - app/backend/package.json
@@ -20,18 +17,9 @@ Các file:
 
 Biến môi trường:
 
-- content-service: `CONTENT_SERVICE_PORT`, `MONGODB_URI`
-- quiz-service: `QUIZ_SERVICE_PORT`, `CONTENT_SERVICE_URL`, `MONGODB_URI`
+- quiz-service: `QUIZ_SERVICE_PORT`, `MONGODB_URI`
 
 Các endpoint chính:
-
-Content service:
-- `GET /health`
-- `GET /lessons`
-- `GET /lessons/:lessonId`
-- `POST /lessons`
-- `PATCH /lessons/:lessonId`
-- `DELETE /lessons/:lessonId`
 
 Quiz service:
 - `GET /health`

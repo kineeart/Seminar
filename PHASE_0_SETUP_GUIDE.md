@@ -305,7 +305,7 @@ npm install
 
 - **Phase 1**: Add Auth Service (separate Node.js service, JWT)
 - **Phase 2**: Add AI Chat Service + Worker
-- **Phase 3+**: Add Flashcard, Quiz, Content services
+- **Phase 3+**: Add Flashcard, Quiz services
 - **Later**: Migrate to Docker + Kubernetes when scale increases
 
 For roadmap details, see [IMPLEMENTATION_ROADMAP.md](../../IMPLEMENTATION_ROADMAP.md).

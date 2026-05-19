@@ -286,7 +286,6 @@ Modify `useOnboardingDemo.js` → refactor `finish()`:
 | Generate quiz | POST | /api/quizzes/generate | Quiz Service |
 | Get quiz | GET | /api/quizzes/:id | Quiz Service |
 | Submit quiz | POST | /api/quizzes/:id/submit | Quiz Service |
-| List lessons | GET | /api/content | Content Service |
 
 ---
 

@@ -10,7 +10,6 @@ const PORT = process.env.GATEWAY_PORT || process.env.PORT || 5000;
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5001';
 const AI_CHAT_SERVICE_URL = process.env.AI_CHAT_SERVICE_URL || 'http://localhost:5002';
 const FLASHCARD_SERVICE_URL = process.env.FLASHCARD_SERVICE_URL || 'http://localhost:3003';
-const CONTENT_SERVICE_URL = process.env.CONTENT_SERVICE_URL || 'http://localhost:5003';
 const QUIZ_SERVICE_URL = process.env.QUIZ_SERVICE_URL || 'http://localhost:5004';
 const ANALYTICS_SERVICE_URL = process.env.ANALYTICS_SERVICE_URL || 'http://localhost:5005';
 
@@ -111,11 +110,9 @@ function trackRequest(req, res) {
           ? 'ai-chat-service'
           : endpoint.startsWith('/api/flashcards')
             ? 'flashcard-service'
-            : endpoint.startsWith('/api/content')
-              ? 'content-service'
-              : endpoint.startsWith('/api/quizzes')
-                ? 'quiz-service'
-                : 'gateway',
+            : endpoint.startsWith('/api/quizzes')
+              ? 'quiz-service'
+              : 'gateway',
       intent: classifyIntent(body),
       topic: classifyTopic(body).join(', '),
     };
@@ -214,27 +211,6 @@ app.use(
 );
 
 app.use(
-  '/api/content',
-  createProxyMiddleware({
-    target: CONTENT_SERVICE_URL,
-    changeOrigin: true,
-    pathRewrite: {
-      '^/api/content': '',
-    },
-    on: {
-      proxyReq: fixRequestBody,
-    },
-    onError(error, _req, res) {
-      console.error('Gateway proxy error:', error.message);
-      res.status(502).json({
-        status: 'error',
-        message: 'Content service unavailable',
-      });
-    },
-  }),
-);
-
-app.use(
   '/api/quizzes',
   createProxyMiddleware({
     target: QUIZ_SERVICE_URL,
@@ -324,7 +300,6 @@ if (require.main === module) {
     console.log(`proxying /api/auth -> ${AUTH_SERVICE_URL}`);
     console.log(`proxying /api/chat -> ${AI_CHAT_SERVICE_URL}`);
     console.log(`proxying /api/flashcards -> ${FLASHCARD_SERVICE_URL}`);
-    console.log(`proxying /api/content -> ${CONTENT_SERVICE_URL}`);
     console.log(`proxying /api/quizzes -> ${QUIZ_SERVICE_URL}`);
     console.log(`proxying /api/analytics -> ${ANALYTICS_SERVICE_URL}`);
   });

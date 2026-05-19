@@ -23,15 +23,15 @@
 	- Lich su hoc tap va dashboard duoc mo rong de phuc vu frontend.
 
 
-### 2026-05-18 — Phase: Phase 4 Quiz + Content Backend (Runnable MVP)
+### 2026-05-18 — Phase: Phase 4 Quiz Backend (Runnable MVP)
 
-- **Mục tiêu**: Trien khai `content-service` va `quiz-service` theo Phase 4, co scoring, attempts, progress; chay duoc khong can DB va co the bat MongoDB bang env.
+- **Mục tiêu**: Trien khai `quiz-service` theo Phase 4, co scoring, attempts, progress; chay duoc khong can DB va co the bat MongoDB bang env.
 - **Prompt da dung**:
 
-> "Trien khai Phase 4 backend (content-service + quiz-service) theo MVP runnable. Co CRUD lessons, quiz generate, submit, score, attempts, progress. In-memory fallback, optional MongoDB qua MONGODB_URI. Cap nhat gateway proxy, scripts, jest config, va README." 
+> "Trien khai Phase 4 backend (quiz-service) theo MVP runnable. Co quiz generate, submit, score, attempts, progress. In-memory fallback, optional MongoDB qua MONGODB_URI. Cap nhat gateway proxy, scripts, jest config, va README." 
 
 - **AI tra ket qua gi**:
-	- Tao `content-service/` va `quiz-service/` (Express CommonJS).
+	- Tao `quiz-service/` (Express CommonJS).
 	- Tao endpoints va tests can thiet.
 	- Cap nhat gateway proxy va workspace scripts.
 
@@ -40,13 +40,12 @@
 	- Kiem tra jest config co pick up tests moi.
 
 - **Toi sua gi**:
-	- Them seed lessons de quiz generate khong bi rong.
-	- Them fallback khi khong co content-service hoac DB.
+	- Them seed data de quiz generate khong bi rong.
+	- Them fallback khi khong co DB.
 
 - **Ket qua cuoi**:
-	- `content-service`: CRUD lessons + seed data + optional MongoDB.
 	- `quiz-service`: generate, submit, attempts, progress + optional MongoDB.
-	- Gateway proxy `/api/content` va `/api/quizzes`.
+	- Gateway proxy `/api/quizzes`.
 
 - **Lesson learned**:
 	- Phan tach storage layer giup de test va de nang cap DB.

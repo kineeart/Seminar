@@ -7,7 +7,6 @@
     '<rootDir>/gateway/src/**/*.test.js',
     '<rootDir>/ai-chat-service/src/**/*.test.js',
     '<rootDir>/flashcard-service/src/**/*.test.js',
-    '<rootDir>/content-service/src/**/*.test.js',
     '<rootDir>/quiz-service/src/**/*.test.js'
   ],
   collectCoverageFrom: [
@@ -15,7 +14,6 @@
     'gateway/src/**/*.js',
     'ai-chat-service/src/**/*.js',
     'flashcard-service/src/**/*.js',
-    'content-service/src/**/*.js',
     'quiz-service/src/**/*.js',
     '!**/*.test.js'
   ],

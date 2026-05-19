@@ -8,18 +8,10 @@ Tài liệu này giải thích lý do đằng sau Phase 4 (Quiz + Content). Tr�
 - Cung cấp các quiz ngắn để ôn tập từ vựng và ngữ pháp.
 - Hiển thị phản hồi nhanh để người học có thể điều chỉnh ngay lập tức.
 
-## Lý do tách content service
-
-- Bài học được tách thành một service riêng để giữ logic quiz sạch sẽ.
-- CRUD bài học cho phép curation thủ công để đảm bảo chất lượng MVP.
-- Seed lessons cho một demo hoạt động ngay cả khi không có cơ sở dữ liệu.
-- MongoDB tùy chọn giữ con đường nâng cấp service đơn giản.
-
 ## Lý do tách quiz service
 
 - Tạo quiz dựa trên template để ổn định MVP.
 - Các câu hỏi được lấy từ từ vựng bài học để giữ nội dung căn bản.
-- Khi content-service bị down, quiz-service vẫn hoạt động với dữ liệu fallback.
 - `GET /quizzes/:id` ẩn `correct_answer` để ngăn chặn gian lận trước khi submit.
 
 ## Thiết kế chấm điểm và phản hồi
@@ -50,4 +42,4 @@ Tài liệu này giải thích lý do đằng sau Phase 4 (Quiz + Content). Tr�
 
 ## Kết luận
 
-Phase 4 cung cấp một vòng quiz tối thiểu nhưng hoàn chỉnh với tìm nguồn nội dung, chấm điểm và theo dõi tiến độ. Thiết kế đánh đổi tạo quiz AI nâng cao để đổi lấy sự ổn định và hành vi thân thiện với offline MVP, trong khi vẫn giữ một con đường trực tiếp tới persistence và logic quiz phong phú hơn sau này.
+Phase 4 cung cấp một vòng quiz tối thiểu nhưng hoàn chỉnh với nội dung được biên soạn, chấm điểm và theo dõi tiến độ. Thiết kế đánh đổi tạo quiz AI nâng cao để đổi lấy sự ổn định và hành vi thân thiện với offline MVP, trong khi vẫn giữ một con đường trực tiếp tới persistence và logic quiz phong phú hơn sau này.

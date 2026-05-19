@@ -8,7 +8,6 @@ Backend MVP được refactor theo hướng nhẹ, chạy thật, không dùng D
 - `auth-service/` — Auth service, lưu user trong MongoDB
 - `ai-chat-service/` — Conversational tutor + conversation persistence
 - `flashcard-service/` — Flashcard generation + history persistence
-- `content-service/` — Lessons/content CRUD với MongoDB
 - `quiz-service/` — Quiz generation, scoring, attempts, progress tracking
 - `jest.config.js` — cấu hình test dùng chung
 - `.eslintrc.js` — cấu hình ESLint dùng chung
@@ -35,7 +34,6 @@ Lệnh này sẽ chạy đồng thời:
 - `auth-service` tại `http://localhost:5001`
 - `ai-chat-service` tại `http://localhost:5002`
 - `flashcard-service` tại `http://localhost:3003`
-- `content-service` tại `http://localhost:5003`
 - `quiz-service` tại `http://localhost:5004`
 
 ### 3. Chạy từng service riêng
@@ -45,7 +43,6 @@ npm run dev:gateway
 npm run dev:auth
 npm run dev:chat
 npm run dev:flashcards
-npm run dev:content
 npm run dev:quiz
 ```
 
@@ -77,7 +74,6 @@ npm run lint
 - `POST /api/chat`
 - `GET /api/chat/conversations?userId=...`
 - `GET /api/flashcards/history?userId=...`
-- `GET /api/content/lessons`
 - `POST /api/quizzes/generate`
 - `POST /api/quizzes/:id/submit`
 

@@ -1,6 +1,6 @@
 # Quiz Service
 
-Quiz generation, scoring, attempts, and progress tracking. Can pull lessons from content-service.
+Quiz generation, scoring, attempts, and progress tracking.
 
 ## Requirements
 
@@ -19,9 +19,6 @@ Copy env file:
 ```bash
 cp .env.example .env
 ```
-
-Optional:
-- Set `CONTENT_SERVICE_URL` (default `http://localhost:5003`).
 
 Required:
 - Set `MONGODB_URI` and `DATABASE_NAME` for MongoDB persistence.
@@ -46,4 +43,3 @@ Service runs on `http://localhost:5004` by default.
 ## Notes
 
 - Uses MongoDB Atlas for persistence (no in-memory fallback).
-- If content-service is not reachable, quiz generation falls back to local data.

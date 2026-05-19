@@ -13,7 +13,6 @@ This feature connects all existing frontend UI pages to their corresponding back
 - **Chat_Service**: The backend AI chat microservice (port 5002) handling conversation creation and message exchange
 - **Flashcard_Service**: The backend flashcard microservice (port 3003) handling flashcard generation, history, stats, and review
 - **Quiz_Service**: The backend quiz microservice (port 5004) handling quiz generation, retrieval, and submission
-- **Content_Service**: The backend content microservice (port 5003) handling lesson CRUD operations
 - **Protected_Route**: A route wrapper component that redirects unauthenticated users to the login page
 - **Onboarding_Preferences**: The user selections made during onboarding (level, exam, goals, topics) that are persisted to the backend
 

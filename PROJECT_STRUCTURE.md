@@ -78,7 +78,6 @@ app/frontend/
 │   │   ├── chatService.js       # Chat API calls, WS setup
 │   │   ├── flashcardService.js  # Flashcard endpoints
 │   │   ├── quizService.js       # Quiz endpoints
-│   │   └── contentService.js    # Content fetch
 │   ├── 📁 hooks/                # React custom hooks
 │   │   ├── useAuth.js           # Auth state
 │   │   ├── useChat.js           # Chat state + WS
@@ -207,20 +206,6 @@ app/backend/
 │   ├── 📄 .env.example
 │   └── 📄 README.md
 │
-├── 📁 content-service/          # Content/lessons management
-│   ├── 📄 Dockerfile
-│   ├── 📁 src/
-│   │   ├── 📄 main.ts
-│   │   ├── 📄 content.controller.ts
-│   │   ├── 📄 content.service.ts
-│   │   ├── 📄 lesson.model.ts
-│   │   ├── 📁 dto/
-│   │   └── 📁 utils/
-│   ├── 📁 db/
-│   ├── 📄 package.json
-│   ├── 📄 .env.example
-│   └── 📄 README.md
-│
 └── 📄 shared-compose.env        # Shared env vars for docker-compose
 ```
 
@@ -304,7 +289,6 @@ docs/
 ├── 📄 ai-chat-service.yml       # Chat service build, test, push image
 ├── 📄 flashcard-service.yml
 ├── 📄 quiz-service.yml
-├── 📄 content-service.yml
 └── 📄 gateway.yml
 ```
 
