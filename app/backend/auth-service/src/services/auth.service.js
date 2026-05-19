@@ -116,7 +116,7 @@ async function login(payload) {
         role,
       },
       getJwtSecret(),
-      { expiresIn: '1h' },
+      { expiresIn: '7d' },
     );
   } catch (err) {
     return {

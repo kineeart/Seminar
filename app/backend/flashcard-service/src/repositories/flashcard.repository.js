@@ -84,10 +84,62 @@ async function clearFlashcards() {
   await Flashcard.deleteMany({});
 }
 
+async function seedFlashcards(flashcards) {
+  await ensureConnected();
+  const docs = await Flashcard.insertMany(flashcards, { ordered: false });
+  return docs.map((doc) => normalizeFlashcard(doc));
+}
+
+/**
+ * Batch create flashcards with deduplication per user.
+ * Skips flashcards where the same user already has a card with the same word.
+ */
+async function batchCreate({ userId, conversationId, source, flashcards }) {
+  await ensureConnected();
+
+  if (!Array.isArray(flashcards) || flashcards.length === 0) {
+    return [];
+  }
+
+  const userIdStr = String(userId);
+  const words = flashcards.map((fc) => fc.word.toLowerCase());
+
+  // Find existing words for this user
+  const existing = await Flashcard.find({
+    user_id: userIdStr,
+    word: { $in: flashcards.map((fc) => fc.word) },
+  }).lean();
+
+  const existingWords = new Set(existing.map((doc) => doc.word.toLowerCase()));
+
+  // Filter out duplicates
+  const toInsert = flashcards
+    .filter((fc) => !existingWords.has(fc.word.toLowerCase()))
+    .map((fc) => ({
+      _id: fc._id,
+      user_id: userIdStr,
+      conversation_id: String(conversationId),
+      word: fc.word,
+      ipa: fc.ipa || '',
+      meaning: fc.meaning,
+      example: fc.example,
+      source: source || 'chat-inline',
+    }));
+
+  if (toInsert.length === 0) {
+    return [];
+  }
+
+  const docs = await Flashcard.insertMany(toInsert, { ordered: false });
+  return docs.map((doc) => normalizeFlashcard(doc));
+}
+
 module.exports = {
   createFlashcards,
+  batchCreate,
   listFlashcards,
   markReviewed,
   getStats,
   clearFlashcards,
+  seedFlashcards,
 };

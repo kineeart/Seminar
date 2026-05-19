@@ -102,6 +102,38 @@ exports.getStats = async (req, res, next) => {
   }
 };
 
+exports.batchCreate = async (req, res, next) => {
+  try {
+    const { userId, conversationId, flashcards, source } = req.body || {};
+    logger.info('[FLASHCARD_BATCH_CREATE_START]', {
+      userId,
+      conversationId,
+      count: Array.isArray(flashcards) ? flashcards.length : 0,
+    });
+
+    if (!userId || !conversationId || !Array.isArray(flashcards)) {
+      return res.status(400).json({ error: 'userId, conversationId, and flashcards[] are required' });
+    }
+
+    if (flashcards.length === 0) {
+      return res.json({ success: true, saved: [] });
+    }
+
+    const result = await FlashcardService.batchCreate({
+      userId,
+      conversationId,
+      source: source || 'chat-inline',
+      flashcards,
+    });
+
+    logger.info('[FLASHCARD_BATCH_CREATE_SUCCESS]', { userId, savedCount: result.length });
+    return res.json({ success: true, saved: result });
+  } catch (err) {
+    logger.error('[FLASHCARD_BATCH_CREATE_FAIL]', { error: err.message });
+    return next(err);
+  }
+};
+
 exports.markReviewed = async (req, res, next) => {
   try {
     const { flashcardId } = req.params;

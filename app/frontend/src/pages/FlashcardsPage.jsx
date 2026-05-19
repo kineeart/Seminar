@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import FlashcardGrid from '../components/FlashcardGrid'
 import ReviewProgress from '../components/ReviewProgress'
+import { demoFlashcards } from '../data/mockFlashcards'
 import '../styles/flashcards.css'
 
 export default function FlashcardsPage() {
@@ -17,11 +18,15 @@ export default function FlashcardsPage() {
   async function loadHistory() {
     try {
       const res = await fetch(`/api/flashcards/history?userId=${encodeURIComponent(userId)}&limit=12`)
-      if (!res.ok) return
+      if (!res.ok) {
+        setHistory(demoFlashcards)
+        return
+      }
       const data = await res.json()
-      setHistory(data.flashcards || [])
+      const cards = data.flashcards || []
+      setHistory(cards.length ? cards : demoFlashcards)
     } catch (err) {
-      // Ignore history load errors to keep the page usable.
+      setHistory(demoFlashcards)
     }
   }
 
@@ -42,14 +47,17 @@ export default function FlashcardsPage() {
       })
       if (!res.ok) throw new Error(`API ${res.status}`)
       const data = await res.json()
-      setFlashcards(data.flashcards || [])
+      setFlashcards(data.flashcards || demoFlashcards)
       loadHistory()
     } catch (err) {
       setError(err.message)
+      setFlashcards(demoFlashcards)
     } finally {
       setLoading(false)
     }
   }
+
+  const visibleCards = flashcards.length ? flashcards : history
 
   return (
     <main className="flashcards-page">
@@ -59,10 +67,10 @@ export default function FlashcardsPage() {
           {loading ? 'Generating...' : 'Generate from Conversation'}
         </button>
       </div>
-      <ReviewProgress total={flashcards.length} />
+      <ReviewProgress total={visibleCards.length} />
       {error && <div className="error">Error: {error}</div>}
-      <FlashcardGrid cards={flashcards} />
-      {flashcards.length === 0 && !loading && <div className="empty">No flashcards yet. Click generate.</div>}
+      <FlashcardGrid cards={visibleCards} />
+      {visibleCards.length === 0 && !loading && <div className="empty">No flashcards yet. Click generate.</div>}
 
       <section className="history-panel">
         <div className="history-header">

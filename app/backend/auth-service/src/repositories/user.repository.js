@@ -36,12 +36,6 @@ async function findByEmail(email) {
   return normalizeUser(doc);
 }
 
-async function findById(id) {
-  await ensureConnected();
-  const doc = await User.findById(id).lean();
-  return normalizeUser(doc);
-}
-
 async function clearUsers() {
   await ensureConnected();
   await User.deleteMany({});
@@ -50,6 +44,5 @@ async function clearUsers() {
 module.exports = {
   createUser,
   findByEmail,
-  findById,
   clearUsers,
 };

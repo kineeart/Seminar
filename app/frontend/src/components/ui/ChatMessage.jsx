@@ -1,5 +1,6 @@
 import Markdown from 'react-markdown'
 import Badge from './Badge'
+import FlashcardCard from './FlashcardCard'
 
 function ChatMessage({ message }) {
   const isUser = message.role === 'user'
@@ -24,6 +25,13 @@ function ChatMessage({ message }) {
           >
             {message.text}
           </Markdown>
+        )}
+        {!isUser && Array.isArray(message.flashcards) && message.flashcards.length > 0 && (
+          <div className="flashcard-inline-list">
+            {message.flashcards.map((fc, idx) => (
+              <FlashcardCard key={fc.id || fc.word || idx} flashcard={fc} />
+            ))}
+          </div>
         )}
       </div>
     </div>

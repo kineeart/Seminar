@@ -1,61 +1,91 @@
 const geminiService = require('../services/gemini.service');
 const conversationRepository = require('../repositories/conversation.repository');
 const { validateChatRequest } = require('../utils/chat-validator');
-
-function classifyIntent(message = '') {
-  const normalized = String(message).toLowerCase();
-
-  if (normalized.includes('translate') || normalized.includes('dịch')) return 'translation';
-  if (normalized.includes('explain') || normalized.includes('giải thích')) return 'explanation';
-  if (normalized.includes('quiz') || normalized.includes('test')) return 'assessment';
-  if (normalized.includes('flashcard') || normalized.includes('card')) return 'flashcard';
-  return normalized ? 'learning' : 'unknown';
-}
-
-function classifyTopics(message = '') {
-  const normalized = String(message).toLowerCase();
-  const topics = [];
-
-  if (normalized.includes('grammar')) topics.push('grammar');
-  if (normalized.includes('vocabulary')) topics.push('vocabulary');
-  if (normalized.includes('speaking')) topics.push('speaking');
-  if (normalized.includes('listening')) topics.push('listening');
-  if (normalized.includes('reading')) topics.push('reading');
-  if (normalized.includes('writing')) topics.push('writing');
-  if (normalized.includes('ielts')) topics.push('ielts');
-  if (normalized.includes('toeic')) topics.push('toeic');
-
-  return topics.length ? topics : ['general'];
-}
-
-function sendAnalyticsEvent(payload) {
-  const analyticsUrl = process.env.ANALYTICS_SERVICE_URL || 'http://localhost:5005';
-  fetch(`${analyticsUrl}/logs/ingest`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-}
+const { detectGoalProgress, ROLEPLAY_SCENARIOS } = require('../utils/prompt-builder');
+const { getConversationHistory } = require('../utils/conversation-memory');
+const { extractFlashcards } = require('../utils/flashcard-response-parser');
+const flashcardClient = require('../utils/flashcard-client');
 
 async function handleChat(req, res, next) {
   try {
     const chatRequest = validateChatRequest(req.body);
     const reply = await geminiService.generateResponse(chatRequest);
 
-    sendAnalyticsEvent({
-      userId: chatRequest.userId || req.body?.userId || 'anonymous',
-      endpoint: '/api/chat',
-      method: 'POST',
-      timestamp: new Date().toISOString(),
-      responseTime: 0,
-      statusCode: 200,
-      tokenEstimate: Math.max(1, Math.ceil(String(chatRequest.message || '').length / 4)),
-      service: 'ai-chat-service',
-      intent: classifyIntent(chatRequest.message),
-      topic: classifyTopics(chatRequest.message).join(', '),
-    });
+    // For roleplay mode, include goal progress
+    let goalProgress = null;
+    if (chatRequest.mode === 'roleplay') {
+      const scenario = chatRequest.scenario || 'coffee';
+      const history = await getConversationHistory(chatRequest.conversationId);
+      const progress = detectGoalProgress(scenario, chatRequest.message, history);
+      const scenarioData = ROLEPLAY_SCENARIOS[scenario];
 
-    return res.json({ success: true, reply });
+      // Check if reply contains [GOAL_COMPLETE] marker
+      let cleanReply = reply;
+      let isComplete = progress.isComplete || reply.includes('[GOAL_COMPLETE]');
+      if (reply.includes('[GOAL_COMPLETE]')) {
+        cleanReply = reply.replace('[GOAL_COMPLETE]', '').trim();
+      }
+
+      goalProgress = {
+        completedSteps: progress.completedSteps,
+        totalSteps: progress.totalSteps,
+        isComplete,
+        completionMessage: isComplete ? scenarioData?.completionMessage : null,
+      };
+
+      return res.json({ success: true, reply: cleanReply, goalProgress });
+    }
+
+    // For knowledge mode, check for inline flashcards
+    const { cleanReply, flashcards } = extractFlashcards(reply);
+
+    console.info(JSON.stringify({
+      event: 'flashcard_extraction',
+      flashcardsFound: flashcards.length,
+      userId: chatRequest.userId || null,
+      hasMarker: reply.includes('```flashcards'),
+    }));
+
+    if (flashcards.length > 0) {
+      // Always try to save — use userId or fallback to 'guest'
+      const saveUserId = chatRequest.userId || 'guest';
+      try {
+        const savedFlashcards = await flashcardClient.saveFlashcards({
+          userId: saveUserId,
+          conversationId: chatRequest.conversationId,
+          flashcards,
+        });
+
+        console.info(JSON.stringify({
+          event: 'flashcard_saved',
+          count: savedFlashcards.length,
+          userId: saveUserId,
+        }));
+
+        return res.json({
+          success: true,
+          reply: cleanReply,
+          flashcards: savedFlashcards.length > 0 ? savedFlashcards : flashcards,
+          conversationId: chatRequest.conversationId,
+        });
+      } catch (saveErr) {
+        console.warn(JSON.stringify({
+          event: 'flashcard_save_error',
+          message: saveErr.message,
+          conversationId: chatRequest.conversationId,
+        }));
+      }
+
+      // Return flashcards even if save failed
+      return res.json({
+        success: true,
+        reply: cleanReply,
+        flashcards,
+        conversationId: chatRequest.conversationId,
+      });
+    }
+
+    return res.json({ success: true, reply: cleanReply });
   } catch (err) {
     return next(err);
   }
