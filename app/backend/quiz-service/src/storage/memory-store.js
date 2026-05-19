@@ -1,6 +1,7 @@
 const quizzes = new Map();
 const attempts = [];
 const progressByUser = new Map();
+const aiQuizLogs = [];
 
 async function createQuiz(quiz) {
   quizzes.set(quiz.id, quiz);
@@ -37,6 +38,30 @@ async function saveProgress(progress) {
   return progress;
 }
 
+async function createAiQuizLog(log) {
+  aiQuizLogs.push(log);
+  return log;
+}
+
+async function listRecentQuestions({ userId, limit = 100 } = {}) {
+  if (!userId) {
+    return [];
+  }
+
+  const items = Array.from(quizzes.values())
+    .filter((quiz) => quiz.user_id === userId)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  const questions = [];
+  items.forEach((quiz) => {
+    (quiz.questions || []).forEach((question) => {
+      questions.push(question);
+    });
+  });
+
+  return questions.slice(0, Math.max(1, Number(limit) || 100));
+}
+
 module.exports = {
   createQuiz,
   getQuiz,
@@ -44,4 +69,6 @@ module.exports = {
   listAttempts,
   getProgress,
   saveProgress,
+  createAiQuizLog,
+  listRecentQuestions,
 };

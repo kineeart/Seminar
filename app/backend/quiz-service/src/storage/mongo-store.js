@@ -9,6 +9,7 @@ const questionSchema = new mongoose.Schema(
     options: { type: [String], default: [] },
     correct_answer: { type: String, required: true },
     explanation: { type: String, default: '' },
+    source: { type: String, default: 'manual' },
     skill_tag: { type: String, default: 'general' },
     difficulty: { type: String, default: 'easy' },
   },
@@ -101,10 +102,35 @@ const progressSchema = new mongoose.Schema(
   },
 );
 
+const aiQuizLogSchema = new mongoose.Schema(
+  {
+    _id: { type: String, required: true },
+    user_id: { type: String, default: null, index: true },
+    quiz_id: { type: String, default: null, index: true },
+    provider: { type: String, default: 'openai' },
+    model: { type: String, default: '' },
+    status: { type: String, default: 'success' },
+    attempt: { type: Number, default: 1 },
+    prompt_path: { type: String, default: '' },
+    prompt_excerpt: { type: String, default: '' },
+    request_payload: { type: mongoose.Schema.Types.Mixed, default: {} },
+    response_text: { type: String, default: '' },
+    response_json: { type: mongoose.Schema.Types.Mixed, default: {} },
+    error_message: { type: String, default: '' },
+  },
+  {
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    versionKey: false,
+  },
+);
+
+aiQuizLogSchema.index({ user_id: 1, created_at: -1 });
+
 const Quiz = mongoose.models.Quiz || mongoose.model('Quiz', quizSchema, 'quizzes');
 const QuizResult = mongoose.models.QuizResult
   || mongoose.model('QuizResult', quizResultSchema, 'quiz_results');
 const Progress = mongoose.models.Progress || mongoose.model('Progress', progressSchema, 'progress');
+const AiQuizLog = mongoose.models.AiQuizLog || mongoose.model('AiQuizLog', aiQuizLogSchema, 'ai_quiz_logs');
 
 async function connect() {
   await connectWithRetry({ appName: 'quiz-service' });
@@ -179,6 +205,33 @@ async function saveProgress(progress) {
   return doc ? doc.toObject() : progress;
 }
 
+async function createAiQuizLog(log) {
+  await connect();
+  const doc = await AiQuizLog.create({ ...log, _id: log.id });
+  return normalizeDoc(doc);
+}
+
+async function listRecentQuestions({ userId, limit = 100 } = {}) {
+  await connect();
+  if (!userId) {
+    return [];
+  }
+
+  const docs = await Quiz.find({ user_id: userId })
+    .sort({ created_at: -1 })
+    .limit(20)
+    .lean();
+
+  const questions = [];
+  docs.forEach((quiz) => {
+    (quiz.questions || []).forEach((question) => {
+      questions.push(question);
+    });
+  });
+
+  return questions.slice(0, Math.max(1, Number(limit) || 100));
+}
+
 module.exports = {
   createQuiz,
   getQuiz,
@@ -186,4 +239,6 @@ module.exports = {
   listAttempts,
   getProgress,
   saveProgress,
+  createAiQuizLog,
+  listRecentQuestions,
 };

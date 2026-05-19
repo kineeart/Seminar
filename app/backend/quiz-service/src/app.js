@@ -1,12 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 const quizRoutes = require('./routes/quiz.routes');
 const attemptRoutes = require('./routes/attempt.routes');
 const progressRoutes = require('./routes/progress.routes');
 const errorMiddleware = require('./middleware/error.middleware');
 
-dotenv.config({ path: '../../.env' });
+const appEnvPath = path.resolve(__dirname, '../../../.env');
+const backendEnvPath = path.resolve(__dirname, '../../.env');
+
+dotenv.config({ path: appEnvPath, override: false });
+dotenv.config({ path: backendEnvPath, override: true });
 
 const app = express();
 
@@ -21,11 +26,10 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Mount at both root and /quizzes for gateway compatibility
-app.use('/', quizRoutes);
 app.use('/quizzes', quizRoutes);
 app.use('/attempts', attemptRoutes);
 app.use('/progress', progressRoutes);
+app.use('/', quizRoutes);
 
 app.use(errorMiddleware);
 

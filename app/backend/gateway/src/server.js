@@ -215,6 +215,8 @@ app.use(
   createProxyMiddleware({
     target: QUIZ_SERVICE_URL,
     changeOrigin: true,
+    timeout: 180000,
+    proxyTimeout: 180000,
     pathRewrite: {
       '^/api/quizzes': '',
     },
@@ -278,9 +280,7 @@ app.use(
   createProxyMiddleware({
     target: QUIZ_SERVICE_URL,
     changeOrigin: true,
-    pathRewrite: {
-      '^/api/attempts': '',
-    },
+    pathRewrite: (path) => path.replace(/^\//, '/attempts/'),
     on: {
       proxyReq: fixRequestBody,
     },

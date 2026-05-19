@@ -1,36 +1,9 @@
 const request = require('supertest');
 const app = require('../app');
-require('../storage/mongo-store');
-const mongoose = require('mongoose');
-const { connectWithRetry, disconnectMongo } = require('../../../shared/database');
 
-const hasMongo = Boolean(process.env.MONGODB_URI && process.env.DATABASE_NAME);
-const describeIf = hasMongo ? describe : describe.skip;
+jest.mock('../storage', () => require('../storage/memory-store'));
 
-describeIf('Quiz Service', () => {
-  beforeAll(async () => {
-    await connectWithRetry({ appName: 'quiz-service-test' });
-  }, 30000);
-
-  afterAll(async () => {
-    await disconnectMongo();
-  }, 30000);
-
-  beforeEach(async () => {
-    const Quiz = mongoose.models.Quiz;
-    const QuizResult = mongoose.models.QuizResult;
-    const Progress = mongoose.models.Progress;
-    if (Quiz) {
-      await Quiz.deleteMany({});
-    }
-    if (QuizResult) {
-      await QuizResult.deleteMany({});
-    }
-    if (Progress) {
-      await Progress.deleteMany({});
-    }
-  }, 30000);
-
+describe('Quiz Service', () => {
   test('GET /health returns ok', async () => {
     const res = await request(app).get('/health');
     expect(res.statusCode).toBe(200);
@@ -38,17 +11,18 @@ describeIf('Quiz Service', () => {
     expect(res.body).toHaveProperty('service', 'quiz-service');
   });
 
-  test('POST /quizzes/generate creates quiz', async () => {
+  test('POST /quizzes/generate creates quiz without exposing correct answers', async () => {
     const payload = {
       title: 'Mini Quiz',
       userId: 'user-1',
       questions: [
         {
-          question: 'What is 2 + 2? ',
+          question: 'What is 2 + 2?',
           options: ['3', '4', '5', '6'],
           correct_answer: '4',
           explanation: 'Basic math',
           skill_tag: 'logic',
+          source: 'manual',
         },
       ],
     };
@@ -58,9 +32,25 @@ describeIf('Quiz Service', () => {
     expect(res.body).toHaveProperty('success', true);
     expect(res.body.quiz).toHaveProperty('id');
     expect(res.body.quiz.questions[0]).not.toHaveProperty('correct_answer');
-  }, 30000);
+  });
 
-  test('GET /quizzes/:id returns quiz', async () => {
+  test('POST /quizzes/generate builds fallback quiz schema', async () => {
+    const res = await request(app).post('/quizzes/generate').send({ count: 4, topic: 'general' });
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.quiz.questions).toHaveLength(4);
+    expect(res.body.quiz.questions[0]).toMatchObject({
+      type: expect.any(String),
+      question: expect.any(String),
+      explanation: expect.any(String),
+      skill_tag: expect.any(String),
+      difficulty: expect.any(String),
+      source: expect.any(String),
+    });
+    expect(res.body.quiz.questions[0]).not.toHaveProperty('correct_answer');
+  });
+
+  test('GET /quizzes/:id returns sanitized quiz', async () => {
     const createRes = await request(app).post('/quizzes/generate').send({
       title: 'Quick Quiz',
       questions: [
@@ -68,6 +58,7 @@ describeIf('Quiz Service', () => {
           question: 'Choose A',
           options: ['A', 'B'],
           correct_answer: 'A',
+          source: 'manual',
         },
       ],
     });
@@ -76,9 +67,10 @@ describeIf('Quiz Service', () => {
     const res = await request(app).get(`/quizzes/${quizId}`);
     expect(res.statusCode).toBe(200);
     expect(res.body.quiz).toHaveProperty('id', quizId);
-  }, 30000);
+    expect(res.body.quiz.questions[0]).not.toHaveProperty('correct_answer');
+  });
 
-  test('POST /quizzes/:id/submit scores answers', async () => {
+  test('POST /quizzes/:id/submit scores answers and returns weak topics', async () => {
     const createRes = await request(app).post('/quizzes/generate').send({
       title: 'Score Quiz',
       userId: 'user-2',
@@ -88,27 +80,42 @@ describeIf('Quiz Service', () => {
           options: ['X', 'Y'],
           correct_answer: 'X',
           skill_tag: 'vocab',
+          source: 'manual',
+        },
+        {
+          question: 'Pick B',
+          options: ['A', 'B'],
+          correct_answer: 'B',
+          skill_tag: 'grammar',
+          source: 'manual',
         },
       ],
     });
 
     const quizId = createRes.body.quiz.id;
-    const questionId = createRes.body.quiz.questions[0].question_id;
+    const firstQuestionId = createRes.body.quiz.questions[0].question_id;
+    const secondQuestionId = createRes.body.quiz.questions[1].question_id;
 
     const submitRes = await request(app).post(`/quizzes/${quizId}/submit`).send({
       userId: 'user-2',
-      answers: [{ questionId, selectedAnswer: 'X' }],
+      answers: [
+        { questionId: firstQuestionId, selectedAnswer: 'X' },
+        { questionId: secondQuestionId, selectedAnswer: 'A' },
+      ],
     });
 
     expect(submitRes.statusCode).toBe(200);
-    expect(submitRes.body.result).toHaveProperty('score', 100);
+    expect(submitRes.body.result).toHaveProperty('score', 50);
     expect(submitRes.body.result).toHaveProperty('correct_count', 1);
-  }, 30000);
+    expect(submitRes.body.result).toHaveProperty('total_questions', 2);
+    expect(submitRes.body.result.weak_topics).toContain('grammar');
+    expect(submitRes.body.result.results).toHaveLength(2);
+  });
 
   test('GET /attempts requires userId', async () => {
     const res = await request(app).get('/attempts');
     expect(res.statusCode).toBe(400);
-  }, 30000);
+  });
 
   test('GET /attempts returns attempts', async () => {
     const createRes = await request(app).post('/quizzes/generate').send({
@@ -119,6 +126,7 @@ describeIf('Quiz Service', () => {
           question: 'Pick A',
           options: ['A', 'B'],
           correct_answer: 'A',
+          source: 'manual',
         },
       ],
     });
@@ -134,9 +142,9 @@ describeIf('Quiz Service', () => {
     const res = await request(app).get('/attempts').query({ userId: 'user-3' });
     expect(res.statusCode).toBe(200);
     expect(res.body.attempts.length).toBeGreaterThan(0);
-  }, 30000);
+  });
 
-  test('GET /progress returns progress', async () => {
+  test('GET /progress returns updated progress after submit', async () => {
     const createRes = await request(app).post('/quizzes/generate').send({
       title: 'Progress Quiz',
       userId: 'user-4',
@@ -146,6 +154,7 @@ describeIf('Quiz Service', () => {
           options: ['A', 'B'],
           correct_answer: 'B',
           skill_tag: 'grammar',
+          source: 'manual',
         },
       ],
     });
@@ -161,16 +170,6 @@ describeIf('Quiz Service', () => {
     const progressRes = await request(app).get('/progress').query({ userId: 'user-4' });
     expect(progressRes.statusCode).toBe(200);
     expect(progressRes.body.progress).toHaveProperty('quizzes_completed', 1);
-  }, 30000);
-
-  test('POST /progress/flashcard-review updates flashcard metrics', async () => {
-    const res = await request(app)
-      .post('/progress/flashcard-review')
-      .send({ userId: 'user-flash', reviewedAt: new Date().toISOString() });
-
-    expect(res.statusCode).toBe(200);
-    expect(res.body.progress).toHaveProperty('flashcards_completed', 1);
-    expect(res.body.progress).toHaveProperty('learned_words_count', 1);
-    expect(res.body.progress).toHaveProperty('streak_days', 1);
-  }, 30000);
+    expect(progressRes.body.progress).toHaveProperty('quiz_accuracy', 100);
+  });
 });

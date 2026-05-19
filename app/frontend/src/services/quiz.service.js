@@ -1,13 +1,37 @@
 import api from './api'
 
 export const quizService = {
-  generate: (topic, count = 5) => api.post('/quizzes/generate', { topic, count }),
+  async generate(payload) {
+    const finalPayload = {
+      topic: payload.topic || 'mixed',
+      count: payload.count || 10,
+      difficulty: payload.difficulty || 'easy',
+      userId: payload.userId,
+      useAi: true,
+      source: 'ai',
+    };
+    const response = await api.post('/quizzes/generate', finalPayload);
+    return response.quiz;
+  },
 
-  getQuiz: (quizId) => api.get(`/quizzes/${quizId}`),
+  async getQuiz(quizId) {
+    const response = await api.get(`/quizzes/${quizId}`);
+    return response.quiz;
+  },
 
-  submitQuiz: (quizId, answers) => api.post(`/quizzes/${quizId}/submit`, { answers }),
+  async submitQuiz(quizId, answers, userId) {
+    const formattedAnswers = (answers || []).map((answer) => ({
+      questionId: answer.questionId,
+      selectedAnswer: answer.selectedAnswer,
+    }));
+    const response = await api.post(`/quizzes/${quizId}/submit`, { answers: formattedAnswers, userId });
+    return response.result;
+  },
 
-  listAttempts: () => api.get('/quizzes/attempts'),
+  async listAttempts(userId, limit = 10) {
+    const response = await api.get(`/attempts?userId=${encodeURIComponent(userId)}&limit=${limit}`);
+    return response.attempts || [];
+  },
 }
 
 export default quizService

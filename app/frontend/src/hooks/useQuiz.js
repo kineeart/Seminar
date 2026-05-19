@@ -1,78 +1,255 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import quizService from '../services/quiz.service'
+
+function mapQuestion(question) {
+  return {
+    id: question.question_id || question.id,
+    type: question.type,
+    prompt: question.question || question.prompt,
+    options: Array.isArray(question.options) && question.options.length
+      ? question.options
+      : [question.correct_answer].filter(Boolean),
+    explanation: question.explanation || '',
+    tag: question.skill_tag || question.tag || 'general',
+    difficulty: question.difficulty || 'easy',
+  }
+}
 
 export default function useQuiz() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const locationState = location.state || {}
+
+  // Setup state (selected by user on QuizPage)
+  const [difficulty, setDifficulty] = useState('')
+  const [questionCount, setQuestionCount] = useState(10)
+
+  // Quiz runtime state
   const [questions, setQuestions] = useState([])
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState(null)
   const [answers, setAnswers] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [quizId, setQuizId] = useState(null)
+  const [userId, setUserId] = useState(null)
 
-  useEffect(() => {
-    async function fetchQuiz() {
-      try {
-        setLoading(true)
-        const data = await quizService.generate('mixed', 5)
-        setQuestions(data.questions || data || [])
-        if (data.quizId || data._id) {
-          setQuizId(data.quizId || data._id)
-        }
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
+  // History state
+  const [attempts, setAttempts] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyError, setHistoryError] = useState(null)
 
-    fetchQuiz()
+  const storedUserId = useMemo(() => {
+    return window.localStorage.getItem('userId') || 'guest'
   }, [])
 
-  const current = questions[index]
-  const total = questions.length
-  const isLast = index === total - 1
-
-  const feedback = useMemo(() => {
-    if (selected === null || !current) return null
-    const correct = selected === current.correct
-    return {
-      correct,
-      text: correct ? 'Correct answer.' : `Not quite. ${current.explanation || ''}`,
+  // Load attempts when userId changes (used on QuizPage level selection)
+  const loadAttempts = useCallback(async () => {
+    setHistoryLoading(true)
+    setHistoryError(null)
+    try {
+      const data = await quizService.listAttempts(storedUserId, 10)
+      setAttempts(data)
+    } catch (err) {
+      setHistoryError(err.message || 'Failed to load quiz history')
+      setAttempts([])
+    } finally {
+      setHistoryLoading(false)
     }
-  }, [selected, current])
+  }, [storedUserId])
 
-  const select = (i) => {
-    if (feedback) return // already submitted
-    setSelected(i)
-  }
+  // Start quiz with selected difficulty and count
+  const startQuiz = useCallback(async (opts = {}) => {
+    const diff = opts.difficulty || difficulty || 'easy'
+    const count = opts.questionCount || questionCount || 10
 
-  const onContinue = useCallback(() => {
-    if (selected === null) return
-    const nextAnswers = [...answers, selected === current.correct ? 1 : 0]
-    setAnswers(nextAnswers)
+    setLoading(true)
+    setError(null)
+    setIndex(0)
     setSelected(null)
+    setAnswers([])
 
-    if (isLast) {
-      // Submit to backend
-      if (quizId) {
-        quizService.submitQuiz(quizId, nextAnswers).catch(() => {})
-      }
-      const score = nextAnswers.reduce((sum, v) => sum + v, 0)
-      navigate('/quiz/result', {
-        state: {
-          score,
-          total: questions.length,
-          weakTopics: questions.filter((_, i) => !nextAnswers[i]).map((q) => q.tag),
-        },
+    setUserId(storedUserId)
+
+    try {
+      const quiz = await quizService.generate({
+        topic: 'mixed',
+        count,
+        difficulty: diff,
+        userId: storedUserId,
+        useAi: true,
+        source: 'ai',
       })
+
+      setQuizId(quiz.id)
+      setQuestions((quiz.questions || []).map(mapQuestion))
+      return { success: true, quizId: quiz.id, questionCount: quiz.questions?.length || count }
+    } catch (err) {
+      setError(err.message || 'Failed to generate quiz')
+      return { success: false, error: err.message || 'Failed to generate quiz' }
+    } finally {
+      setLoading(false)
+    }
+  }, [difficulty, questionCount, storedUserId])
+
+  // For backward compatibility / retry flow
+  const autoStart = useCallback(async () => {
+    if (locationState.retry && locationState.quiz?.id && Array.isArray(locationState.quiz?.questions)) {
+      setDifficulty(locationState.difficulty || 'easy')
+      setQuestionCount(locationState.questionCount || locationState.quiz.questions.length || 10)
+      setQuizId(locationState.quiz.id)
+      setQuestions(locationState.quiz.questions.map(mapQuestion))
+      setUserId(storedUserId)
+      setLoading(false)
+      setError(null)
+      setIndex(0)
+      setSelected(null)
+      setAnswers([])
       return
     }
 
-    setIndex((prev) => prev + 1)
-  }, [selected, answers, current, isLast, quizId, questions, navigate])
+    const shouldAutoStart = Boolean(locationState.difficulty)
+    if (!shouldAutoStart) {
+      setLoading(false)
+      return
+    }
+    setDifficulty(locationState.difficulty || 'easy')
+    const count = locationState.questionCount || 10
+    setQuestionCount(count)
+    await startQuiz({ difficulty: locationState.difficulty, questionCount: count })
+  }, [locationState, startQuiz, storedUserId])
 
-  return { current, index, total, selected, feedback, loading, error, select, onContinue, isLast }
+  useEffect(() => {
+    if (locationState.retry) {
+      autoStart()
+    }
+  }, [locationState.retry, autoStart])
+
+  const current = questions[index] || null
+  const total = questions.length
+  const isLast = total > 0 && index === total - 1
+
+  const feedback = useMemo(() => {
+    if (selected === null || !current) return null
+    return {
+      correct: null,
+      text: 'Answer selected. Submit the quiz to review correct and incorrect answers.',
+    }
+  }, [selected, current])
+
+  const select = (optionIndex) => {
+    setSelected(optionIndex)
+  }
+
+  const onContinue = useCallback(async () => {
+    if (selected === null || !current) return
+
+    const selectedAnswer = current.options[selected]
+    const nextAnswers = [
+      ...answers,
+      {
+        questionId: current.id,
+        selectedAnswer,
+        skillTag: current.tag,
+        question: current.prompt,
+        options: current.options,
+      },
+    ]
+
+    setAnswers(nextAnswers)
+    setSelected(null)
+
+    if (!isLast) {
+      setIndex((prev) => prev + 1)
+      return
+    }
+
+    try {
+      const result = await quizService.submitQuiz(
+        quizId,
+        nextAnswers.map((answer) => ({
+          questionId: answer.questionId,
+          selectedAnswer: answer.selectedAnswer,
+        })),
+        userId,
+      )
+
+      const detailedResults = (result.results || []).map((item) => {
+        const question = nextAnswers.find((answer) => answer.questionId === item.question_id)
+        return {
+          questionId: item.question_id,
+          question: question?.question || 'Question',
+          options: question?.options || [],
+          selectedAnswer: item.selected_answer,
+          correctAnswer: item.correct_answer,
+          isCorrect: Boolean(item.is_correct),
+          explanation: item.explanation || '',
+          skillTag: question?.skillTag || 'general',
+        }
+      })
+
+      navigate('/quiz/result', {
+        state: {
+          score: result.correct_count,
+          total: result.total_questions,
+          percent: result.score,
+          weakTopics: result.weak_topics || [],
+          results: detailedResults,
+          difficulty,
+          questionCount: total,
+          quiz: {
+            id: quizId,
+            questions: questions.map((question) => ({
+              id: question.id,
+              type: question.type,
+              question: question.prompt,
+              options: question.options,
+              explanation: question.explanation,
+              skill_tag: question.tag,
+              difficulty: question.difficulty,
+            })),
+          },
+        },
+      })
+    } catch (err) {
+      setError(err.message || 'Failed to submit quiz')
+    }
+  }, [selected, current, answers, isLast, quizId, navigate, userId, questions, difficulty, total])
+
+  // Reset setup state when navigating to a new mode
+  useEffect(() => {
+    if (locationState.fresh) {
+      setDifficulty('')
+      setQuestionCount(10)
+    }
+  }, [locationState.fresh])
+
+  return {
+    // Runtime
+    current,
+    index,
+    total,
+    selected,
+    feedback,
+    loading,
+    error,
+    select,
+    onContinue,
+    isLast,
+    // Setup (for QuizPage level selection UI)
+    difficulty,
+    questionCount,
+    setDifficulty,
+    setQuestionCount,
+    startQuiz,
+    // History
+    attempts,
+    historyLoading,
+    historyError,
+    loadAttempts,
+    // Helpers
+    userId: userId || storedUserId,
+    autoStart,
+  }
 }
