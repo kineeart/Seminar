@@ -33,7 +33,15 @@ async function signup(req, res) {
 }
 
 async function login(req, res) {
+  // Temporary trace for login path debugging.
+  // eslint-disable-next-line no-console
+  console.log('[LOGIN] controller invoked');
   const result = await authService.login(req.body || {});
+  // eslint-disable-next-line no-console
+  console.log('[LOGIN] service result', {
+    error: result.error || null,
+    hasToken: Boolean(result.token),
+  });
 
   if (result.error === 'validation') {
     return res.status(400).json({

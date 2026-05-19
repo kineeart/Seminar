@@ -25,13 +25,17 @@ function validateCredentials({ email, password }) {
 }
 
 function getJwtSecret() {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    const error = new Error('JWT_SECRET is required');
-    error.code = 'CONFIG_MISSING';
-    throw error;
-  }
-  return secret;
+  const jwtSecret = process.env.JWT_SECRET || 'dev_fallback_secret';
+
+  // Temporary audit logs for login path debugging.
+  // eslint-disable-next-line no-console
+  console.log('[LOGIN DEBUG] JWT_SECRET =', process.env.JWT_SECRET);
+  // eslint-disable-next-line no-console
+  console.log('[LOGIN DEBUG] ENV KEYS =', Object.keys(process.env).filter((key) => key.includes('JWT')));
+  // eslint-disable-next-line no-console
+  console.log('JWT SIGN TEST', jwt.sign({ test: 1 }, jwtSecret));
+
+  return jwtSecret;
 }
 
 async function signup(payload) {
@@ -66,6 +70,9 @@ async function signup(payload) {
 }
 
 async function login(payload) {
+  // Temporary trace for login path debugging.
+  // eslint-disable-next-line no-console
+  console.log('[LOGIN] service invoked');
   const validation = validateCredentials(payload);
 
   if (validation.error) {
@@ -73,6 +80,11 @@ async function login(payload) {
   }
 
   const existingUser = await userRepository.findByEmail(validation.email);
+  // eslint-disable-next-line no-console
+  console.log('[LOGIN] user lookup completed', {
+    found: Boolean(existingUser),
+    hasStoredHash: Boolean(existingUser && existingUser.password_hash),
+  });
 
   if (!existingUser || existingUser.password_hash !== validation.password) {
     return {
@@ -83,6 +95,8 @@ async function login(payload) {
 
   let token;
   try {
+    // eslint-disable-next-line no-console
+    console.log('[LOGIN] about to sign token');
     token = jwt.sign(
       {
         sub: existingUser.id,

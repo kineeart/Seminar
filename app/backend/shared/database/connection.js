@@ -22,6 +22,9 @@ async function connectMongo(overrides = {}) {
 
   mongoose.set('strictQuery', true);
 
+  // eslint-disable-next-line no-console
+  console.log('[DB] Connecting to MongoDB Atlas...');
+
   connectionPromise = mongoose
     .connect(config.uri, {
       dbName: config.dbName,
@@ -31,7 +34,16 @@ async function connectMongo(overrides = {}) {
       socketTimeoutMS: config.socketTimeoutMs,
       appName: config.appName,
     })
-    .then(() => mongoose.connection)
+    .then(() => {
+      // eslint-disable-next-line no-console
+      console.log('[DB] Connected successfully');
+      return mongoose.connection;
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(`[DB] Connection failed: ${error.message}`);
+      throw error;
+    })
     .finally(() => {
       connectionPromise = null;
     });

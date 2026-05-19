@@ -1,5 +1,5 @@
-const User = require('../models/user.model');
 const { connectWithRetry } = require('../../../shared/database');
+const User = require('../models/user.model');
 
 async function ensureConnected() {
   await connectWithRetry({ appName: 'auth-service' });
