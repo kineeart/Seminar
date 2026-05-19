@@ -93,6 +93,7 @@ const progressSchema = new mongoose.Schema(
         flashcards_reviewed: Number,
         quizzes_completed: Number,
         learned_words: Number,
+        study_seconds: Number,
       },
     ],
   },

@@ -114,6 +114,26 @@ export function useFlashcardLibrary() {
             byDeck.other = otherCards
           }
 
+          const topicBuckets = flashcards.reduce((acc, card) => {
+            const rawTopic = String(card.topic || '').trim()
+            const normalized = !rawTopic || rawTopic.toLowerCase() === 'general' ? 'none' : rawTopic
+            if (!acc[normalized]) acc[normalized] = []
+            acc[normalized].push(card)
+            return acc
+          }, {})
+
+          Object.entries(topicBuckets).forEach(([topicName, cards]) => {
+            const deckId = `topic:${topicName.toLowerCase()}`
+            collections.push({
+              id: deckId,
+              title: topicName === 'none' ? 'None' : topicName,
+              category: 'Topic',
+              count: cards.length,
+              progress: Math.round((cards.filter((c) => c.reviewed_at).length / cards.length) * 100),
+            })
+            byDeck[deckId] = cards
+          })
+
           setDecks(collections)
           setCardsByDeck(byDeck)
         } else {
@@ -172,6 +192,13 @@ export function useFlashcardStudyAPI(deckId = 'all') {
           filtered = raw.filter((fc) => !['chat-inline', 'ai', 'seed'].includes(fc.source))
         } else if (deckId === 'all') {
           filtered = raw
+        } else if (deckId.startsWith('topic:')) {
+          const topicName = deckId.slice(6)
+          filtered = raw.filter((fc) => {
+            const rawTopic = String(fc.topic || '').trim().toLowerCase()
+            const normalized = !rawTopic || rawTopic === 'general' ? 'none' : rawTopic
+            return normalized === topicName
+          })
         }
 
         // Map API flashcard format to study card format

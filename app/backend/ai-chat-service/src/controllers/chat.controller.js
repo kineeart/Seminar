@@ -6,6 +6,24 @@ const { getConversationHistory } = require('../utils/conversation-memory');
 const { extractFlashcards } = require('../utils/flashcard-response-parser');
 const flashcardClient = require('../utils/flashcard-client');
 
+function extractTopicName(message = '') {
+  const text = String(message || '').trim();
+  if (!text) return null;
+  const patterns = [
+    /chủ đề\s+["“]?([^"”\n,.!?]+)["”]?/i,
+    /topic\s*[:\-]\s*["“]?([^"”\n,.!?]+)["”]?/i,
+    /về\s+["“]?([^"”\n,.!?]+)["”]?/i,
+    /about\s+["“]?([^"”\n,.!?]+)["”]?/i,
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return null;
+}
+
 async function handleChat(req, res, next) {
   try {
     const chatRequest = validateChatRequest(req.body);
@@ -38,6 +56,19 @@ async function handleChat(req, res, next) {
 
     // For knowledge mode, check for inline flashcards
     const { cleanReply, flashcards } = extractFlashcards(reply);
+    const topic = extractTopicName(chatRequest.message);
+
+    if (flashcards.length > 0 && !topic) {
+      // Ask user to name the topic before saving flashcards
+      return res.json({
+        success: true,
+        reply: `Tôi đã tạo được ${flashcards.length} flashcard. Bạn muốn đặt tên topic là gì? (Ví dụ: "Office TOEIC", "Travel Vocabulary")`,
+        flashcards: [],
+        rawFlashcards: flashcards,
+        pendingTopic: true,
+        conversationId: chatRequest.conversationId,
+      });
+    }
 
     console.info(JSON.stringify({
       event: 'flashcard_extraction',
@@ -53,6 +84,7 @@ async function handleChat(req, res, next) {
         const savedFlashcards = await flashcardClient.saveFlashcards({
           userId: saveUserId,
           conversationId: chatRequest.conversationId,
+          topic: topic || 'general',
           flashcards,
         });
 
@@ -81,6 +113,7 @@ async function handleChat(req, res, next) {
         success: true,
         reply: cleanReply,
         flashcards,
+        topic: topic || 'general',
         conversationId: chatRequest.conversationId,
       });
     }
@@ -122,8 +155,45 @@ async function getConversation(req, res, next) {
   }
 }
 
+async function saveFlashcardsWithTopic(req, res, next) {
+  try {
+    const { topic, conversationId, userId, flashcards } = req.body || {};
+
+    if (!topic || !conversationId || !Array.isArray(flashcards) || flashcards.length === 0) {
+      return res.status(400).json({ error: 'topic, conversationId, and flashcards[] are required' });
+    }
+
+    const saveUserId = userId || 'guest';
+
+    const savedFlashcards = await flashcardClient.saveFlashcards({
+      userId: saveUserId,
+      conversationId,
+      topic: topic.trim(),
+      flashcards,
+    });
+
+    console.info(JSON.stringify({
+      event: 'flashcard_saved_with_topic',
+      count: savedFlashcards.length,
+      userId: saveUserId,
+      topic: topic.trim(),
+    }));
+
+    return res.json({
+      success: true,
+      reply: `Đã lưu ${savedFlashcards.length} flashcard vào topic "${topic.trim()}"!`,
+      flashcards: savedFlashcards,
+      conversationId,
+    });
+  } catch (err) {
+    console.error('[SAVE_FLASHCARDS_WITH_TOPIC_ERROR]', err.message);
+    return next(err);
+  }
+}
+
 module.exports = {
   handleChat,
   listConversations,
   getConversation,
+  saveFlashcardsWithTopic,
 };

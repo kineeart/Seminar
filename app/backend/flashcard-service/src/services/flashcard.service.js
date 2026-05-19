@@ -13,7 +13,7 @@ try {
   // Progress tracking is optional
 }
 
-async function generateFromConversation({ conversationId, userId, messages }) {
+async function generateFromConversation({ conversationId, userId, messages, topic }) {
   // Build prompt
   const prompt = promptBuilder.buildSystemPrompt(messages);
 
@@ -35,6 +35,7 @@ async function generateFromConversation({ conversationId, userId, messages }) {
     _id: createId('flashcard'),
     user_id: ownerId,
     conversation_id: String(conversationId),
+    topic: String(topic || 'general'),
     word: card.word,
     ipa: card.ipa,
     meaning: card.meaning,
@@ -49,10 +50,11 @@ async function generateFromConversation({ conversationId, userId, messages }) {
   return flashcardRepository.createFlashcards(flashcardsToSave);
 }
 
-async function listHistory({ userId, conversationId, limit, offset }) {
+async function listHistory({ userId, conversationId, topic, limit, offset }) {
   return flashcardRepository.listFlashcards({
     userId,
     conversationId,
+    topic,
     limit,
     offset,
   });
@@ -75,7 +77,7 @@ async function markReviewed(flashcardId) {
   return flashcard;
 }
 
-async function batchCreate({ userId, conversationId, source, flashcards }) {
+async function batchCreate({ userId, conversationId, source, topic, flashcards }) {
   const ownerId = userId || 'guest';
   const flashcardsWithIds = flashcards.map((card) => ({
     _id: createId('flashcard'),
@@ -89,6 +91,7 @@ async function batchCreate({ userId, conversationId, source, flashcards }) {
     userId: ownerId,
     conversationId: String(conversationId || ''),
     source: source || 'chat-inline',
+    topic: topic || 'general',
     flashcards: flashcardsWithIds,
   });
 }

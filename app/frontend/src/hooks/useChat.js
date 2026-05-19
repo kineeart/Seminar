@@ -25,6 +25,7 @@ export default function useChat() {
   const [isTyping, setIsTyping] = useState(false)
   const [mode, setMode] = useState(initialState?.mode || 'knowledge')
   const [conversationId, setConversationId] = useState(initialState?.conversationId || null)
+  const [pendingFlashcards, setPendingFlashcards] = useState([])
 
   useEffect(() => {
     const snapshot = {
@@ -32,6 +33,7 @@ export default function useChat() {
       input,
       mode,
       conversationId,
+      pendingFlashcards,
     }
     window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(snapshot))
   }, [messages, input, mode, conversationId])
@@ -40,6 +42,42 @@ export default function useChat() {
     async (overrideText) => {
       const text = typeof overrideText === 'string' ? overrideText : input
       if (!text.trim()) return
+
+      // If we have pending flashcards waiting for topic name
+      if (pendingFlashcards.length > 0) {
+        setMessages((prev) => [
+          ...prev,
+          { id: Date.now(), role: 'user', text: `Topic: ${text}` },
+        ])
+        setInput('')
+        setIsTyping(true)
+
+        try {
+          // Send topic name with a special marker to save flashcards
+          const data = await chatService.sendMessageWithTopic(text, conversationId, pendingFlashcards, user)
+          if (data.conversationId) {
+            setConversationId(data.conversationId)
+          }
+          setPendingFlashcards([])
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now() + 1,
+              role: 'ai',
+              text: data.reply || data.message || 'Flashcards saved!',
+              flashcards: Array.isArray(data.flashcards) ? data.flashcards : undefined,
+            },
+          ])
+        } catch (err) {
+          setMessages((prev) => [
+            ...prev,
+            { id: Date.now() + 1, role: 'ai', text: `Error: ${err.message}` },
+          ])
+        } finally {
+          setIsTyping(false)
+        }
+        return
+      }
 
       const userMsg = { id: Date.now(), role: 'user', text }
       setMessages((prev) => [...prev, userMsg])
@@ -51,6 +89,12 @@ export default function useChat() {
         if (data.conversationId) {
           setConversationId(data.conversationId)
         }
+
+        // Check if AI is asking for topic name
+        if (data.pendingTopic && data.flashcards && data.flashcards.length === 0) {
+          setPendingFlashcards(data.rawFlashcards || [])
+        }
+
         setMessages((prev) => [
           ...prev,
           {
@@ -60,6 +104,7 @@ export default function useChat() {
             flashcards: Array.isArray(data.flashcards) && data.flashcards.length > 0
               ? data.flashcards
               : undefined,
+            pendingTopic: data.pendingTopic || false,
           },
         ])
       } catch (err) {
@@ -71,7 +116,7 @@ export default function useChat() {
         setIsTyping(false)
       }
     },
-    [input, conversationId, mode, user],
+    [input, conversationId, mode, user, pendingFlashcards],
   )
 
   const handleQuick = useCallback(
@@ -89,7 +134,8 @@ export default function useChat() {
     setInput('')
     setConversationId(null)
     setIsTyping(false)
+    setPendingFlashcards([])
   }, [])
 
-  return { messages, input, setInput, isTyping, mode, setMode, send, handleQuick, conversationId, startNewSession }
+  return { messages, input, setInput, isTyping, mode, setMode, send, handleQuick, conversationId, startNewSession, pendingFlashcards }
 }

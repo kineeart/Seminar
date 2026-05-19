@@ -39,6 +39,8 @@ function createMCQFromVocabulary(item, vocabulary, difficulty) {
     skill_tag: 'vocabulary',
     difficulty,
     source: 'lesson-vocabulary',
+    source_flashcard_word: item.term,
+    source_topic: item.topic || null,
   };
 }
 
@@ -61,6 +63,8 @@ function createVocabularyMeaningQuestion(item, vocabulary, difficulty) {
     skill_tag: 'vocabulary',
     difficulty,
     source: 'lesson-vocabulary',
+    source_flashcard_word: item.term,
+    source_topic: item.topic || null,
   };
 }
 
@@ -87,6 +91,8 @@ function createFillInBlank(item, difficulty) {
     skill_tag: 'vocabulary',
     difficulty,
     source: 'lesson-vocabulary',
+    source_flashcard_word: term,
+    source_topic: item.topic || null,
   };
 }
 
@@ -113,6 +119,8 @@ function createGrammarCorrection(grammarPoint, examples, difficulty) {
       skill_tag: 'grammar',
       difficulty,
       source: 'lesson-grammar',
+      source_flashcard_word: null,
+      source_topic: null,
     };
   }
 
@@ -126,6 +134,8 @@ function createGrammarCorrection(grammarPoint, examples, difficulty) {
     skill_tag: 'grammar',
     difficulty,
     source: 'lesson-grammar',
+    source_flashcard_word: null,
+    source_topic: null,
   };
 }
 
@@ -198,6 +208,8 @@ function createMCQ(item, vocabulary, difficulty) {
     skill_tag: 'vocabulary',
     difficulty,
     source: 'lesson-vocabulary',
+    source_flashcard_word: item.term,
+    source_topic: item.topic || null,
   };
 }
 
@@ -227,6 +239,8 @@ function createFallbackMCQ(index, difficulty) {
     skill_tag: 'vocabulary',
     difficulty,
     source: 'fallback-vocabulary',
+    source_flashcard_word: item.term,
+    source_topic: null,
   };
 }
 

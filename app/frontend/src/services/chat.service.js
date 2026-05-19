@@ -20,6 +20,20 @@ export const chatService = {
     })
   },
 
+  /**
+   * Send topic name to save pending flashcards
+   */
+  sendMessageWithTopic: (topicName, conversationId = null, flashcards = [], user = null) => {
+    const userId = user?.id || window.localStorage.getItem('userId') || null
+
+    return api.post('/chat/save-flashcards-with-topic', {
+      topic: topicName,
+      conversationId: conversationId || undefined,
+      userId,
+      flashcards,
+    })
+  },
+
   listConversations: () => api.get('/chat/conversations'),
 
   getConversation: (conversationId) => api.get(`/chat/conversations/${conversationId}`),

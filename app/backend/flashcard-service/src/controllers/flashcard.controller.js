@@ -32,7 +32,7 @@ exports.health = (req, res) => {
 
 exports.generateFlashcards = async (req, res, next) => {
   try {
-    const { conversationId, messages, userId } = req.body || {};
+    const { conversationId, messages, userId, topic } = req.body || {};
     logger.info('[FLASHCARD_GENERATION_START]', {
       conversationId,
       userId,
@@ -47,6 +47,7 @@ exports.generateFlashcards = async (req, res, next) => {
       conversationId,
       userId,
       messages,
+      topic,
     });
 
     sendAnalyticsEvent({
@@ -73,13 +74,19 @@ exports.generateFlashcards = async (req, res, next) => {
 
 exports.getHistory = async (req, res, next) => {
   try {
-    const { userId, conversationId, limit, offset } = req.query || {};
+    const { userId, conversationId, topic, limit, offset, requesterId, requesterRole } = req.query || {};
     if (!userId) {
       return res.status(400).json({ error: 'userId is required' });
+    }
+    const isAdmin = String(requesterRole || '').toLowerCase() === 'admin';
+    const isOwner = String(requesterId || '') === String(userId);
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ error: 'forbidden: only owner or admin can access these flashcards' });
     }
     const history = await FlashcardService.listHistory({
       userId,
       conversationId,
+      topic,
       limit,
       offset,
     });
@@ -91,9 +98,14 @@ exports.getHistory = async (req, res, next) => {
 
 exports.getStats = async (req, res, next) => {
   try {
-    const { userId } = req.query || {};
+    const { userId, requesterId, requesterRole } = req.query || {};
     if (!userId) {
       return res.status(400).json({ error: 'userId is required' });
+    }
+    const isAdmin = String(requesterRole || '').toLowerCase() === 'admin';
+    const isOwner = String(requesterId || '') === String(userId);
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ error: 'forbidden: only owner or admin can access stats' });
     }
     const stats = await FlashcardService.getStats(userId);
     return res.json({ success: true, stats });
@@ -104,7 +116,7 @@ exports.getStats = async (req, res, next) => {
 
 exports.batchCreate = async (req, res, next) => {
   try {
-    const { userId, conversationId, flashcards, source } = req.body || {};
+    const { userId, conversationId, flashcards, source, topic } = req.body || {};
     logger.info('[FLASHCARD_BATCH_CREATE_START]', {
       userId,
       conversationId,
@@ -123,6 +135,7 @@ exports.batchCreate = async (req, res, next) => {
       userId,
       conversationId,
       source: source || 'chat-inline',
+      topic: topic || 'general',
       flashcards,
     });
 

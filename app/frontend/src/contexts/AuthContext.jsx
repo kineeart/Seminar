@@ -23,11 +23,15 @@ export function AuthProvider({ children }) {
         if (profile?.id) {
           window.localStorage.setItem('userId', profile.id)
         }
+        if (profile?.role) {
+          window.localStorage.setItem('userRole', profile.role)
+        }
       })
       .catch(() => {
         // Token invalid, clear it
         window.localStorage.removeItem('authToken')
         window.localStorage.removeItem('userId')
+        window.localStorage.removeItem('userRole')
       })
       .finally(() => setLoading(false))
   }, [])
@@ -39,6 +43,9 @@ export function AuthProvider({ children }) {
     }
     if (data.user?.id) {
       window.localStorage.setItem('userId', data.user.id)
+    }
+    if (data.user?.role) {
+      window.localStorage.setItem('userRole', data.user.role)
     }
     setUser(data.user)
     return data
@@ -52,6 +59,9 @@ export function AuthProvider({ children }) {
     if (data.user?.id) {
       window.localStorage.setItem('userId', data.user.id)
     }
+    if (data.user?.role) {
+      window.localStorage.setItem('userRole', data.user.role)
+    }
     setUser(data.user)
     return data
   }, [])
@@ -59,6 +69,7 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     window.localStorage.removeItem('authToken')
     window.localStorage.removeItem('userId')
+    window.localStorage.removeItem('userRole')
     setUser(null)
     window.location.href = '/login'
   }, [])

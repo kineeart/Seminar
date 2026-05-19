@@ -26,7 +26,7 @@ async function createFlashcards(flashcards) {
   return docs.map((doc) => normalizeFlashcard(doc));
 }
 
-async function listFlashcards({ userId, conversationId, limit = 50, offset = 0 } = {}) {
+async function listFlashcards({ userId, conversationId, topic, limit = 50, offset = 0 } = {}) {
   await ensureConnected();
   const query = {};
   if (userId) {
@@ -34,6 +34,9 @@ async function listFlashcards({ userId, conversationId, limit = 50, offset = 0 }
   }
   if (conversationId) {
     query.conversation_id = String(conversationId);
+  }
+  if (topic) {
+    query.topic = String(topic);
   }
 
   const docs = await Flashcard.find(query)
@@ -94,7 +97,7 @@ async function seedFlashcards(flashcards) {
  * Batch create flashcards with deduplication per user.
  * Skips flashcards where the same user already has a card with the same word.
  */
-async function batchCreate({ userId, conversationId, source, flashcards }) {
+async function batchCreate({ userId, conversationId, source, topic, flashcards }) {
   await ensureConnected();
 
   if (!Array.isArray(flashcards) || flashcards.length === 0) {
@@ -102,8 +105,6 @@ async function batchCreate({ userId, conversationId, source, flashcards }) {
   }
 
   const userIdStr = String(userId);
-  const words = flashcards.map((fc) => fc.word.toLowerCase());
-
   // Find existing words for this user
   const existing = await Flashcard.find({
     user_id: userIdStr,
@@ -119,6 +120,7 @@ async function batchCreate({ userId, conversationId, source, flashcards }) {
       _id: fc._id,
       user_id: userIdStr,
       conversation_id: String(conversationId),
+      topic: String(topic || 'general'),
       word: fc.word,
       ipa: fc.ipa || '',
       meaning: fc.meaning,

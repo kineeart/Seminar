@@ -5,6 +5,12 @@ const flashcardSchema = new mongoose.Schema(
     _id: { type: String },
     user_id: { type: String, index: true },
     conversation_id: { type: String, index: true },
+    topic: {
+      type: String,
+      trim: true,
+      default: 'general',
+      index: true,
+    },
     word: {
       type: String,
       required: true,
@@ -43,6 +49,7 @@ const flashcardSchema = new mongoose.Schema(
 flashcardSchema.index({ user_id: 1, created_at: -1 });
 flashcardSchema.index({ conversation_id: 1, created_at: -1 });
 flashcardSchema.index({ user_id: 1, word: 1 });
+flashcardSchema.index({ user_id: 1, topic: 1, created_at: -1 });
 
 const Flashcard = mongoose.models.Flashcard
   || mongoose.model('Flashcard', flashcardSchema, 'flashcards');

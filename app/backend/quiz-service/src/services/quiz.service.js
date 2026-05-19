@@ -42,6 +42,7 @@ function normalizeVocabularyEntry(entry) {
     term,
     meaning,
     example,
+    topic: normalizeString(entry.topic || ''),
   };
 }
 
@@ -214,6 +215,7 @@ async function generateQuiz(payload) {
       flashcards = await fetchFlashcardHistory({
         userId: value.userId,
         limit: flashcardLimit,
+        topic: value.topic || undefined,
       });
 
       const flashcardVocabulary = (flashcards || [])
@@ -221,6 +223,7 @@ async function generateQuiz(payload) {
           term: card.word,
           meaning: card.meaning,
           example: card.example,
+          topic: card.topic,
         }))
         .filter(Boolean);
 
@@ -381,6 +384,8 @@ async function generateQuiz(payload) {
     questions: questions.map((question) => ({
       ...question,
       question_id: question.question_id || createId('question'),
+      source_flashcard_word: question.source_flashcard_word || null,
+      source_topic: question.source_topic || (lesson && lesson.topic) || value.topic || null,
     })),
     created_at: now,
     deleted_at: null,
@@ -443,6 +448,8 @@ async function submitQuiz(quizId, payload) {
       correct_answer: question.correct_answer,
       is_correct: isCorrect,
       explanation: question.explanation || '',
+      source_flashcard_word: question.source_flashcard_word || null,
+      source_topic: question.source_topic || null,
     };
   });
 
@@ -460,6 +467,8 @@ async function submitQuiz(quizId, payload) {
       question_id: result.question_id,
       selected_answer: result.selected_answer,
       is_correct: result.is_correct,
+      source_flashcard_word: result.source_flashcard_word || null,
+      source_topic: result.source_topic || null,
     })),
     score,
     correct_count: correctCount,

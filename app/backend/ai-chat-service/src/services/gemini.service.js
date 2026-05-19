@@ -40,6 +40,11 @@ async function callOpenAICompatible(prompt, systemPrompt, options = {}) {
   });
 
   if (!response.ok) {
+    // Retry once on 502/503 (temporary server errors)
+    if ((response.status === 502 || response.status === 503) && !options._retried) {
+      await new Promise((r) => setTimeout(r, 2000));
+      return callOpenAICompatible(prompt, systemPrompt, { ...options, _retried: true });
+    }
     const err = new Error(`OpenAI-compatible API error: ${response.status}`);
     err.status = response.status;
     throw err;
