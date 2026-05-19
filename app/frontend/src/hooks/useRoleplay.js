@@ -10,7 +10,7 @@ const scenarios = [
     subtitle: 'Cafe counter',
     assistant: 'BARISTA',
     intro: 'Good morning! Welcome in. I can help you choose a drink, size, and milk option. What would you like today?',
-    quickReplies: ['Can I get it iced?', 'What sizes do you have?', 'That is all, thank you.'],
+    quickReplies: ['Can I see the menu?', 'What sizes do you have?', 'Do you have oat milk?'],
   },
   {
     id: 'restaurant',
@@ -77,7 +77,12 @@ export default function useRoleplay() {
       setStep((s) => s + 1)
 
       try {
-        const data = await chatService.sendMessage(text, conversationId, 'roleplay', user, scenario.id)
+        const data = await chatService.sendMessage(text, conversationId, 'roleplay', user, {
+          id: scenario.id,
+          title: scenario.title,
+          subtitle: scenario.subtitle,
+          assistant: scenario.assistant,
+        })
         if (data.conversationId) {
           setConversationId(data.conversationId)
         }
@@ -99,7 +104,7 @@ export default function useRoleplay() {
         setIsTyping(false)
       }
     },
-    [conversationId, input, scenario.assistant, scenario.id, user],
+    [conversationId, input, scenario, user],
   )
 
   const handleQuick = useCallback(
