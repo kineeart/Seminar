@@ -18,12 +18,13 @@ function normalizeUser(doc) {
   };
 }
 
-async function createUser({ id, email, passwordHash }) {
+async function createUser({ id, email, passwordHash, role = 'user' }) {
   await ensureConnected();
   const doc = await User.create({
     _id: id,
     email,
     password_hash: passwordHash,
+    role,
   });
   return normalizeUser(doc);
 }

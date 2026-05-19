@@ -57,6 +57,21 @@ Ghi lại tiến trình phát triển theo phong cách Vibe Engineering: nhật 
 
 ---
 
+### 2026-05-19 — Phase: Admin Analytics Control Panel
+
+- **Mục tiêu**: Thêm lớp analytics cho gateway requests, lưu prompts vào MongoDB, và tách admin dashboard thành các trang kiểm soát riêng.
+- **Prompt đã dùng**:
+
+	> "Build a working Admin Control System + Lightweight Analytics Layer. Gateway should log API requests to analytics-service, store prompts in MongoDB, and provide admin pages for analytics, users, prompts, system health, and chat testing. Keep it simple and practical."
+
+- **AI trả kết quả gì**: Đề xuất kiến trúc analytics-service + admin pages; sau đó implement backend service, proxy gateway, request logging middleware, and dedicated admin screens.
+- **Tôi review gì**: Kiểm tra role admin cho account demo, xác nhận đường đi `/api/analytics` không gây loop log, và bảo đảm các trang mới có thể chạy bằng JWT qua gateway.
+- **Tôi sửa gì**: Mở rộng auth để `admin@gmail.com` nhận role admin, thêm `analytics-service`, cập nhật gateway proxy/logging, và tạo các trang `users.html`, `analytics.html`, `prompts.html`, `system.html`, `chat.html`.
+- **Kết quả cuối**: Hệ thống có lớp logging/analytics ban đầu và bộ trang admin điều khiển tách rời, dùng Vanilla HTML/CSS/JS.
+- **Bài học rút ra**: Khi thêm analytics vào kiến trúc microservice, cần tách rõ log ingestion internal và admin query API, đồng thời giữ middleware logging ở gateway thật nhẹ để không làm chậm request chính.
+
+---
+
 ### [Template] New entry (copy for each day)
 
 #### YYYY-MM-DD — Phase: <Phase Name>

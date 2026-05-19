@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompts — AI Tutor Admin</title>
+  <link rel="stylesheet" href="styles/admin-shell.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">AI</div><div><h1>AI Tutor</h1><p>Admin control</p></div></div>
+      <nav class="side-nav">
+        <a class="side-link" href="admin.html"><span>Dashboard</span><span>→</span></a>
+        <a class="side-link" href="users.html"><span>Users</span><span>→</span></a>
+        <a class="side-link" href="analytics.html"><span>Analytics</span><span>→</span></a>
+        <a class="side-link active" href="prompts.html"><span>Prompts</span><span>→</span></a>
+        <a class="side-link" href="system.html"><span>System</span><span>→</span></a>
+        <a class="side-link" href="chat.html"><span>Chat</span><span>→</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <section class="hero">
+        <div><div class="eyebrow">Prompt control</div><h2>Prompt Manager</h2><p class="muted" id="signedInAs">Signed in</p></div>
+        <div class="button-row"><button class="button secondary" id="refreshButton" type="button">Refresh</button><button class="button secondary" id="logoutButton" type="button">Logout</button></div>
+      </section>
+      <section class="section-grid grid">
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">Current prompts</div><h3>Stored prompt templates</h3><p class="muted" id="promptStatus">Manage service prompts here.</p></div></div>
+          <div class="list" id="promptList"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><div class="eyebrow">Editor</div><h3>Update prompt</h3><p class="muted">Select a service and save the new prompt text.</p></div></div>
+          <form class="stack-form" id="promptForm">
+            <div class="field-grid">
+              <label><span class="muted">Service</span><input class="input" id="promptService" value="chat" /></label>
+              <label><span class="muted">Mode</span><input class="input" value="admin" disabled /></label>
+            </div>
+            <label><span class="muted">Prompt</span><textarea class="textarea" id="promptText" placeholder="Write the prompt template here..."></textarea></label>
+            <button class="button" type="submit">Save prompt</button>
+          </form>
+        </article>
+      </section>
+    </main>
+  </div>
+  <script src="js/api.js"></script>
+  <script type="module" src="js/prompts.js"></script>
+</body>
+</html>
