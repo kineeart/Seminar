@@ -5,7 +5,7 @@ const authRoutes = require('./routes/auth.routes');
 const authController = require('./controllers/auth.controller');
 const { connectWithRetry, registerGracefulShutdown } = require('../../shared/database');
 
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: '../.env' });
 
 const app = express();
 const PORT = process.env.AUTH_SERVICE_PORT || process.env.PORT || 5001;

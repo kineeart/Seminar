@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env' });
+require('dotenv').config({ path: '../.env' });
 const app = require('./app');
 const { connectWithRetry, registerGracefulShutdown } = require('../../shared/database');
 
