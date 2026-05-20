@@ -1,5 +1,26 @@
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  CD Pipeline - Continuous Deployment                                         ║
+# ║                                                                              ║
+# ║  Pipeline này chạy SAU KHI CI pass thành công trên branch main.              ║
+# ║  Mục đích: Tự động deploy code mới lên production.                           ║
+# ║                                                                              ║
+# ║  Luồng:                                                                      ║
+# ║  1. CI pass → trigger CD                                                     ║
+# ║  2. Deploy frontend (build artifact → hosting)                               ║
+# ║  3. Deploy backend (trigger webhook → server pull & restart)                  ║
+# ║  4. Post-deploy health check (verify production hoạt động)                   ║
+# ║                                                                              ║
+# ║  Yêu cầu secrets:                                                           ║
+# ║  - FRONTEND_DEPLOY_HOOK_URL: Webhook URL để trigger frontend deploy           ║
+# ║  - BACKEND_DEPLOY_HOOK_URL: Webhook URL để trigger backend deploy             ║
+# ║  - PRODUCTION_URL: URL production để health check                             ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
 name: CD
 
+# ─── Trigger ─────────────────────────────────────────────────────────────────────
+# Chạy khi CI workflow hoàn thành thành công trên main/Final_Project
+# Hoặc chạy thủ công qua GitHub Actions UI (workflow_dispatch)
 on:
   workflow_run:
     workflows: ["CI"]
@@ -7,47 +28,151 @@ on:
     branches: [main, Final_Project]
   workflow_dispatch:
 
+# Không chạy 2 deploy cùng lúc
 concurrency:
   group: cd-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # JOB 1: DEPLOY FRONTEND
+  # Mục đích: Deploy React app (đã build) lên hosting (Vercel/Netlify/etc)
+  # Cách hoạt động: Gọi webhook URL → hosting service tự pull & build
+  # ═══════════════════════════════════════════════════════════════════════════════
   deploy-frontend:
-    name: 🚀 Deploy Frontend
+    name: "🚀 Deploy Frontend"
     runs-on: ubuntu-latest
+    # Chỉ chạy khi:
+    # - Trigger thủ công (workflow_dispatch), HOẶC
+    # - CI pass thành công VÀ có FRONTEND_DEPLOY_HOOK_URL secret
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && secrets.FRONTEND_DEPLOY_HOOK_URL != '')
+      (github.event.workflow_run.conclusion == 'success')
     steps:
-      - name: Trigger frontend deploy
+      - name: "🎨 Trigger Frontend Deploy"
         run: |
-          echo "Deploying frontend..."
-          curl -sS -X POST "${{ secrets.FRONTEND_DEPLOY_HOOK_URL }}"
-          echo "✓ Frontend deploy triggered"
+          echo "═══════════════════════════════════════"
+          echo "  Deploying Frontend..."
+          echo "═══════════════════════════════════════"
+          
+          if [ -z "${{ secrets.FRONTEND_DEPLOY_HOOK_URL }}" ]; then
+            echo "⚠️  FRONTEND_DEPLOY_HOOK_URL not configured"
+            echo "   Skipping frontend deploy"
+            exit 0
+          fi
+          
+          # Gọi webhook để trigger deploy
+          HTTP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.FRONTEND_DEPLOY_HOOK_URL }}")
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✓ Frontend deploy triggered (HTTP $HTTP_CODE)"
+          else
+            echo "✗ Frontend deploy failed (HTTP $HTTP_CODE)"
+            exit 1
+          fi
 
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # JOB 2: DEPLOY BACKEND
+  # Mục đích: Deploy tất cả microservices lên server
+  # Cách hoạt động: Gọi webhook → server pull code mới & restart services
+  # ═══════════════════════════════════════════════════════════════════════════════
   deploy-backend:
-    name: 🚀 Deploy Backend
+    name: "🚀 Deploy Backend"
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && secrets.BACKEND_DEPLOY_HOOK_URL != '')
+      (github.event.workflow_run.conclusion == 'success')
     steps:
-      - name: Trigger backend deploy
+      - name: "⚙️ Trigger Backend Deploy"
         run: |
-          echo "Deploying backend services..."
-          curl -sS -X POST "${{ secrets.BACKEND_DEPLOY_HOOK_URL }}"
-          echo "✓ Backend deploy triggered"
+          echo "═══════════════════════════════════════"
+          echo "  Deploying Backend Services..."
+          echo "  Services: Gateway, Auth, AI Chat,"
+          echo "  Flashcard, Quiz, Analytics, Admin"
+          echo "═══════════════════════════════════════"
+          
+          if [ -z "${{ secrets.BACKEND_DEPLOY_HOOK_URL }}" ]; then
+            echo "⚠️  BACKEND_DEPLOY_HOOK_URL not configured"
+            echo "   Skipping backend deploy"
+            exit 0
+          fi
+          
+          HTTP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.BACKEND_DEPLOY_HOOK_URL }}")
+          
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✓ Backend deploy triggered (HTTP $HTTP_CODE)"
+          else
+            echo "✗ Backend deploy failed (HTTP $HTTP_CODE)"
+            exit 1
+          fi
 
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # JOB 3: POST-DEPLOY HEALTH CHECK
+  # Mục đích: Sau khi deploy xong, verify production đang hoạt động
+  # Nếu health check fail → cần rollback thủ công
+  # ═══════════════════════════════════════════════════════════════════════════════
   post-deploy-check:
-    name: ✅ Post-Deploy Health Check
+    name: "✅ Post-Deploy Verification"
     runs-on: ubuntu-latest
     needs: [deploy-frontend, deploy-backend]
-    if: always() && secrets.PRODUCTION_URL != ''
+    # Luôn chạy (kể cả khi deploy skip) để report status
+    if: always()
     steps:
-      - name: Wait for deploy
-        run: sleep 30
-      - name: Check production health
+      - name: "⏳ Wait for deploy to propagate"
         run: |
-          HEALTH=$(curl -sf "${{ secrets.PRODUCTION_URL }}/health" || echo '{"status":"unreachable"}')
-          echo "Production health: $HEALTH"
-          echo $HEALTH | grep -q '"ok"' && echo "✓ Production is healthy" || echo "⚠ Production may need attention"
+          echo "Waiting 45 seconds for services to restart..."
+          sleep 45
+
+      - name: "🏥 Check Production Health"
+        run: |
+          echo "═══════════════════════════════════════"
+          echo "  Post-Deploy Health Check"
+          echo "═══════════════════════════════════════"
+          
+          PROD_URL="${{ secrets.PRODUCTION_URL }}"
+          
+          if [ -z "$PROD_URL" ]; then
+            echo "⚠️  PRODUCTION_URL not configured"
+            echo "   Cannot verify production health"
+            echo "   Please check manually"
+            exit 0
+          fi
+          
+          echo "Checking: $PROD_URL/health"
+          
+          # Retry 3 lần (production có thể cần thời gian warm up)
+          for i in 1 2 3; do
+            RESP=$(curl -sf "$PROD_URL/health" 2>/dev/null || echo '{"status":"unreachable"}')
+            echo "Attempt $i: $RESP"
+            
+            if echo "$RESP" | grep -q '"ok"'; then
+              echo ""
+              echo "✓ Production is HEALTHY"
+              echo "  Deploy completed successfully! 🎉"
+              exit 0
+            fi
+            
+            if [ $i -lt 3 ]; then
+              echo "  Retrying in 15 seconds..."
+              sleep 15
+            fi
+          done
+          
+          echo ""
+          echo "⚠️  Production health check FAILED after 3 attempts"
+          echo "   Action required: Check logs and consider rollback"
+          exit 1
+
+      - name: "📊 Deploy Summary"
+        if: always()
+        run: |
+          echo ""
+          echo "╔══════════════════════════════════════╗"
+          echo "║     DEPLOYMENT SUMMARY               ║"
+          echo "╠══════════════════════════════════════╣"
+          echo "║  Trigger: ${{ github.event_name }}"
+          echo "║  Branch:  ${{ github.ref_name }}"
+          echo "║  Time:    $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "╚══════════════════════════════════════╝"
