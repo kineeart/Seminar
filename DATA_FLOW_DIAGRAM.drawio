@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-20T00:00:00.000Z" agent="ChatGPT" version="24.6.0" type="device">
+  <diagram id="dfd-diagram" name="Architecture Flow">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title"
+          value="Architecture Flow: Chat → Flashcard → Quiz → Progress"
+          style="text;html=1;fontSize=18;fontStyle=1"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="10" width="900" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ================= FLOW 1 ================= -->
+
+        <mxCell id="flow1-title"
+          value="FLOW 1: AI Chat Processing"
+          style="text;html=1;fontSize=14;fontStyle=1;fillColor=#E8F4F8"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="50" width="350" height="25" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-user"
+          value="1. User"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="90" width="90" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-gateway"
+          value="2. API Gateway&#xa;(JWT Validate)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CCFFCC;strokeColor=#00AA00;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="140" y="90" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-chat"
+          value="3. Chat Service&#xa;(Persist Request)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6D9FF;strokeColor=#9900CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="280" y="90" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-rabbit"
+          value="4. RabbitMQ&#xa;(Queue Job)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFCC;strokeColor=#FFAA00;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="430" y="90" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-worker"
+          value="5. AI Worker&#xa;(Consume Job)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFD9D9;strokeColor=#CC0000;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="570" y="90" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-gemini"
+          value="6. Gemini API&#xa;(Generate Answer)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0066CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="710" y="90" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-db"
+          value="7. MongoDB&#xa;(Save Transcript)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D9F2E6;strokeColor=#009933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="860" y="90" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f1-front"
+          value="8. Frontend&#xa;(Display Response)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="1010" y="90" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- FLOW1 EDGES -->
+
+        <mxCell id="e1" edge="1" parent="1" source="f1-user" target="f1-gateway"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e2" edge="1" parent="1" source="f1-gateway" target="f1-chat"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e3" edge="1" parent="1" source="f1-chat" target="f1-rabbit"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e4" edge="1" parent="1" source="f1-rabbit" target="f1-worker"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e5" edge="1" parent="1" source="f1-worker" target="f1-gemini"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e6" edge="1" parent="1" source="f1-gemini" target="f1-db"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e7" edge="1" parent="1" source="f1-db" target="f1-front"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ================= FLOW 2 ================= -->
+
+        <mxCell id="flow2-title"
+          value="FLOW 2: Flashcard Generation"
+          style="text;html=1;fontSize=14;fontStyle=1;fillColor=#E8F4F8"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="190" width="350" height="25" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f2-user"
+          value="1. User Tags&#xa;Message"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="230" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f2-service"
+          value="2. Flashcard&#xa;Service"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6D9FF;strokeColor=#9900CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="170" y="230" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f2-gemini"
+          value="3. Gemini API&#xa;(Generate Card)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0066CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="320" y="230" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f2-sm2"
+          value="4. SM-2&#xa;Scheduling"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6D9FF;strokeColor=#9900CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="480" y="230" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f2-db"
+          value="5. MongoDB&#xa;(Save Flashcard)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D9F2E6;strokeColor=#009933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="640" y="230" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f2-dashboard"
+          value="6. Dashboard&#xa;(Today's Review)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="810" y="230" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- FLOW2 EDGES -->
+
+        <mxCell id="e21" edge="1" parent="1" source="f2-user" target="f2-service"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e22" edge="1" parent="1" source="f2-service" target="f2-gemini"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e23" edge="1" parent="1" source="f2-gemini" target="f2-sm2"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e24" edge="1" parent="1" source="f2-sm2" target="f2-db"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e25" edge="1" parent="1" source="f2-db" target="f2-dashboard"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ================= FLOW 3 ================= -->
+
+        <mxCell id="flow3-title"
+          value="FLOW 3: Quiz Generation &amp; Scoring"
+          style="text;html=1;fontSize=14;fontStyle=1;fillColor=#E8F4F8"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="340" width="400" height="25" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f3-user"
+          value="1. User&#xa;(Start Quiz)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="380" width="110" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f3-service"
+          value="2. Quiz Service&#xa;(Fetch Context)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6D9FF;strokeColor=#9900CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="180" y="380" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f3-gemini"
+          value="3. Gemini API&#xa;(Generate Quiz)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0066CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="360" y="380" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f3-db"
+          value="4. MongoDB&#xa;(Save Quiz)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D9F2E6;strokeColor=#009933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="540" y="380" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f3-front"
+          value="5. Frontend&#xa;(Show Quiz)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="720" y="380" width="130" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f3-grade"
+          value="6. Grade Result&#xa;+ Save Score"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6D9FF;strokeColor=#9900CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="900" y="380" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- FLOW3 EDGES -->
+
+        <mxCell id="e31" edge="1" parent="1" source="f3-user" target="f3-service"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e32" edge="1" parent="1" source="f3-service" target="f3-gemini"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e33" edge="1" parent="1" source="f3-gemini" target="f3-db"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e34" edge="1" parent="1" source="f3-db" target="f3-front"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e35" edge="1" parent="1" source="f3-front" target="f3-grade"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ================= FLOW 4 ================= -->
+
+        <mxCell id="flow4-title"
+          value="FLOW 4: Progress Tracking"
+          style="text;html=1;fontSize=14;fontStyle=1;fillColor=#E8F4F8"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="500" width="400" height="25" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f4-events"
+          value="Events&#xa;• Quiz Completed&#xa;• Flashcard Reviewed&#xa;• Chat Session"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="20" y="540" width="150" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f4-rabbit"
+          value="RabbitMQ&#xa;Events"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFCC;strokeColor=#FFAA00;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="230" y="560" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f4-progress"
+          value="Progress Service&#xa;(Canonical Source)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6D9FF;strokeColor=#9900CC;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="420" y="550" width="150" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f4-db"
+          value="MongoDB&#xa;(progress collection)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D9F2E6;strokeColor=#009933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="640" y="550" width="150" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="f4-dashboard"
+          value="Frontend Dashboard&#xa;(Metrics &amp; Streak)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#FF9933;strokeWidth=2"
+          vertex="1"
+          parent="1">
+          <mxGeometry x="860" y="550" width="170" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- FLOW4 EDGES -->
+
+        <mxCell id="e41" edge="1" parent="1" source="f4-events" target="f4-rabbit"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e42" edge="1" parent="1" source="f4-rabbit" target="f4-progress"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e43" edge="1" parent="1" source="f4-progress" target="f4-db"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e44" edge="1" parent="1" source="f4-db" target="f4-dashboard"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
