@@ -231,7 +231,7 @@ async function generateQuiz(payload) {
 
       const aiEnabled = isAiConfigured({ mode: 'flashcard-only' });
 
-      if (aiEnabled && mergedVocabulary.length > 0) {
+      if (aiEnabled) {
         const recentLimit = Number(
           process.env.QUIZ_RECENT_QUESTION_LIMIT || DEFAULT_RECENT_QUESTION_LIMIT
         );

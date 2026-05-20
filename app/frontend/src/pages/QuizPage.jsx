@@ -26,13 +26,17 @@ function QuizPage() {
     isLast,
     difficulty,
     questionCount,
+    topic,
+    topics,
     setDifficulty,
     setQuestionCount,
+    setTopic,
     startQuiz,
     attempts,
     historyLoading,
     historyError,
     loadAttempts,
+    retryFromHistory,
   } = useQuiz()
 
   useEffect(() => {
@@ -68,6 +72,22 @@ function QuizPage() {
             </div>
 
             <div>
+              <h2 style={{ marginBottom: '12px' }}>Topic</h2>
+              <div className="filter-chips" style={{ marginBottom: '12px' }}>
+                {topics.map((item) => (
+                  <button
+                    key={item}
+                    className={topic === item ? 'filter-chip filter-chip-active' : 'filter-chip'}
+                    type="button"
+                    onClick={() => setTopic(item)}
+                  >
+                    {item === 'none' ? 'None' : item}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <h2 style={{ marginBottom: '12px' }}>Question count</h2>
               <div className="action-row">
                 {[10, 15, 20].map((count) => (
@@ -84,7 +104,7 @@ function QuizPage() {
 
             <div className="action-row">
               <Button variant="ghost" to="/dashboard">Back to home</Button>
-              <Button onClick={() => startQuiz()} disabled={!difficulty}>Start quiz</Button>
+              <Button onClick={() => startQuiz()} disabled={!difficulty || !topic}>Start quiz</Button>
             </div>
 
             {error ? <p>{error}</p> : null}
@@ -120,6 +140,9 @@ function QuizPage() {
                       ))}
                     </div>
                   ) : null}
+                  <div className="action-row" style={{ marginTop: '12px' }}>
+                    <Button onClick={() => retryFromHistory(attempt)}>Retry this quiz</Button>
+                  </div>
                 </Card>
               ))}
             </div>

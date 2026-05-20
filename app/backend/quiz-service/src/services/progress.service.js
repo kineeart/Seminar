@@ -121,6 +121,8 @@ async function recordAttempt(attempt) {
   const mergedWeakTopics = Array.from(
     new Set([...(progress.weak_topics || []), ...(attempt.weak_topics || [])])
   );
+  const correctCount = Number(attempt.correct_count) || 0;
+  const totalQuestions = Number(attempt.total_questions) || (attempt.answers || []).length || 0;
 
   const wrongAnswers = (attempt.answers || []).filter((a) => !a.is_correct);
   const correctAnswers = (attempt.answers || []).filter((a) => a.is_correct);

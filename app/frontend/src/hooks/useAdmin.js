@@ -1,45 +1,55 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import api from '../services/api'
 
+const SERVICES = [
+  { id: 'gateway', name: 'Gateway', port: 5000, healthUrl: '/health' },
+  { id: 'auth', name: 'Auth Service', port: 5001, healthUrl: '/api/auth/health' },
+  { id: 'ai-chat', name: 'AI Chat Service', port: 5002, healthUrl: '/api/chat/health' },
+  { id: 'flashcard', name: 'Flashcard Service', port: 3003, healthUrl: '/api/flashcards/health' },
+  { id: 'content', name: 'Content Service', port: 5003, healthUrl: '/api/content/health' },
+  { id: 'quiz', name: 'Quiz Service', port: 5004, healthUrl: '/api/quizzes/health' },
+]
+
 export default function useAdmin() {
-  const [metrics, setMetrics] = useState([])
-  const [reports, setReports] = useState([])
+  const [services, setServices] = useState(
+    SERVICES.map((s) => ({ ...s, status: 'checking', responseTime: null, error: null }))
+  )
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [lastChecked, setLastChecked] = useState(null)
 
-  useEffect(() => {
-    async function fetchAdmin() {
-      try {
-        setLoading(true)
-        // Admin endpoints - adjust based on actual backend implementation
-        const [metricsData, reportsData] = await Promise.all([
-          api.get('/auth/admin/metrics').catch(() => null),
-          api.get('/auth/admin/reports').catch(() => null),
-        ])
-
-        if (metricsData?.metrics) {
-          setMetrics(metricsData.metrics)
-        } else if (metricsData) {
-          setMetrics([
-            { label: 'Total users', value: String(metricsData.totalUsers ?? 0) },
-            { label: 'Active today', value: String(metricsData.activeToday ?? 0) },
-            { label: 'AI requests/day', value: String(metricsData.aiRequests ?? 0) },
-            { label: 'Flagged chats', value: String(metricsData.flaggedChats ?? 0) },
-          ])
+  const checkServices = useCallback(async () => {
+    setLoading(true)
+    const results = await Promise.all(
+      SERVICES.map(async (service) => {
+        const start = Date.now()
+        try {
+          // Use fetch directly to avoid api.js 401 redirect
+          const resp = await fetch(service.healthUrl, {
+            signal: AbortSignal.timeout(5000),
+          })
+          const elapsed = Date.now() - start
+          if (resp.ok) {
+            const data = await resp.json().catch(() => ({}))
+            return { ...service, status: 'online', responseTime: elapsed, data }
+          }
+          return { ...service, status: 'error', responseTime: elapsed, error: `HTTP ${resp.status}` }
+        } catch (err) {
+          const elapsed = Date.now() - start
+          return { ...service, status: 'offline', responseTime: elapsed, error: err.message }
         }
-
-        if (reportsData?.reports) {
-          setReports(reportsData.reports)
-        }
-      } catch (err) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchAdmin()
+      })
+    )
+    setServices(results)
+    setLastChecked(new Date())
+    setLoading(false)
   }, [])
 
-  return { metrics, reports, loading, error }
+  useEffect(() => {
+    checkServices()
+  }, [checkServices])
+
+  const onlineCount = services.filter((s) => s.status === 'online').length
+  const totalCount = services.length
+
+  return { services, loading, lastChecked, onlineCount, totalCount, refresh: checkServices }
 }
