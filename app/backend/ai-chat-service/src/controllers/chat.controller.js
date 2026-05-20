@@ -58,7 +58,12 @@ async function handleChat(req, res, next) {
         completionMessage: isComplete ? scenarioData?.completionMessage : null,
       };
 
-      return res.json({ success: true, reply: cleanReply, goalProgress });
+      return res.json({
+        success: true,
+        reply: cleanReply,
+        goalProgress,
+        conversationId: chatRequest.conversationId,
+      });
     }
 
     // For knowledge mode, check for inline flashcards
@@ -125,7 +130,11 @@ async function handleChat(req, res, next) {
       });
     }
 
-    return res.json({ success: true, reply: cleanReply });
+    return res.json({
+      success: true,
+      reply: cleanReply,
+      conversationId: chatRequest.conversationId,
+    });
   } catch (err) {
     return next(err);
   }

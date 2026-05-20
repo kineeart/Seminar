@@ -26,6 +26,9 @@ export default function useChat() {
   const [mode, setMode] = useState(initialState?.mode || 'knowledge')
   const [conversationId, setConversationId] = useState(initialState?.conversationId || null)
   const [pendingFlashcards, setPendingFlashcards] = useState([])
+  const [conversationList, setConversationList] = useState([])
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(false)
 
   useEffect(() => {
     const snapshot = {
@@ -37,6 +40,44 @@ export default function useChat() {
     }
     window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(snapshot))
   }, [messages, input, mode, conversationId])
+
+  const loadConversationList = useCallback(async () => {
+    const userId = user?.id || window.localStorage.getItem('userId')
+    if (!userId) return
+
+    setHistoryLoading(true)
+    try {
+      const data = await chatService.listConversations(userId)
+      setConversationList(data.conversations || [])
+    } catch (_err) {
+      setConversationList([])
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [user])
+
+  const openConversation = useCallback(async (id) => {
+    if (!id) return
+    setHistoryLoading(true)
+    try {
+      const data = await chatService.getConversation(id)
+      const convo = data.conversation || {}
+      const mapped = Array.isArray(convo.messages)
+        ? convo.messages.map((msg, idx) => ({
+          id: `${id}-${idx}`,
+          role: msg.role === 'assistant' ? 'ai' : 'user',
+          text: msg.content || '',
+        }))
+        : []
+      setConversationId(id)
+      setMessages(mapped.length ? mapped : messages)
+      setHistoryOpen(false)
+    } catch (_err) {
+      // ignore
+    } finally {
+      setHistoryLoading(false)
+    }
+  }, [messages])
 
   const send = useCallback(
     async (overrideText) => {
@@ -128,14 +169,38 @@ export default function useChat() {
   )
 
   const startNewSession = useCallback(() => {
+    const newConversationId = `conv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
     setMessages([
       { id: Date.now(), role: 'ai', text: 'Hi! Ask me anything about English, TOEIC, IELTS, or daily communication.' },
     ])
     setInput('')
-    setConversationId(null)
+    setConversationId(newConversationId)
     setIsTyping(false)
     setPendingFlashcards([])
+    setHistoryOpen(false)
   }, [])
 
-  return { messages, input, setInput, isTyping, mode, setMode, send, handleQuick, conversationId, startNewSession, pendingFlashcards }
+  useEffect(() => {
+    loadConversationList()
+  }, [loadConversationList])
+
+  return {
+    messages,
+    input,
+    setInput,
+    isTyping,
+    mode,
+    setMode,
+    send,
+    handleQuick,
+    conversationId,
+    startNewSession,
+    pendingFlashcards,
+    conversationList,
+    historyOpen,
+    setHistoryOpen,
+    historyLoading,
+    openConversation,
+    loadConversationList,
+  }
 }

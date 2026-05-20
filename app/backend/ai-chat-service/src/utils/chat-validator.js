@@ -26,13 +26,16 @@ function normalizeLevel(inputLevel) {
 }
 
 function normalizeConversationId(inputConversationId) {
+  const createConversationId = () =>
+    `conv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
   if (inputConversationId === undefined || inputConversationId === null) {
-    return 'default';
+    return createConversationId();
   }
 
   const value = String(inputConversationId).trim();
   if (!value) {
-    return 'default';
+    return createConversationId();
   }
 
   return value.slice(0, 100);

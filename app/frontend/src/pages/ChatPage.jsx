@@ -7,7 +7,21 @@ import useChat from '../hooks/useChat'
 
 function ChatPage() {
   const navigate = useNavigate()
-  const { messages, input, setInput, isTyping, send, handleQuick, startNewSession, pendingFlashcards } = useChat()
+  const {
+    messages,
+    input,
+    setInput,
+    isTyping,
+    send,
+    handleQuick,
+    startNewSession,
+    pendingFlashcards,
+    conversationList,
+    historyOpen,
+    setHistoryOpen,
+    historyLoading,
+    openConversation,
+  } = useChat()
   const [topicInput, setTopicInput] = useState('')
 
   const hasPendingTopic = pendingFlashcards && pendingFlashcards.length > 0
@@ -30,8 +44,39 @@ function ChatPage() {
         <div className="mode-toggle">
           <button className="active" type="button">Knowledge</button>
           <button type="button" onClick={() => navigate('/roleplay')}>Roleplay</button>
+          <button type="button" onClick={() => setHistoryOpen((v) => !v)}>History</button>
         </div>
       </header>
+
+      {historyOpen ? (
+        <div className="card-base" style={{ marginBottom: '12px' }}>
+          <div className="between" style={{ marginBottom: '8px' }}>
+            <strong>Chat History</strong>
+            <button type="button" className="new-session-btn" onClick={startNewSession}>+</button>
+          </div>
+          {historyLoading ? (
+            <p className="muted">Loading history...</p>
+          ) : conversationList.length === 0 ? (
+            <p className="muted">No history yet.</p>
+          ) : (
+            <div className="col" style={{ gap: '8px' }}>
+              {conversationList.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="card-base deck-pick"
+                  onClick={() => openConversation(item.id)}
+                >
+                  <strong>{item.last_message || 'Untitled chat'}</strong>
+                  <p className="muted" style={{ margin: '4px 0 0', fontSize: '12px' }}>
+                    {item.message_count || 0} messages
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="message-list">
         {messages.map((m) => (
