@@ -137,6 +137,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Admin routes (handled directly by gateway)
+const adminRoutes = require('./admin.routes');
+app.use('/api/admin', adminRoutes);
+
 app.get('/health', (_req, res) => {
   return res.status(200).json({
     status: 'ok',

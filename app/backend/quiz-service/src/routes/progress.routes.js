@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get('/', controller.getProgress);
 router.get('/recommendations', controller.getRecommendations);
+router.get('/learning-analysis', controller.getLearningAnalysis);
 router.post('/flashcard-review', controller.recordFlashcardReview);
 router.post('/chat-activity', controller.recordChatActivity);
 

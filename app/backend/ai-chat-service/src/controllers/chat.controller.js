@@ -6,6 +6,13 @@ const { getConversationHistory } = require('../utils/conversation-memory');
 const { extractFlashcards } = require('../utils/flashcard-response-parser');
 const flashcardClient = require('../utils/flashcard-client');
 
+let geminiClient = null;
+try {
+  geminiClient = require('../services/gemini.service');
+} catch (err) {
+  // Gemini service is optional
+}
+
 function extractTopicName(message = '') {
   const text = String(message || '').trim();
   if (!text) return null;
@@ -191,9 +198,39 @@ async function saveFlashcardsWithTopic(req, res, next) {
   }
 }
 
+async function analyzeLearning(req, res, next) {
+  try {
+    const { systemPrompt, userPrompt, userId, timeoutMs } = req.body || {};
+
+    if (!systemPrompt || !userPrompt) {
+      return res.status(400).json({ error: 'systemPrompt and userPrompt are required' });
+    }
+
+    // Use geminiService to generate response
+    const reply = await geminiService.generateResponse({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      userId: userId || 'guest',
+      mode: 'knowledge',
+      timeoutMs: timeoutMs || 60000,
+    });
+
+    return res.json({
+      success: true,
+      reply: reply || 'Unable to generate analysis at this time.',
+    });
+  } catch (err) {
+    console.error('[ANALYZE_LEARNING_ERROR]', err.message);
+    return next(err);
+  }
+}
+
 module.exports = {
   handleChat,
   listConversations,
   getConversation,
   saveFlashcardsWithTopic,
+  analyzeLearning,
 };
