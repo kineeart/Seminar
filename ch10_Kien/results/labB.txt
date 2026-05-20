@@ -1,0 +1,3 @@
+def get_euclidean_dist(a, b):
+    print("Info: computing L2 distance...")
+    return np.sqrt(np.sum((a - b) ** 2))
