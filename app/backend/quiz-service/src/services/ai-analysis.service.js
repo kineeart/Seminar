@@ -1,4 +1,8 @@
-const logger = require('../utils/logger');
+const logger = {
+  error: (...args) => console.error(...args),
+  warn: (...args) => console.warn(...args),
+  info: (...args) => console.log(...args),
+};
 
 /**
  * Generate a detailed AI Learning Analysis using AI Chat Service.

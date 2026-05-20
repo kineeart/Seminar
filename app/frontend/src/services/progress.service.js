@@ -17,7 +17,7 @@ export const progressService = {
 
   getLearningAnalysis: (userId) => {
     const uid = getUserId(userId)
-    return api.get(`/progress/learning-analysis?userId=${encodeURIComponent(uid)}`)
+    return api.get(`/analytics/learning-analysis?userId=${encodeURIComponent(uid)}`)
   },
 
   recordFlashcardReview: (flashcardId, known) =>

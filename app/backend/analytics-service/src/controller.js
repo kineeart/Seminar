@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const repo = require('./repository');
+const { generateLearningAnalysis } = require('./services/learning-analysis.service');
 
 function health(_req, res) {
   return res.status(200).json({
@@ -140,6 +141,17 @@ function forbidden(_req, res) {
   return res.status(401).json({ status: 'error', message: 'Unauthorized' });
 }
 
+async function getLearningAnalysis(req, res, next) {
+  try {
+    const userId = req.query.userId || req.body?.userId || 'guest';
+    const useAI = String(req.query.useAI || 'true').toLowerCase() !== 'false';
+    const analysis = await generateLearningAnalysis({ userId, useAI });
+    return res.json({ success: true, analysis });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   health,
   requireAdmin,
@@ -152,4 +164,5 @@ module.exports = {
   getFlashcardAnalytics,
   getTopicStats,
   forbidden,
+  getLearningAnalysis,
 };
