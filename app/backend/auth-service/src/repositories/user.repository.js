@@ -47,9 +47,39 @@ async function clearUsers() {
   await User.deleteMany({});
 }
 
+async function updateUser(userId, updates) {
+  await ensureConnected();
+  const updateFields = {};
+  if (updates.role) updateFields.role = updates.role;
+  if (updates.password) updateFields.password_hash = updates.password;
+  const doc = await User.findByIdAndUpdate(userId, updateFields, { new: true }).lean();
+  return normalizeUser(doc);
+}
+
+async function deleteUser(userId) {
+  await ensureConnected();
+  const doc = await User.findByIdAndDelete(userId);
+  return doc ? true : false;
+}
+
+async function listAll() {
+  await ensureConnected();
+  const docs = await User.find({}).lean();
+  return docs.map(normalizeUser);
+}
+
+async function countAll() {
+  await ensureConnected();
+  return User.countDocuments({});
+}
+
 module.exports = {
   createUser,
   findByEmail,
   findById,
   clearUsers,
+  listAll,
+  countAll,
+  updateUser,
+  deleteUser,
 };

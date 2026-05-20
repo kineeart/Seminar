@@ -147,7 +147,7 @@ export default function useQuiz() {
       return
     }
 
-    const shouldAutoStart = Boolean(locationState.difficulty)
+    const shouldAutoStart = Boolean(locationState.difficulty || locationState.topic)
     if (!shouldAutoStart) {
       setLoading(false)
       return

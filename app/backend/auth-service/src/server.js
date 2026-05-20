@@ -37,6 +37,50 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/health', authController.health);
+
+// Admin endpoints
+const userRepository = require('./repositories/user.repository');
+const { createId } = require('./utils/id');
+
+app.get('/admin/stats', async (req, res) => {
+  try {
+    const total = await userRepository.countAll();
+    res.json({ total });
+  } catch { res.json({ total: 0 }); }
+});
+app.get('/admin/users', async (req, res) => {
+  try {
+    const users = await userRepository.listAll();
+    const safe = users.map(u => ({ id: u.id, email: u.email, role: u.role, created_at: u.created_at }));
+    res.json({ users: safe });
+  } catch { res.json({ users: [] }); }
+});
+app.post('/admin/users', async (req, res) => {
+  try {
+    const { email, password, role } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+    const existing = await userRepository.findByEmail(email);
+    if (existing) return res.status(409).json({ error: 'Email already exists' });
+    const user = await userRepository.createUser({ id: createId('user'), email, passwordHash: password, role: role || 'user' });
+    res.json({ success: true, user: { id: user.id, email: user.email, role: user.role } });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.patch('/admin/users/:id', async (req, res) => {
+  try {
+    const { role, password } = req.body;
+    const updated = await userRepository.updateUser(req.params.id, { role, password });
+    if (!updated) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true, user: { id: updated.id, email: updated.email, role: updated.role } });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+app.delete('/admin/users/:id', async (req, res) => {
+  try {
+    const deleted = await userRepository.deleteUser(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'User not found' });
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.use('/', authRoutes);
 
 async function startServer() {

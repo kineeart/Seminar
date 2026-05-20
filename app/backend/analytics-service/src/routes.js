@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get('/health', controller.health);
 router.post('/logs/ingest', controller.ingestLog);
+router.get('/learning-analysis', controller.getLearningAnalysis);
 
 router.use(controller.requireAdmin);
 router.get('/logs', controller.getLogs);
