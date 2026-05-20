@@ -1,0 +1,19 @@
+CONTEXT: You are provided with the function's docstring enclosed with {{{ DOCSTRING }}} and the required input enclosed with {{{ REQUIRED_INPUT }}}.
+TASK: Optimize the function to run in batches within the memory limit.
+
+ DOCSTRING: {{{ """
+    Reads a CSV file containing video interactions, calculates the average
+    watch ratio for each video,
+    and returns the video with the highest average watch ratio.
+
+    Args:
+        path (str): The file path to the CSV file containing video interactions.
+
+    Returns:
+        str: The identifier of the video with the highest average watch ratio.
+    """
+}}}
+
+REQUIRED_INPUT = {{{ 100,000 rows x 100,000 columns matrix}}}
+
+IMPROVED IMPLEMENTATION:
