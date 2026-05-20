@@ -11,14 +11,23 @@ function normalizeUser(doc) {
   }
 
   const user = doc.toObject ? doc.toObject() : doc;
+  // Keep original mongo id under `id` and remove `_id` from payload.
+  // eslint-disable-next-line no-underscore-dangle
+  const mongoId = user._id;
   return {
     ...user,
-    id: user._id,
+    id: mongoId,
     _id: undefined,
   };
 }
 
-async function createUser({ id, email, passwordHash, displayName, role = 'user' }) {
+async function createUser({
+  id,
+  email,
+  passwordHash,
+  displayName,
+  role = 'user',
+}) {
   await ensureConnected();
   const doc = await User.create({
     _id: id,
@@ -59,7 +68,7 @@ async function updateUser(userId, updates) {
 async function deleteUser(userId) {
   await ensureConnected();
   const doc = await User.findByIdAndDelete(userId);
-  return doc ? true : false;
+  return Boolean(doc);
 }
 
 async function listAll() {

@@ -6,13 +6,6 @@ const { getConversationHistory } = require('../utils/conversation-memory');
 const { extractFlashcards } = require('../utils/flashcard-response-parser');
 const flashcardClient = require('../utils/flashcard-client');
 
-let geminiClient = null;
-try {
-  geminiClient = require('../services/gemini.service');
-} catch (err) {
-  // Gemini service is optional
-}
-
 function extractTopicName(message = '') {
   const text = String(message || '').trim();
   if (!text) return null;
@@ -46,7 +39,7 @@ async function handleChat(req, res, next) {
 
       // Check if reply contains [GOAL_COMPLETE] marker
       let cleanReply = reply;
-      let isComplete = progress.isComplete || reply.includes('[GOAL_COMPLETE]');
+      const isComplete = progress.isComplete || reply.includes('[GOAL_COMPLETE]');
       if (reply.includes('[GOAL_COMPLETE]')) {
         cleanReply = reply.replace('[GOAL_COMPLETE]', '').trim();
       }
@@ -173,7 +166,9 @@ async function getConversation(req, res, next) {
 
 async function saveFlashcardsWithTopic(req, res, next) {
   try {
-    const { topic, conversationId, userId, flashcards } = req.body || {};
+    const {
+      topic, conversationId, userId, flashcards,
+    } = req.body || {};
 
     if (!topic || !conversationId || !Array.isArray(flashcards) || flashcards.length === 0) {
       return res.status(400).json({ error: 'topic, conversationId, and flashcards[] are required' });
@@ -209,7 +204,9 @@ async function saveFlashcardsWithTopic(req, res, next) {
 
 async function analyzeLearning(req, res, next) {
   try {
-    const { systemPrompt, userPrompt, userId, timeoutMs } = req.body || {};
+    const {
+      systemPrompt, userPrompt, userId, timeoutMs,
+    } = req.body || {};
 
     if (!systemPrompt || !userPrompt) {
       return res.status(400).json({ error: 'systemPrompt and userPrompt are required' });

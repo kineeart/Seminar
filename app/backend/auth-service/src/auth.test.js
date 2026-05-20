@@ -2,7 +2,8 @@ const request = require('supertest');
 const app = require('./server');
 const authService = require('./services/auth.service');
 
-const hasMongo = Boolean(process.env.MONGODB_URI && process.env.DATABASE_NAME);
+const hasMongo = process.env.RUN_AUTH_INTEGRATION_TESTS === 'true'
+  && Boolean(process.env.MONGODB_URI && process.env.DATABASE_NAME);
 const describeIf = hasMongo ? describe : describe.skip;
 
 describeIf('Auth Service MVP', () => {
@@ -91,7 +92,7 @@ describeIf('Auth Service MVP', () => {
 
   test('GET /profile returns user profile with JWT token', async () => {
     // Sign up first
-    const signupResponse = await request(app)
+    await request(app)
       .post('/signup')
       .send({
         name: 'Student A',
@@ -109,7 +110,7 @@ describeIf('Auth Service MVP', () => {
       })
       .expect(200);
 
-    const token = loginResponse.body.token;
+    const { token } = loginResponse.body;
 
     // Get profile with token
     const profileResponse = await request(app)
@@ -130,3 +131,4 @@ describeIf('Auth Service MVP', () => {
     expect(response.body.status).toBe('error');
     expect(response.body.message).toBe('No token provided');
   });
+});

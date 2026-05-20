@@ -11,7 +11,9 @@ const TIMEOUT_MS = 5000;
  * Save flashcards by calling flashcard-service POST /batch.
  * Returns array of saved flashcards on success, empty array on failure.
  */
-async function saveFlashcards({ userId, conversationId, topic, flashcards }) {
+async function saveFlashcards({
+  userId, conversationId, topic, flashcards,
+}) {
   if (!Array.isArray(flashcards) || flashcards.length === 0) {
     return [];
   }

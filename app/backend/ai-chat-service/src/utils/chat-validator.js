@@ -26,8 +26,7 @@ function normalizeLevel(inputLevel) {
 }
 
 function normalizeConversationId(inputConversationId) {
-  const createConversationId = () =>
-    `conv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const createConversationId = () => `conv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
   if (inputConversationId === undefined || inputConversationId === null) {
     return createConversationId();

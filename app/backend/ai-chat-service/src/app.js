@@ -19,6 +19,7 @@ app.get('/health', (req, res) => {
 
 // Admin endpoints
 const Conversation = require('./models/conversation.model');
+
 app.get('/admin/stats', async (req, res) => {
   try {
     const total = await Conversation.countDocuments({});
@@ -33,7 +34,7 @@ app.get('/admin/conversations', async (req, res) => {
       .sort({ updated_at: -1 })
       .limit(limit)
       .lean()
-      .then(docs => docs.map(d => ({
+      .then((docs) => docs.map((d) => ({
         id: d._id,
         userId: d.user_id,
         messageCount: d.messages ? d.messages.length : 0,

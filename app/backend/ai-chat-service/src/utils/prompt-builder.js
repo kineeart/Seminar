@@ -1,4 +1,4 @@
-﻿const { normalizeLevel } = require('./chat-validator');
+const { normalizeLevel } = require('./chat-validator');
 
 const LEVEL_GUIDANCE = {
   Beginner: {
@@ -226,14 +226,14 @@ function detectGoalProgress(scenario, message, history) {
   if (!scenarioData) return { completedSteps: [], isComplete: false };
 
   const allMessages = [
-    ...(history || []).filter(m => m.role === 'user').map(m => m.content),
+    ...(history || []).filter((m) => m.role === 'user').map((m) => m.content),
     message,
   ].join(' ').toLowerCase();
 
   const completedSteps = [];
   for (const step of scenarioData.goalSteps) {
     const keywords = scenarioData.goalKeywords[step] || [];
-    const matched = keywords.some(kw => allMessages.includes(kw));
+    const matched = keywords.some((kw) => allMessages.includes(kw));
     if (matched) completedSteps.push(step);
   }
 
@@ -241,7 +241,9 @@ function detectGoalProgress(scenario, message, history) {
   return { completedSteps, isComplete, totalSteps: scenarioData.goalSteps.length };
 }
 
-function buildRoleplayPrompt({ message, level, history, scenario }) {
+function buildRoleplayPrompt({
+  message, level, history, scenario,
+}) {
   const normalizedLevel = normalizeLevel(level);
   const conversationHistory = Array.isArray(history) ? history : [];
 
@@ -264,7 +266,7 @@ function buildRoleplayPrompt({ message, level, history, scenario }) {
     goalInstruction = [
       '',
       `Goal: ${scenarioData.goal}`,
-      `Steps remaining: ${scenarioData.goalSteps.filter(s => !progress.completedSteps.includes(s)).join(', ')}`,
+      `Steps remaining: ${scenarioData.goalSteps.filter((s) => !progress.completedSteps.includes(s)).join(', ')}`,
       'Guide the conversation naturally toward the next uncompleted step.',
       '',
     ].join('\n');

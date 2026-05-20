@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { createProxyMiddleware, fixRequestBody } = require('http-proxy-middleware');
+const adminRoutes = require('./admin.routes');
 
 dotenv.config({ path: '../.env' });
 
@@ -71,6 +72,14 @@ function estimateTokens(body = {}) {
   return Math.max(1, Math.ceil(text.length / 4));
 }
 
+function resolveServiceFromEndpoint(endpoint) {
+  if (endpoint.startsWith('/api/auth')) return 'auth-service';
+  if (endpoint.startsWith('/api/chat')) return 'ai-chat-service';
+  if (endpoint.startsWith('/api/flashcards')) return 'flashcard-service';
+  if (endpoint.startsWith('/api/quizzes')) return 'quiz-service';
+  return 'gateway';
+}
+
 function shouldLogRequest(req) {
   if (!req.originalUrl.startsWith('/api/')) {
     return false;
@@ -104,15 +113,7 @@ function trackRequest(req, res) {
       responseTime: Date.now() - startedAt,
       statusCode: res.statusCode,
       tokenEstimate: estimateTokens(body),
-      service: endpoint.startsWith('/api/auth')
-        ? 'auth-service'
-        : endpoint.startsWith('/api/chat')
-          ? 'ai-chat-service'
-          : endpoint.startsWith('/api/flashcards')
-            ? 'flashcard-service'
-            : endpoint.startsWith('/api/quizzes')
-              ? 'quiz-service'
-              : 'gateway',
+      service: resolveServiceFromEndpoint(endpoint),
       intent: classifyIntent(body),
       topic: classifyTopic(body).join(', '),
     };
@@ -138,7 +139,6 @@ app.use((req, res, next) => {
 });
 
 // Admin routes (handled directly by gateway)
-const adminRoutes = require('./admin.routes');
 app.use('/api/admin', adminRoutes);
 
 app.get('/health', (_req, res) => {

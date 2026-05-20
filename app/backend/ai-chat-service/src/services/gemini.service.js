@@ -2,7 +2,9 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const { validateChatRequest, normalizeLevel } = require('../utils/chat-validator');
 const { appendConversationMessages, getConversationHistory } = require('../utils/conversation-memory');
-const { SYSTEM_PROMPT, buildTutorPrompt, buildRoleplayPrompt, isFlashcardRequest, buildFlashcardPrompt, FLASHCARD_SYSTEM_PROMPT } = require('../utils/prompt-builder');
+const {
+  SYSTEM_PROMPT, buildTutorPrompt, buildRoleplayPrompt, isFlashcardRequest, buildFlashcardPrompt, FLASHCARD_SYSTEM_PROMPT,
+} = require('../utils/prompt-builder');
 const progressClient = require('../utils/progress-client');
 
 const MAX_INPUT_LENGTH = 2000;
@@ -24,7 +26,7 @@ async function callOpenAICompatible(prompt, systemPrompt, options = {}) {
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -77,9 +79,7 @@ async function callGemini(prompt) {
 
   const result = await Promise.race([
     model.generateContent(prompt),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini timeout')), DEFAULT_TIMEOUT_MS)
-    ),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Gemini timeout')), DEFAULT_TIMEOUT_MS)),
   ]);
 
   const response = result?.response;
@@ -91,7 +91,7 @@ async function callGemini(prompt) {
 
 function buildFallbackReply(message, mode) {
   if (mode === 'roleplay') {
-    return "Sure! Let me check that for you. What else can I help you with?";
+    return 'Sure! Let me check that for you. What else can I help you with?';
   }
   return 'AI tutor is temporarily busy. Please try again in a few seconds.';
 }
@@ -129,7 +129,9 @@ async function persistConversationActivity(conversationId, userId, level, messag
 
 async function generateResponse(rawInput, options = {}) {
   const request = typeof rawInput === 'string' ? { message: rawInput } : rawInput || {};
-  const { message, level, conversationId, userId, mode, scenario } = validateChatRequest(request);
+  const {
+    message, level, conversationId, userId, mode, scenario,
+  } = validateChatRequest(request);
 
   if (message.length > MAX_INPUT_LENGTH) {
     const error = new Error('Message too long');
@@ -144,7 +146,9 @@ async function generateResponse(rawInput, options = {}) {
 
   let prompt;
   if (mode === 'roleplay') {
-    prompt = buildRoleplayPrompt({ message, level, history, scenario });
+    prompt = buildRoleplayPrompt({
+      message, level, history, scenario,
+    });
   } else if (needsFlashcards) {
     prompt = buildFlashcardPrompt({ message, level, history });
   } else {

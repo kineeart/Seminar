@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --configLoader native",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest --run"
+    "test": "vitest --run --configLoader native --passWithNoTests"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.1",

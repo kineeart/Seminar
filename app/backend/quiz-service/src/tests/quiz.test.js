@@ -74,6 +74,7 @@ describe('Quiz Service', () => {
     const createRes = await request(app).post('/quizzes/generate').send({
       title: 'Score Quiz',
       userId: 'user-2',
+      count: 2,
       questions: [
         {
           question: 'Pick X',
@@ -148,6 +149,7 @@ describe('Quiz Service', () => {
     const createRes = await request(app).post('/quizzes/generate').send({
       title: 'Progress Quiz',
       userId: 'user-4',
+      count: 1,
       questions: [
         {
           question: 'Pick B',
