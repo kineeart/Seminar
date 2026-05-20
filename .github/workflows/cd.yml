@@ -4,9 +4,7 @@ on:
   workflow_run:
     workflows: ["CI"]
     types: [completed]
-    branches:
-      - main
-      - Final_Project
+    branches: [main, Final_Project]
   workflow_dispatch:
 
 concurrency:
@@ -15,23 +13,41 @@ concurrency:
 
 jobs:
   deploy-frontend:
-    name: Deploy Frontend
+    name: 🚀 Deploy Frontend
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && secrets.FRONTEND_DEPLOY_HOOK_URL != '')
     steps:
-      - name: Trigger frontend deploy hook
+      - name: Trigger frontend deploy
         run: |
+          echo "Deploying frontend..."
           curl -sS -X POST "${{ secrets.FRONTEND_DEPLOY_HOOK_URL }}"
+          echo "✓ Frontend deploy triggered"
 
   deploy-backend:
-    name: Deploy Backend
+    name: 🚀 Deploy Backend
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && secrets.BACKEND_DEPLOY_HOOK_URL != '')
     steps:
-      - name: Trigger backend deploy hook
+      - name: Trigger backend deploy
         run: |
+          echo "Deploying backend services..."
           curl -sS -X POST "${{ secrets.BACKEND_DEPLOY_HOOK_URL }}"
+          echo "✓ Backend deploy triggered"
+
+  post-deploy-check:
+    name: ✅ Post-Deploy Health Check
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, deploy-backend]
+    if: always() && secrets.PRODUCTION_URL != ''
+    steps:
+      - name: Wait for deploy
+        run: sleep 30
+      - name: Check production health
+        run: |
+          HEALTH=$(curl -sf "${{ secrets.PRODUCTION_URL }}/health" || echo '{"status":"unreachable"}')
+          echo "Production health: $HEALTH"
+          echo $HEALTH | grep -q '"ok"' && echo "✓ Production is healthy" || echo "⚠ Production may need attention"
