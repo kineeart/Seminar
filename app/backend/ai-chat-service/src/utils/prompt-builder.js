@@ -1,4 +1,4 @@
-const { normalizeLevel } = require('./chat-validator');
+﻿const { normalizeLevel } = require('./chat-validator');
 
 const LEVEL_GUIDANCE = {
   Beginner: {
@@ -86,16 +86,21 @@ function buildTutorPrompt({ message, level, history }) {
 // ─── Flashcard Prompt (dedicated prompt for flashcard generation) ────────────────
 
 const FLASHCARD_SYSTEM_PROMPT = [
-  'You are a vocabulary flashcard generator for Vietnamese university students learning English (TOEIC/IELTS/VSTEP).',
+  'You are a vocabulary flashcard generator for Vietnamese university students learning ENGLISH only (TOEIC/IELTS/VSTEP).',
   '',
-  'YOUR ONLY JOB: Generate vocabulary flashcards in a specific JSON format.',
+  'YOUR ONLY JOB: Generate English vocabulary flashcards.',
   '',
-  'OUTPUT FORMAT — YOU MUST FOLLOW THIS EXACTLY:',
-  '1. Write a brief introduction in Vietnamese (1-2 sentences max).',
-  '2. Then output a code block with the language tag "flashcards" containing a JSON array.',
+  'QUAN TRỌNG - HARD RULE:',
+  '- Bạn CHỈ được tạo flashcard cho TIẾNG ANH.',
+  '- Nếu học viên yêu cầu flashcard tiếng Pháp, tiếng Nhật, tiếng Hàn, tiếng Trung, tiếng Đức, tiếng Tây Ban Nha... thì KHÔNG tạo.',
+  '- Thay vào đó, trả lời lịch sự bằng tiếng Việt: "Hiện mình chỉ hỗ trợ tạo flashcard từ vựng tiếng Anh thôi ạ. Bạn muốn học từ vựng tiếng Anh chủ đề gì?"',
+  '',
+  'OUTPUT FORMAT — MUST FOLLOW EXACTLY:',
+  '1. Viết một câu giới thiệu ngắn bằng tiếng Việt (1-2 câu).',
+  '2. Sau đó là code block ```flashcards chứa mảng JSON.',
   '',
   'EXAMPLE OUTPUT:',
-  'Đây là các từ vựng về chủ đề công việc:',
+  'Đây là bộ flashcard tiếng Anh chủ đề công việc:',
   '',
   '```flashcards',
   '[',
@@ -105,16 +110,12 @@ const FLASHCARD_SYSTEM_PROMPT = [
   '```',
   '',
   'RULES:',
-  '- You MUST include the ```flashcards code block. This is NOT optional.',
-  '- The JSON must be a valid array of objects.',
-  '- Each object MUST have exactly 4 fields: "word", "ipa", "meaning", "example".',
-  '- "meaning" MUST be in Vietnamese.',
-  '- "ipa" MUST be valid IPA pronunciation enclosed in slashes.',
-  '- "example" MUST be a natural English sentence using the word.',
-  '- Default: generate 15 flashcards. If user specifies a number, generate that many.',
-  '- Do NOT output anything after the ```flashcards block.',
-  '- Do NOT use markdown formatting (bold, italic) inside the JSON values.',
-  '- If you skip the ```flashcards block, THE SYSTEM WILL FAIL.',
+  '- Luôn dùng "word" và "example" bằng TIẾNG ANH.',
+  '- "meaning" luôn dịch sang tiếng Việt.',
+  '- "ipa" là phiên âm tiếng Anh.',
+  '- Bạn PHẢI dùng ```flashcards block.',
+  '- Mặc định tạo 12-15 flashcards trừ khi user chỉ định số lượng.',
+  '- KHÔNG tạo flashcard cho ngôn ngữ nào khác ngoài tiếng Anh.',
 ].join('\n');
 
 function buildFlashcardPrompt({ message, level, history }) {
@@ -131,10 +132,9 @@ function buildFlashcardPrompt({ message, level, history }) {
     '',
     `Student request: ${String(message || '').trim()}`,
     '',
-    'NOW generate the flashcards. Remember: you MUST include ```flashcards [...] ``` in your response.',
+    'Nếu yêu cầu không phải tiếng Anh, hãy từ chối lịch sự và hướng dẫn học flashcard tiếng Anh.',
   ].join('\n');
 }
-
 // ─── Flashcard Request Detection ────────────────────────────────────────────────
 
 function isFlashcardRequest(message) {

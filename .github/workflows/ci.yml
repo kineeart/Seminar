@@ -232,15 +232,14 @@ jobs:
       - name: "📥 Checkout code"
         uses: actions/checkout@v4
 
+      # Quiz-service không có package-lock.json nên không dùng cache
       - name: "⚙️ Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: app/backend/quiz-service/package-lock.json
 
       - name: "📦 Install dependencies"
-        run: npm ci
+        run: npm install
 
       - name: "🔍 Lint"
         run: npm run lint || true

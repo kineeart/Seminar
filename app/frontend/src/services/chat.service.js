@@ -34,9 +34,17 @@ export const chatService = {
     })
   },
 
-  listConversations: () => api.get('/chat/conversations'),
+  listConversations: (userId) => {
+    const uid = userId || window.localStorage.getItem('userId')
+    if (!uid) return Promise.resolve({ conversations: [] })
+    return api.get(`/chat/conversations?userId=${encodeURIComponent(uid)}`)
+  },
 
-  getConversation: (conversationId) => api.get(`/chat/conversations/${conversationId}`),
+  getConversation: (conversationId) => {
+    const userId = window.localStorage.getItem('userId')
+    const params = userId ? `?userId=${encodeURIComponent(userId)}` : ''
+    return api.get(`/chat/conversations/${conversationId}${params}`)
+  },
 }
 
 export default chatService

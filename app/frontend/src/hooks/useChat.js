@@ -1,46 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import chatService from '../services/chat.service'
 
-const CHAT_STORAGE_KEY = 'chat_state_knowledge_v1'
-
 export default function useChat() {
   const { user } = useAuth()
-  const initialState = useMemo(() => {
-    try {
-      const raw = window.localStorage.getItem(CHAT_STORAGE_KEY)
-      if (!raw) return null
-      const parsed = JSON.parse(raw)
-      if (!Array.isArray(parsed.messages) || !parsed.messages.length) return null
-      return parsed
-    } catch (_err) {
-      return null
-    }
-  }, [])
 
-  const [messages, setMessages] = useState(initialState?.messages || [
+  const [messages, setMessages] = useState([
     { id: 1, role: 'ai', text: 'Hi! Ask me anything about English, TOEIC, IELTS, or daily communication.' },
   ])
-  const [input, setInput] = useState(initialState?.input || '')
+  const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [mode, setMode] = useState(initialState?.mode || 'knowledge')
-  const [conversationId, setConversationId] = useState(initialState?.conversationId || null)
+  const [mode, setMode] = useState('knowledge')
+  const [conversationId, setConversationId] = useState(null)
   const [pendingFlashcards, setPendingFlashcards] = useState([])
   const [conversationList, setConversationList] = useState([])
   const [historyOpen, setHistoryOpen] = useState(false)
   const [historyLoading, setHistoryLoading] = useState(false)
 
-  useEffect(() => {
-    const snapshot = {
-      messages,
-      input,
-      mode,
-      conversationId,
-      pendingFlashcards,
-    }
-    window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(snapshot))
-  }, [messages, input, mode, conversationId])
-
+  // Khi bấm vào history item → load conversation cũ từ server
   const loadConversationList = useCallback(async () => {
     const userId = user?.id || window.localStorage.getItem('userId')
     if (!userId) return
