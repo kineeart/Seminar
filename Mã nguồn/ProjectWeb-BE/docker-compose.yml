@@ -1,0 +1,232 @@
+services:
+  #Redis
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    #    command: redis-server --save 20 1 --loglevel warning
+    command: redis-server --bind 0.0.0.0 --protected-mode no
+    volumes:
+      - cache:/data
+    networks:
+      - app-network
+  #MongoDB
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+  #Prometheus
+  prometheus:
+    image: prom/prometheus
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+  #Zipkin
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - app-network
+  #Kafka
+  kafka:
+    image: apache/kafka:3.7.0
+    container_name: kafka
+    hostname: kafka
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - CLUSTER_ID=WnLkTHhkQaiJbwP8FClPhw
+      - KAFKA_RECOVERY_MODE_ENABLED=true
+      - KAFKA_LOG_RETENTION_HOURS=1
+      - KAFKA_LOG_RETENTION_BYTES=1073741824
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    extra_hosts:
+      - "kafka:127.0.0.1"
+    networks:
+      - app-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=kafka-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      # - KAFKA_CLUSTERS_0_SCHEMAREGISTRY=http://localhost:8081 # Optional, if you have a schema registry
+    networks:
+      - app-network
+
+#Eureka-Server
+  eureka-server:
+    build: ./eureka-server
+    image: eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=eureka-server
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+
+#User-service
+  user-service:
+    image: user-service
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+      - redis
+      - eureka-server
+      - zipkin
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+
+#Product-service
+  product-service:
+    image: product-service
+    build: ./product-service
+    container_name: product-service
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+      - eureka-server
+      - zipkin
+      - redis
+      - kafka
+      - kafka-ui
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+  #Order-service
+  order-service:
+    image: order-service
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "8083:8083"
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+      - eureka-server
+      - zipkin
+      - redis
+      - kafka
+      - kafka-ui
+      - product-service
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/database
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+#Notification-service
+  notification-service:
+    image: notification-service
+    build: ./notification-service
+    container_name: notification-service
+    ports:
+      - "8084:8084"
+    networks:
+      - app-network
+    depends_on:
+      - kafka
+      - kafka-ui
+      - eureka-server
+      - zipkin
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
+
+#Payment-service
+  payment-service:
+    image: payment-service
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8085:8085"
+    networks:
+      - app-network
+    depends_on:
+      - eureka-server
+      - zipkin
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+
+#Api-gateway
+  api-gateway:
+    image: api-gateway
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8181:8181"
+    depends_on:
+      - eureka-server
+      - redis
+    environment:
+      - FRONTEND_ALLOWED_ORIGINS=http://localhost:5173,http://frontend:5173
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  cache:
+    driver: local
+  kafka-data:
+    driver: local
